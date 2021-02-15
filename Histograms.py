@@ -58,6 +58,7 @@ def comparison(A, B, Eta=True, Phi=True, Rapidity=True, R=True ):
     
     return (dEta, dPhi, dRapidity, dR)
 
+
 from ROOT import TFile, TH1F, TBranch
 
 outfile=TFile("GenParticles.root","RECREATE")
@@ -217,7 +218,8 @@ for n in range(Events):
             # Electrons
             if particle.PID == 11:
                 BeamElectron = particle
-
+#                 print('Event', n, ' Particle ', particle.PID, ' Status', particle.Status, 'E', particle.E, 'PT', particle.PT, ' Eta', particle.Eta, ' Phi', particle.Phi)
+                    
         # Final state particles                
         elif particle.Status == 1:
             
@@ -230,8 +232,6 @@ for n in range(Events):
                 # Adding the electron to the sorting list 
                 ElectronPT.append( (particle.PT, particle) )
                 
-
-
             # Selecting positrons
             elif particle.PID == -11:
                 # Adding the particle to the final state list
@@ -247,17 +247,11 @@ for n in range(Events):
                 # Adding the muon to the sorting list                 
                 MuonPT.append( (particle.PT, particle) )      
                 
-
+            # Selecting neutrinos
+            elif abs(particle.PID) == 12 or abs(particle.PID) == 14:
+                 FinalLeptons.append(particle)
                 
-        # Selecting outgoing protons
-        # 0 < PID < 11 are quarks 
-        if (0<particle.PID<11) :
-
-            Proton_Outgoing_Eta.Fill(particle.Eta)
-            Proton_Outgoing_Phi.Fill(particle.Phi)
-            Proton_Outgoing_Rapidity.Fill(particle.Rapidity)
-            Proton_Outgoing_PT.Fill(particle.PT)    
-    
+            
     # Loop through generated Jets
     for i in range(branchGenJets.GetEntries()):
         jet = branchGenJets.At(i)
@@ -274,16 +268,15 @@ for n in range(Events):
             
             # Small Delta corresponds to overlap between the jet and the particle
             Delta = (JetLepton[0]**2 + JetLepton[1]**2)**0.5
-            
+           
             # If the jet overlaps with this particle:
             if Delta < 0.4:
                 Overlap += 1
-        
+                
         # Jet discared if it overlaps with any particles
         if Overlap == 0:
             jet_count += 1
             JetPT.append( ( jet.PT, jet) )
-    
     
     # Sorts ElectronPT based on the 1st element in each tuple in ascending order
     ElectronPT_sorted = sorted(ElectronPT, key=lambda x: x[0])
@@ -359,7 +352,7 @@ for n in range(Events):
         Jet_Leading_Eta.Fill(LeadingJet.Eta)
         Jet_Leading_Phi.Fill(LeadingJet.Phi)
         # Jet doesnt have a Rapidality
-    #     Jet_Leading_Rapidity.Fill(LeadingJet.Rapidity)
+#         Jet_Leading_Rapidity.Fill(LeadingJet.Rapidity)
         Jet_Leading_PT.Fill(LeadingJet.PT) 
         
         if len(JetPT) >=2:
@@ -370,27 +363,32 @@ for n in range(Events):
                 Jet_SubLeading_Eta.Fill(SubLeadingJet.Eta)
                 Jet_SubLeading_Phi.Fill(SubLeadingJet.Phi)
                 # Jet doesnt have a Rapidality
-            #     Jet_SubLeading_Rapidity.Fill(SubLeadingJet.Rapidity)
+#                 Jet_SubLeading_Rapidity.Fill(SubLeadingJet.Rapidity)
                 Jet_SubLeading_PT.Fill(SubLeadingJet.PT)     
 
     
     # Accounting for beam final state electron, boson muons and beam final state jet
-    ElectronCount.Fill(e_count-1)
-    MuonCount.Fill(mu_count-2)
-    JetCount.Fill(jet_count-1)
+    ElectronCount.Fill(e_count)
+    MuonCount.Fill(mu_count)
+    JetCount.Fill(jet_count)
     
     # QSquared of the event
     
     FinalElectron_P = (FinalElectron.E,  FinalElectron.Px, FinalElectron.Py, FinalElectron.Pz)
-    BeamElectron_P = (BeamElectron.E,  BeamElectron.Px, BeamElectron.Py, BeamElectron.Pz)
+    BeamElectron_P = (BeamElectron.E,  BeamElectron.Px, BeamElectron.Py, BeamElectron.Pz)  
     
     # q = FinalElectron_P - BeamElectron_P (for each element)
     q = tuple(x-y for x,y in zip(FinalElectron_P, BeamElectron_P))
-    # Q2 = - q.q = p^2 - E^2
-    Q2 = (q[1]**2 + q[2]**2 + q[3]**2) - q[0]**2
+    # Q2 = - q.q = E^2 - p^2
+    Q2 = abs( q[0]**2 - (q[1]**2 + q[2]**2 + q[3]**2) )
     
+#     FinalElectron_Theta = TMath.ATan(FinalElectron.CtgTheta)
+#     Q2 = abs( 2*FinalElectron.E*BeamElectron.E*( 1 + TMath.Cos(FinalElectron_Theta)) )  
+    
+#     print('Event', n, ' Final Electron:', FinalElectron_P, ' Beam Electron:', BeamElectron_P, ' Q2', Q2)
     QSquared.Fill(Q2)
-#     print('(Outgoing e, Beam e)',  (Electron_Outgoing_P, Electron_Beam_P), '\n q', q, '\n p^2', (q[1]**2 + q[2]**2 + q[3]**2), '\n Q2', Q2)
+    
+    
     
     # Comparing the leading muons
     MuonMuon = comparison(LeadingMuon, SubLeadingMuon)
