@@ -7,7 +7,7 @@ ROOT.gSystem.Load("libDelphes")
 ROOT.gInterpreter.Declare('#include "classes/DelphesClasses.h"')
 ROOT.gInterpreter.Declare('#include "external/ExRootAnalysis/ExRootTreeReader.h"')
 
-filename = "Muon_Decays/tag_1_delphes_events.root"
+filename = "tag_1_delphes_events.root"
 # filename = "Electron/tag_1_pythia_events.root"
 # filename = "Neutrino/tag_1_pythia_events..root"
 
@@ -86,7 +86,7 @@ PhiMax = 3.5
 RapidityMin = -20
 RapidityMax = 20
 PTMin = -200
-PTMax = 200
+PTMax = 300
 
 # Outgoing beam electrons
 FinalElectron_Eta = TH1F("FinalElectron_Eta", "FinalElectron_Eta;Eta;Frequency", Nbins, EtaMin, EtaMax)
@@ -130,11 +130,6 @@ NonBosonMuon_Plus_Phi = TH1F("NonBosonMuon_Plus_Phi", "NonBosonMuon_Plus_Phi;Eta
 NonBosonMuon_Plus_Rapidity = TH1F("NonBosonMuon_Plus_Rapidity", "NonBosonMuon_Plus_Rapidity;Eta;Frequency", Nbins, RapidityMin, RapidityMax)
 NonBosonMuon_Plus_PT = TH1F("NonBosonMuon_Plus_PT", "NonBosonMuon_Plus_PT;Eta;Frequency", Nbins, PTMin, PTMax) 
 
-# Outgoing beam quarks
-Proton_Outgoing_Eta = TH1F("Proton_Outgoing_Eta", "Proton_Outgoing_Eta;Eta;Frequency", Nbins, EtaMin, EtaMax)
-Proton_Outgoing_Phi = TH1F("Proton_Outgoing_Phi", "Proton_Outgoing_Phi;Phi;Frequency", Nbins, PhiMin, PhiMax)
-Proton_Outgoing_Rapidity = TH1F("Proton_Outgoing_Rapidity", "Proton_Outgoing_Rapidity;Rapidity;Frequency", Nbins, RapidityMin, RapidityMax)
-Proton_Outgoing_PT = TH1F("Proton_Outgoing_PT", "Proton_Outgoing_PT;PT;Frequency", Nbins, PTMin, PTMax)
 
 # Outgoing leading jets
 Jet_Leading_Eta = TH1F("Jet_Leading_Eta", "Jet_Leading_EtaEta;Frequency", Nbins, EtaMin, EtaMax)
@@ -149,7 +144,7 @@ Jet_SubLeading_Rapidity = TH1F("Jet_SubLeading_Rapidity", "Jet_SubLeading_Rapidi
 Jet_SubLeading_PT = TH1F("Jet_SubLeading_PT", "Jet_SubLeading_PT;PT;Frequency", Nbins, PTMin, PTMax)
 
 Q2Min = 0
-Q2Max = 1000000
+Q2Max = 200000
 
 QSquared = TH1F("QSquared", "QSquared;Q2;Frequency", Nbins, Q2Min, Q2Max)
 
@@ -211,24 +206,20 @@ for n in range(Events):
     for i in range(branchParticle.GetEntries()) :
         particle = branchParticle.At(i)        
                     
-        # Status=4 are outgoing particles of the hardest subprocess    
-        # Beam particles
-        if particle.Status == 4:         
-            
-            # Electrons
-            if particle.PID == 11:
-                BeamElectron = particle
-#                 print('Event', n, ' Particle ', particle.PID, ' Status', particle.Status, 'E', particle.E, 'PT', particle.PT, ' Eta', particle.Eta, ' Phi', particle.Phi)
+        # i == 0 corresponds to beam quark
+        # i == 1 corresponds to beam electron
+        if i == 1:         
+            BeamElectron = particle
                     
         # Final state particles                
-        elif particle.Status == 1:
+        if particle.Status == 1:
             
             # Electrons
             if particle.PID == 11:
                 # Adding the particle to the final state list
                 FinalLeptons.append(particle)                
                 e_count += 1
-                
+
                 # Adding the electron to the sorting list 
                 ElectronPT.append( (particle.PT, particle) )
                 
