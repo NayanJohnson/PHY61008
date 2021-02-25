@@ -1,22 +1,27 @@
-import ROOT
+from ROOT import gSystem, gInterpreter
 
 # Path of Delphes directory 
-ROOT.gSystem.AddDynamicPath("/home/nayan/MG5_aMC_v2_8_2/Delphes/")
-ROOT.gSystem.Load("libDelphes")
+# Personal laptop path
+gSystem.AddDynamicPath("/home/nayan/MG5_aMC_v2_8_2/Delphes/")
+# Cluster path
+# ROOT.gSystem.AddDynamicPath("/home/johnson/MG5_aMC_v2_4_3/Delphes/")
+gSystem.Load("libDelphes")
 
-ROOT.gInterpreter.Declare('#include "classes/DelphesClasses.h"')
-ROOT.gInterpreter.Declare('#include "external/ExRootAnalysis/ExRootTreeReader.h"')
+gInterpreter.Declare('#include "classes/DelphesClasses.h"')
+gInterpreter.Declare('#include "external/ExRootAnalysis/ExRootTreeReader.h"')
 
 filename = "tag_1_delphes_events.root"
 # filename = "Electron/tag_1_pythia_events.root"
 # filename = "Neutrino/tag_1_pythia_events..root"
 
+from ROOT import TChain, ExRootTreeReader 
+
 # Create chain of root trees 
-chain = ROOT.TChain("Delphes")
+chain = TChain("Delphes")
 chain.Add(filename)
 
 # Create object of class ExRootTreeReader
-myTree = ROOT.ExRootTreeReader(chain)
+myTree = ExRootTreeReader(chain)
 Events = myTree.GetEntries()
 
 # Get pointers to branches used in this analysis
@@ -26,15 +31,15 @@ branchMissingET = myTree.UseBranch("MissingET")
 
 from ROOT import TMath
 
-def comparison(A, B, Eta=True, Phi=True, Rapidity=True, R=True ):
+def comparison(A, B, Eta=True, Phi=True, Rapidity=True, R_Eta=True, R_Rap=True ):
     '''
-    Given two particles will compute dEta, dPhi, dRapidty and dR
+    Given two particles will compute dEta, dPhi, dRapidty and two different versions of dR (one using dEta and one using dRapidity)
     A, B = Particle branch
     Eta, Phi, Rapidity, R = what comparisons to compute
     '''
     
     # Default values
-    dEta, dPhi, dRapidity, dR = 0, 0, 0, 0
+    dEta, dPhi, dRapidity, dR_Eta, dR_Rap = 'NA', 'NA', 'NA', 'NA', 'NA'
     Pi = TMath.Pi()
     
     
@@ -52,11 +57,14 @@ def comparison(A, B, Eta=True, Phi=True, Rapidity=True, R=True ):
     
     if Rapidity:
         dRapidity = A.Rapidity - B.Rapidity
-        
-    if R and Phi and Rapidity:
-        dR = (dPhi**2 + dRapidity**2)**0.5
     
-    return (dEta, dPhi, dRapidity, dR)
+    if R_Eta and Phi and Eta:
+        dR_Eta = (dPhi**2 + dEta**2)**0.5
+        
+    if R_Rap and Phi and Rapidity:
+        dR_Rap = (dPhi**2 + dRapidity**2)**0.5
+    
+    return (dEta, dPhi, dRapidity, dR_Eta, dR_Rap)
 
 
 from ROOT import TFile, TH1F, TBranch
@@ -130,7 +138,6 @@ NonBosonMuon_Plus_Phi = TH1F("NonBosonMuon_Plus_Phi", "NonBosonMuon_Plus_Phi;Eta
 NonBosonMuon_Plus_Rapidity = TH1F("NonBosonMuon_Plus_Rapidity", "NonBosonMuon_Plus_Rapidity;Eta;Frequency", Nbins, RapidityMin, RapidityMax)
 NonBosonMuon_Plus_PT = TH1F("NonBosonMuon_Plus_PT", "NonBosonMuon_Plus_PT;Eta;Frequency", Nbins, PTMin, PTMax) 
 
-
 # Outgoing leading jets
 Jet_Leading_Eta = TH1F("Jet_Leading_Eta", "Jet_Leading_EtaEta;Frequency", Nbins, EtaMin, EtaMax)
 Jet_Leading_Phi = TH1F("Jet_Leading_Phi", "Jet_Leading_Phi;Phi;Frequency", Nbins, PhiMin, PhiMax)
@@ -160,17 +167,21 @@ dRMax = 10
 MuonMuon_dEta = TH1F("MuonMuon_dEta", "MuonMuon_dEta;dEta;Frequency", Nbins, EtaMin, EtaMax)
 MuonMuon_dPhi = TH1F("MuonMuon_dPhi", "MuonMuon_dPhi;dPhi;Frequency", Nbins, PhiMin, PhiMax)
 MuonMuon_dRapidity = TH1F("MuonMuon_dRapidity", "MuonMuon_dRapidity;dRapidity;Frequency", Nbins, RapidityMin, RapidityMax)
-MuonMuon_dR = TH1F("MuonMuon_dR", "MuonMuon_dR;dR;Frequency", Nbins, dRMin, dRMax)
+MuonMuon_dR_Eta = TH1F("MuonMuon_dR_Eta", "MuonMuon_dR_Eta;dR_Eta;Frequency", Nbins, dRMin, dRMax)
+MuonMuon_dR_Rap = TH1F("MuonMuon_dR_Rap", "MuonMuon_dR_Rap;dR_Rap;Frequency", Nbins, dRMin, dRMax)
+
 
 ElectronLeadingMuon_dEta = TH1F("ElectronLeadingMuon_dEta", "ElectronLeadingMuon_dEta;dEta;Frequency", Nbins, EtaMin, EtaMax)
 ElectronLeadingMuon_dPhi = TH1F("ElectronLeadingMuon_dPhi", "ElectronLeadingMuon_dPhi;dPhi;Frequency", Nbins, PhiMin, PhiMax)
 ElectronLeadingMuon_dRapidity = TH1F("ElectronLeadingMuon_dRapidity", "ElectronLeadingMuon_dRapidity;dRapidity;Frequency", Nbins, RapidityMin, RapidityMax)
-ElectronLeadingMuon_dR = TH1F("ElectronLeadingMuon_dR", "ElectronLeadingMuon_dR;dR;Frequency", Nbins, dRMin, dRMax)
+ElectronLeadingMuon_dR_Eta = TH1F("ElectronLeadingMuon_dR_Eta", "ElectronLeadingMuon_dR_Eta;dR_Eta;Frequency", Nbins, dRMin, dRMax)
+ElectronLeadingMuon_dR_Rap = TH1F("ElectronLeadingMuon_dR_Rap", "ElectronLeadingMuon_dR_Rap;dR_Rap;Frequency", Nbins, dRMin, dRMax)
 
 ElectronSubLeadingMuon_dEta = TH1F("ElectronSubLeadingMuon_dEta", "ElectronSubLeadingMuon_dEta;dEta;Frequency", Nbins, EtaMin, EtaMax)
 ElectronSubLeadingMuon_dPhi = TH1F("ElectronSubLeadingMuon_dPhi", "ElectronSubLeadingMuon_dPhi;dPhi;Frequency", Nbins, PhiMin, PhiMax)
 ElectronSubLeadingMuon_dRapidity = TH1F("ElectronSubLeadingMuon_dRapidity", "ElectronSubLeadingMuon_dRapidity;dRapidity;Frequency", Nbins, RapidityMin, RapidityMax)
-ElectronSubLeadingMuon_dR = TH1F("ElectronSubLeadingMuon_dR", "ElectronSubLeadingMuon_dR;dR;Frequency", Nbins, dRMin, dRMax)
+ElectronSubLeadingMuon_dR_Eta = TH1F("ElectronSubLeadingMuon_dR_Eta", "ElectronSubLeadingMuon_dR_Eta;dR_Eta;Frequency", Nbins, dRMin, dRMax)
+ElectronSubLeadingMuon_dR_Rap = TH1F("ElectronSubLeadingMuon_dR_Rap", "ElectronSubLeadingMuon_dR_Rap;dR_Rap;Frequency", Nbins, dRMin, dRMax)
 
 METMin = 0
 METMax = 500
@@ -243,7 +254,7 @@ for n in range(Events):
                  FinalLeptons.append(particle)
                 
             
-    # Loop through generated Jets
+        # Loop through generated Jets
     for i in range(branchGenJets.GetEntries()):
         jet = branchGenJets.At(i)
         
@@ -255,13 +266,11 @@ for n in range(Events):
             
             # Only need dEta and dPhi
             # JetLepton = comparison(A=jet, B=particle, dEta=True, dPhi=True, dRapidity=False, dR=False)
-            JetLepton = comparison(jet, particle, True, True, False, False)
+            JetLepton = comparison(jet, particle, True, True, False, True, False)
             
-            # Small Delta corresponds to overlap between the jet and the particle
-            Delta = (JetLepton[0]**2 + JetLepton[1]**2)**0.5
-           
+            # Small dR corresponds to overlap between the jet and the particle           
             # If the jet overlaps with this particle:
-            if Delta < 0.4:
+            if JetLepton[3] < 0.4:
                 Overlap += 1
                 
         # Jet discared if it overlaps with any particles
@@ -387,7 +396,8 @@ for n in range(Events):
     MuonMuon_dEta.Fill(MuonMuon[0])
     MuonMuon_dPhi.Fill(MuonMuon[1])
     MuonMuon_dRapidity.Fill(MuonMuon[2])
-    MuonMuon_dR.Fill( MuonMuon[3] )
+    MuonMuon_dR_Eta.Fill( MuonMuon[3] )
+    MuonMuon_dR_Rap.Fill( MuonMuon[4] )
     
     # Comparing the electron and leading muon
     ElectronLeadingMuon = comparison(FinalElectron, LeadingMuon)
@@ -395,16 +405,18 @@ for n in range(Events):
     ElectronLeadingMuon_dEta.Fill(ElectronLeadingMuon[0])
     ElectronLeadingMuon_dPhi.Fill(ElectronLeadingMuon[1])
     ElectronLeadingMuon_dRapidity.Fill(ElectronLeadingMuon[2])
-    ElectronLeadingMuon_dR.Fill( ElectronLeadingMuon[3] )
-
+    ElectronLeadingMuon_dR_Eta.Fill( ElectronLeadingMuon[3] )
+    ElectronLeadingMuon_dR_Rap.Fill( ElectronLeadingMuon[4] )
+    
     # Comparing the electron and subleading muon
     ElectronSubLeadingMuon = comparison(FinalElectron, SubLeadingMuon)
 
     ElectronSubLeadingMuon_dEta.Fill(ElectronSubLeadingMuon[0])
     ElectronSubLeadingMuon_dPhi.Fill(ElectronSubLeadingMuon[1])
     ElectronSubLeadingMuon_dRapidity.Fill(ElectronSubLeadingMuon[2])
-    ElectronSubLeadingMuon_dR.Fill( ElectronSubLeadingMuon[3] )
-
+    ElectronSubLeadingMuon_dR_Eta.Fill( ElectronSubLeadingMuon[3] )
+    ElectronSubLeadingMuon_dR_Rap.Fill( ElectronSubLeadingMuon[4] )
+    
     # Comparing the leading jets (Should first impliment jet cuts)
 #     MuonMuon = [
 #         LeadingMuon.Eta - SubLeadingMuon.Eta, #dEta
