@@ -34,7 +34,7 @@ def comparison(A, B, Eta=True, Phi=True, Rapidity=True, R=True ):
     '''
     
     # Default values
-    dEta, dPhi, dRapidity, dR = 0, 0, 0, 0
+    dEta, dPhi, dRapidity, dR = 'NA', 'NA', 'NA', 'NA'
     Pi = TMath.Pi()
     
     
@@ -53,8 +53,8 @@ def comparison(A, B, Eta=True, Phi=True, Rapidity=True, R=True ):
     if Rapidity:
         dRapidity = A.Rapidity - B.Rapidity
         
-    if R and Phi and Rapidity:
-        dR = (dPhi**2 + dRapidity**2)**0.5
+    if R and Phi and Eta:
+        dR = (dPhi**2 + dEta**2)**0.5
     
     return (dEta, dPhi, dRapidity, dR)
 
@@ -204,8 +204,8 @@ for n in range(Events):
     JetPT = []
     
     # Tuples for the components of the electron beam incoming and outgoing 4vectors
-    BeamElectron_P = (0 , 0, 0, 0)
-    FinalElectron_P = (0 , 0, 0, 0)
+    BeamElectron_P = (0, 0, 0, 0)
+    FinalElectron_P = (0, 0, 0, 0)
     
     # Loop through generated particles
     for i in range(branchParticle.GetEntries()) :
@@ -264,13 +264,11 @@ for n in range(Events):
             
             # Only need dEta and dPhi
             # JetLepton = comparison(A=jet, B=particle, dEta=True, dPhi=True, dRapidity=False, dR=False)
-            JetLepton = comparison(jet, particle, True, True, False, False)
+            JetLepton = comparison(jet, particle, True, True, False, True)
             
-            # Small Delta corresponds to overlap between the jet and the particle
-            Delta = (JetLepton[0]**2 + JetLepton[1]**2)**0.5
-           
+            # Small dR corresponds to overlap between the jet and the particle           
             # If the jet overlaps with this particle:
-            if Delta < 0.4:
+            if JetLepton[3] < 0.4:
                 Overlap += 1
                 
         # Jet discared if it overlaps with any particles
