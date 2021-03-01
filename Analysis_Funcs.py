@@ -36,7 +36,7 @@ def LoadROOT(filename):
                     'Branches'  :   {
                         'Particle'          :   branchParticle,
                         'GenJets'           :   branchGenJets,
-                        'branchMissingET'   :   branchMissingET
+                        'MissingET'   :   branchMissingET
                     }
                 }
 
@@ -62,14 +62,14 @@ def Histograms(name, Nbins=200, HistVariables=['Eta', 'Phi', 'Rapidity', 'PT'], 
     for i in range(len(HistVariables)):
         
         variable = str(HistVariables[i])
-        h = TH1F(str(name)+'_'+variable, str(name)+'_'+variable+';'+variable+';Frequency', NBins, HistLims[i][0], HistLims[i][1])
+        h = TH1F(str(name)+'_'+variable, str(name)+'_'+variable+';'+variable+';Frequency', Nbins, HistLimits[i][0], HistLimits[i][1])
         Hists.append(h)
 
     
     return Hists
 
 
-def comparison(A, B, Eta=True, Phi=True, Rapidity=True, R_Eta=True, R_Rap=True ):
+def Comparison(A, B, Eta=True, Phi=True, Rapidity=True, R_Eta=True, R_Rap=True):
     '''
     Given two particles will compute dEta, dPhi, dRapidty and two different versions of dR (one using dEta and one using dRapidity)
     A, B = Particle branch
@@ -102,9 +102,25 @@ def comparison(A, B, Eta=True, Phi=True, Rapidity=True, R_Eta=True, R_Rap=True )
     if R_Rap and Phi and Rapidity:
         dR_Rap = (dPhi**2 + dRapidity**2)**0.5
     
+
     return (dEta, dPhi, dRapidity, dR_Eta, dR_Rap)
 
+def InvMass(Particles):
+    '''
+    Given a list of particles, will calculate the invariant mass.
+    '''
 
+    Momenta = []
+    for particle in Particles:
+        Momenta.append((particle.E, particle.Px, particle.Py, particle.Pz))
+
+    ESum = sum([x[0] for x in Momenta])
+    PxSum = sum([x[1] for x in Momenta])
+    PySum = sum([x[2] for x in Momenta])
+    PzSum = sum([x[3] for x in Momenta])
+    
+    InvMass = ( ESum**2 - PxSum**2 - PySum**2 - PzSum**2 )**0.5
+    return InvMass
 
 def ParticleLoop(TreeDict, EventNum):
     '''
@@ -112,43 +128,43 @@ def ParticleLoop(TreeDict, EventNum):
 
     TreeDict['Tree'].ReadEntry(EventNum)
 
+    # Number ot particular particles in eventNbins
+    e_count = 0
+    mu_count = 0
+    jet_count = 0
+    
+    # List of all final state leptons
+    FinalLeptons = []
+    
+    # Lists for sorting by PT in this event
+    ElectronPT = []
+    MuonPT = []
+    JetPT = []
+    
+    
     # Loop through generated particles
-    for p in range(TreeDict['Branches']['Particles'].GetEntries):
-        particle = branchParticle.At(p)
-
-        # Status=4 are outgoing particles of the hardest subprocess    
-        # Beam particles
-        if particle.Status == 4:         
-        
-            # Electrons
-            if particle.PID == 11:
-                BeamElectron = particle
-        
+    for i in range(TreeDict['Branches']['Particle'].GetEntries()) :
+        particle = TreeDict['Branches']['Particle'].At(i)        
+                    
+        # i == 0 corresponds to beam quark
+        # i == 1 corresponds to beam electron
+        if i == 1:         
+            BeamElectron = particle
+                    
         # Final state particles                
-        elif particle.Status == 1:
-
-            # Electrons
-            if particle.PID == 11:
-
+        if particle.Status == 1:
+            
+            # Electrons and positrons
+            if abs(particle.PID) == 11:
                 # Adding the particle to the final state list
                 FinalLeptons.append(particle)                
                 e_count += 1
-                
-                # Adding the electron to the sorting list 
-                ElectronPT.append( (particle.PT, particle) )
-                
-            # Positrons
-            elif particle.PID == -11:
-
-                # Adding the particle to the final state list
-                FinalLeptons.append(particle)       
-                e_count += 1
 
                 # Adding the electron to the sorting list 
                 ElectronPT.append( (particle.PT, particle) )
                 
-            # Selecting mu-
-            elif particle.PID ==  13 or particle.PID == -13:                
+            # Selecting mu
+            elif abs(particle.PID) ==  13:                
                 # Adding the particle to the final state list
                 FinalLeptons.append(particle)              
                 mu_count += 1                
@@ -158,11 +174,12 @@ def ParticleLoop(TreeDict, EventNum):
                 
             # Selecting neutrinos
             elif abs(particle.PID) == 12 or abs(particle.PID) == 14:
-                FinalLeptons.append(particle)
-
+                 FinalLeptons.append(particle)
+                
+            
         # Loop through generated Jets
-    for i in range(branchGenJets.GetEntries()):
-        jet = branchGenJets.At(i)
+    for i in range(TreeDict['Branches']['GenJets'].GetEntries()):
+        jet = TreeDict['Branches']['GenJets'].At(i)
         
         # Keeps track of how many particles the jet overlaps with
         Overlap = 0
@@ -172,13 +189,11 @@ def ParticleLoop(TreeDict, EventNum):
             
             # Only need dEta and dPhi
             # JetLepton = comparison(A=jet, B=particle, dEta=True, dPhi=True, dRapidity=False, dR=False)
-            JetLepton = comparison(jet, particle, True, True, False, False)
+            JetLepton = Comparison(jet, particle, True, True, False, True, False)
             
-            # Small Delta corresponds to overlap between the jet and the particle
-            Delta = (JetLepton[0]**2 + JetLepton[1]**2)**0.5
-        
+            # Small dR corresponds to overlap between the jet and the particle           
             # If the jet overlaps with this particle:
-            if Delta < 0.4:
+            if JetLepton[3] < 0.4:
                 Overlap += 1
                 
         # Jet discared if it overlaps with any particles
@@ -193,12 +208,16 @@ def ParticleLoop(TreeDict, EventNum):
 
     EventDict   =   {
         'Count'     :   {
-            'Electron'
-        }
+            'Electron'  :   e_count,
+            'Muon'      :   mu_count,
+            'Jet'       :   jet_count
+        },
+        'BeamElectron'  :   BeamElectron,
         'PTSorted'  :   {
             'Electron'  :   ElectronPT_sorted,
             'Muon'      :   MuonPT_sorted,
             'Jet'       :   JetPT_sorted
         }
-
     }
+
+    return EventDict
