@@ -71,61 +71,68 @@ def Histograms(name, Nbins=200, HistVariables=['Eta', 'Phi', 'Rapidity', 'PT'], 
 
 def Comparison(A, B, Eta=True, Phi=True, Rapidity=True, R_Eta=True, R_Rap=True):
     '''
-    Given two particles will compute dEta, dPhi, dRapidty and two different versions of dR (one using dEta and one using dRapidity)
+    Given two TLorentzVectors will compute dEta, dPhi, dRapidty and two different versions of dR (one using dEta and one using dRapidity)
     A, B = Particle branch
     Eta, Phi, Rapidity, R = what comparisons to compute
     '''
     
     # Default values
     dEta, dPhi, dRapidity, dR_Eta, dR_Rap = 'NA', 'NA', 'NA', 'NA', 'NA'
-    Pi = TMath.Pi()
     
     
     if Eta:
-        dEta = A.Eta - B.Eta
-        
-    if Phi:
-        dPhi = A.Phi - B.Phi
+        dEta = A.Eta() - B.Eta()
     
-        # Constraining dPhi between -2Pi and 2Pi
-        if dPhi < -Pi:
-            dPhi = dPhi + 2*Pi
-        elif dPhi > Pi:
-            dPhi = dPhi - 2*Pi
+    if Phi:
+        dPhi = A.DeltaPhi(B)
     
     if Rapidity:
-        dRapidity = A.Rapidity - B.Rapidity
+        dRapidity = A.Rapidity() - B.Rapidity()
     
-    if R_Eta and Phi and Eta:
-        dR_Eta = (dPhi**2 + dEta**2)**0.5
+    if R_Eta:
+        # TLorentzVector class has a function for calculating DrEtaPhi
+        dR_Eta = A.DrEtaPhi(B)
         
     if R_Rap and Phi and Rapidity:
-        dR_Rap = (dPhi**2 + dRapidity**2)**0.5
-    
+        # TLorentzVector class has a function for calculating DrRapidityPhi
+        dR_Rap = A.DrEtaPhi(B)
+            
 
     return (dEta, dPhi, dRapidity, dR_Eta, dR_Rap)
 
-def InvMass(Particles):
-    '''
-    Given a list of particles, will calculate the invariant mass.
-    '''
-
-    Momenta = []
-    for particle in Particles:
-        Momenta.append((particle.E, particle.Px, particle.Py, particle.Pz))
-
-    ESum = sum([x[0] for x in Momenta])
-    PxSum = sum([x[1] for x in Momenta])
-    PySum = sum([x[2] for x in Momenta])
-    PzSum = sum([x[3] for x in Momenta])
-    
-    InvMass = ( ESum**2 - PxSum**2 - PySum**2 - PzSum**2 )**0.5
-    return InvMass
-
 def ParticleLoop(TreeDict, EventNum):
     '''
+    Main particle loop.
+    Given a dictionary:
+
+    TreeDict =  {
+        'Tree'      :   myTree,
+        'Events'    :   Events,
+        'Branches'  :   {
+            'Particle'          :   branchParticle,
+            'GenJets'           :   branchGenJets,
+            'MissingET'   :   branchMissingET
+        }
+    } 
+
+    and the event being inspected, will return a dictionary:
+
+    EventDict   =   {
+        'Count'     :   {
+            'Electron'  :   e_count,
+            'Muon'      :   mu_count,
+            'Jet'       :   jet_count
+        },
+        'BeamElectron'  :   BeamElectron,
+        'PTSorted'  :   {
+            'Electron'  :   ElectronPT_sorted,
+            'Muon'      :   MuonPT_sorted,
+            'Jet'       :   JetPT_sorted
+        }
+    }
     '''
 
+    # Reading a specific event 
     TreeDict['Tree'].ReadEntry(EventNum)
 
     # Number ot particular particles in eventNbins
@@ -187,11 +194,12 @@ def ParticleLoop(TreeDict, EventNum):
         # Compare to final state leptons to look for overlap
         for particle in FinalLeptons:
             
-            # Only need dEta and dPhi
-            # JetLepton = comparison(A=jet, B=particle, dEta=True, dPhi=True, dRapidity=False, dR=False)
-            JetLepton = Comparison(jet, particle, True, True, False, True, False)
+            # Only need dR_Eta
+            JetLepton = Comparison(jet.P4(), particle.P4(), Eta=False, Phi=False, Rapidity=False, R_Eta=True, R_Rap=False)
             
-            # Small dR corresponds to overlap between the jet and the particle           
+            # Comparison() returns a list of many comparison vars, dR_Eta is 
+            # the 4th in the list         
+            # Small dR corresponds to overlap between the jet and the particle  
             # If the jet overlaps with this particle:
             if JetLepton[3] < 0.4:
                 Overlap += 1
