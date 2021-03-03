@@ -8,7 +8,7 @@ gSystem.Load("libDelphes")
 gInterpreter.Declare('#include "classes/DelphesClasses.h"')
 gInterpreter.Declare('#include "external/ExRootAnalysis/ExRootTreeReader.h"')
 
-from ROOT import TChain, ExRootTreeReader, TH1F, TMath
+from ROOT import TChain, ExRootTreeReader, TH1F, TLorentzVector
 
 
 def LoadROOT(filename):
@@ -124,6 +124,7 @@ def ParticleLoop(TreeDict, EventNum):
             'Jet'       :   jet_count
         },
         'BeamElectron'  :   BeamElectron,
+        'MissingE_P'   :   MissingE_P,
         'PTSorted'  :   {
             'Electron'  :   ElectronPT_sorted,
             'Muon'      :   MuonPT_sorted,
@@ -143,6 +144,9 @@ def ParticleLoop(TreeDict, EventNum):
     # List of all final state leptons
     FinalLeptons = []
     
+    # Neutrino 4momentum list
+    Neutrinos_P = []
+
     # Lists for sorting by PT in this event
     ElectronPT = []
     MuonPT = []
@@ -181,7 +185,8 @@ def ParticleLoop(TreeDict, EventNum):
                 
             # Selecting neutrinos
             elif abs(particle.PID) == 12 or abs(particle.PID) == 14:
-                 FinalLeptons.append(particle)
+                Neutrinos_P.append(particle.P4())
+                FinalLeptons.append(particle)
                 
             
         # Loop through generated Jets
@@ -214,6 +219,13 @@ def ParticleLoop(TreeDict, EventNum):
     MuonPT_sorted = sorted(MuonPT, key=lambda x: x[0])
     JetPT_sorted = sorted(JetPT, key=lambda x: x[0])
 
+    # MissingE is the sum of all neutrino momenta in the event
+    MissingE_P = TLorentzVector()
+    for neutrino in Neutrinos_P:
+        neutrino.SetPz(0)
+        neutrino.SetE(neutrino.Et())
+        MissingET_P = MissingE_P + neutrino
+
     EventDict   =   {
         'Count'     :   {
             'Electron'  :   e_count,
@@ -221,6 +233,7 @@ def ParticleLoop(TreeDict, EventNum):
             'Jet'       :   jet_count
         },
         'BeamElectron'  :   BeamElectron,
+        'MissingET_P'     :   MissingET_P,
         'PTSorted'  :   {
             'Electron'  :   ElectronPT_sorted,
             'Muon'      :   MuonPT_sorted,

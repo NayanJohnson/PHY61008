@@ -194,9 +194,10 @@ for n in range(myTree['Events']):
     ElectronJetInvMass = (FinalElectron_P + LeadingJet_P).M()
     ElectronJetHist[0].Fill(ElectronJetInvMass)
 
-    # There is only one MissingET entry per event
-    MissingET_P = myTree['Branches']['MissingET'].At(0).P4()    
+    # MissingE
+    MissingET_P = EventDict['MissingET_P']    
     
+    # In the detector, only the transverse components can be resolved
     MissingETHist[0].Fill(MissingET_P.Eta())
     MissingETHist[1].Fill(MissingET_P.Phi())
     MissingETHist[2].Fill(MissingET_P.Rapidity())
