@@ -119,9 +119,9 @@ def ParticleLoop(TreeDict, EventNum):
 
     EventDict   =   {
         'Count'     :   {
-            'Electron'  :   e_count,
-            'Muon'      :   mu_count,
-            'Jet'       :   jet_count
+            'Electrons'  :   e_count,
+            'Muons'      :   mu_count,
+            'Jets'       :   jet_count
         },
         'BeamElectron'  :   BeamElectron,
         'MissingE_P'   :   MissingE_P,
@@ -228,9 +228,9 @@ def ParticleLoop(TreeDict, EventNum):
 
     EventDict   =   {
         'Count'     :   {
-            'Electron'  :   e_count,
-            'Muon'      :   mu_count,
-            'Jet'       :   jet_count
+            'Electrons'  :   e_count,
+            'Muons'      :   mu_count,
+            'Jets'       :   jet_count
         },
         'BeamElectron'  :   BeamElectron,
         'MissingET_P'     :   MissingET_P,
