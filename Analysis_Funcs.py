@@ -1,5 +1,5 @@
 
-from ROOT import gSystem, gInterpreter
+from ROOT import gSystem, gInterpreter, TChain, TH1F, TLorentzVector
 
 # Path of Delphes directory 
 gSystem.AddDynamicPath("/home/nayan/MG5_aMC_v2_8_2/Delphes/")
@@ -8,7 +8,7 @@ gSystem.Load("libDelphes")
 gInterpreter.Declare('#include "classes/DelphesClasses.h"')
 gInterpreter.Declare('#include "external/ExRootAnalysis/ExRootTreeReader.h"')
 
-from ROOT import TChain, ExRootTreeReader, TH1F, TLorentzVector
+from ROOT import ExRootTreeReader
 
 
 def LoadROOT(filename):
@@ -28,7 +28,6 @@ def LoadROOT(filename):
     # Get pointers to branches used in this analysis
     branchParticle = myTree.UseBranch("Particle")
     branchGenJets = myTree.UseBranch("GenJet")
-    branchMissingET = myTree.UseBranch("MissingET")
 
     TreeDict =  {
                     'Tree'      :   myTree,
@@ -124,7 +123,7 @@ def ParticleLoop(TreeDict, EventNum):
             'Jets'       :   jet_count
         },
         'BeamElectron'  :   BeamElectron,
-        'MissingE_P'   :   MissingE_P,
+        'MissingET_P'   :   MissingET_P,
         'PTSorted'  :   {
             'Electron'  :   ElectronPT_sorted,
             'Muon'      :   MuonPT_sorted,
