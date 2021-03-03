@@ -44,7 +44,7 @@ def LoadROOT(filename):
 
 
 
-def Histograms(name, Nbins=200, HistVariables=['Eta', 'Phi', 'Rapidity', 'PT'], HistLimits=[(-10, 10), (-3.5, 3.5), (-10, 10), (-200, 300)]):
+def Histograms(name, Nbins=200, HistVariables=['Eta', 'Phi', 'Rapidity', 'PT'], HistLimits=[(-10, 10), (-3.5, 3.5), (-10, 10), (0, 200)]):
     '''
     Takes:
     - name:str() base name of histogram.
