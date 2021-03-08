@@ -25,7 +25,7 @@ JetCountHist = funcs.Histograms('Jet', HistVariables=['Count'], HistLimits=[(0, 
 
 # Outgoing Beam electron and Q2
 FinalElectronHist = funcs.Histograms('FinalElectron')
-QSquaredHist = funcs.Histograms('QSquared', HistVariables=['Q2'], HistLimits=[(0, 200000)])
+QSquaredHist = funcs.Histograms('QSquared', HistVariables=['Electron', 'Quark'], HistLimits=[(0, 200000), (0, 2000000)])
 
 # Boson Muons by leading and subleading
 LeadingMuonHist = funcs.Histograms('LeadingMuon')
@@ -49,8 +49,9 @@ MuonMuonHist = funcs.Histograms('MuonMuon', HistVariables=ComparisonVars, HistLi
 ElectronLeadingMuonHist = funcs.Histograms('ElectronLeadingMuon', HistVariables=ComparisonVars[0:5], HistLimits=ComparisonLims[0:5])
 ElectronSubLeadingMuonHist = funcs.Histograms('ElectronSubLeadingMuon', HistVariables=ComparisonVars[0:5], HistLimits=ComparisonLims[0:5])
 
+
 # Invariant mass of electron and beam jet
-ElectronJetHist = funcs.Histograms('ElectronJet', HistVariables=['InvMass'], HistLimits=[(0, 800)])
+ElectronJetHist = funcs.Histograms('ElectronJet', HistVariables=['dPhi', 'InvMass'], HistLimits=[(-3.5, 3.5), (0, 800)])
 
 # MissingET hists and dPhi comparisons
 MissingETHist = funcs.Histograms('MissingET', HistVariables=['Eta', 'Phi', 'Rapidity', 'PT', 'MET'], HistLimits=[(-10, 10), (-3.5, 3.5), (-10, 10), (0, 200), (0, 500)])
@@ -77,6 +78,9 @@ for n in range(myTree['Events']):
     BeamElectron = EventDict['BeamElectron']
     BeamElectron_P = BeamElectron.P4()
 
+    BeamQuark = EventDict['BeamQuark']
+    BeamQuark_P = BeamQuark.P4()
+
     # Final electron found from sorted list
     numbElectrons = EventDict['Count']['Electrons']
     for i in range(0, numbElectrons):
@@ -92,12 +96,6 @@ for n in range(myTree['Events']):
             FinalElectronHist[2].Fill(FinalElectron_P.Rapidity())
             FinalElectronHist[3].Fill(FinalElectron_P.Pt())
 
-
-            q = FinalElectron_P - BeamElectron_P
-
-            # For some reason Q2 is always negative?
-            Q2 = abs(q.Mag2())
-            QSquaredHist[0].Fill(Q2)
 
     # Leading and SubLeading muon found from sorted list
     numbMuons = EventDict['Count']['Muons']
@@ -213,7 +211,20 @@ for n in range(myTree['Events']):
                 FourthJetHist[1].Fill(FourthJet_P.Phi())
                 FourthJetHist[2].Fill(FourthJet_P.Rapidity())
                 FourthJetHist[3].Fill(FourthJet_P.Pt())
-        
+    
+    # Two different Q2 calcs
+    if FinalElectronCheck:
+        q_electron = FinalElectron_P - BeamElectron_P
+        # For some reason Q2 is always negative?
+        Q2_electron = abs(q_electron.Mag2())
+        QSquaredHist[0].Fill(Q2_electron)
+
+    if LeadingJetCheck:
+        q_quark = FinalElectron_P - BeamQuark_P
+        # For some reason Q2 is always negative?
+        Q2_quark = abs(q_quark.Mag2())
+        QSquaredHist[1].Fill(Q2_quark)
+
 
     ElectronCountHist[0].Fill(numbElectrons)
     MuonCountHist[0].Fill(numbMuons)
@@ -254,9 +265,11 @@ for n in range(myTree['Events']):
         ElectronSubLeadingMuonHist[4].Fill(ElectronSubLeadingMuon[4])
 
     if FinalElectronCheck and LeadingJetCheck:
-        # Leading jet and electron invariant mass:
+        # Leading jet and electron dPhi and invariant mass:
+        ElectronJet = funcs.Comparison(FinalElectron_P, LeadingJet_P)
         ElectronJetInvMass = (FinalElectron_P + LeadingJet_P).M()
-        ElectronJetHist[0].Fill(ElectronJetInvMass)
+        ElectronJetHist[0].Fill(ElectronJet[1])
+        ElectronJetHist[1].Fill(ElectronJetInvMass)
 
     # MissingET
     MissingET_P = EventDict['MissingET_P']    
