@@ -35,7 +35,6 @@ def LoadROOT(filename):
                     'Branches'  :   {
                         'Particle'          :   branchParticle,
                         'GenJets'           :   branchGenJets,
-                        'MissingET'   :   branchMissingET
                     }
                 }
 
