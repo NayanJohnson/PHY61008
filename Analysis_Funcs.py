@@ -122,6 +122,7 @@ def ParticleLoop(TreeDict, EventNum):
             'Jets'       :   jet_count
         },
         'BeamElectron'  :   BeamElectron,
+        'BeamQuark'     :   BeamQuark,
         'MissingET_P'   :   MissingET_P,
         'PTSorted'  :   {
             'Electron'  :   ElectronPT_sorted,
@@ -156,8 +157,10 @@ def ParticleLoop(TreeDict, EventNum):
         particle = TreeDict['Branches']['Particle'].At(i)        
                     
         # i == 0 corresponds to beam quark
+        if i == 0:
+            BeamQuark = particle
         # i == 1 corresponds to beam electron
-        if i == 1:         
+        elif i == 1:         
             BeamElectron = particle
                     
         # Final state particles                
@@ -231,6 +234,7 @@ def ParticleLoop(TreeDict, EventNum):
             'Jets'       :   jet_count
         },
         'BeamElectron'  :   BeamElectron,
+        'BeamQuark'     :   BeamQuark,
         'MissingET_P'     :   MissingET_P,
         'PTSorted'  :   {
             'Electron'  :   ElectronPT_sorted,
