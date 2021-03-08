@@ -2,7 +2,7 @@ import Analysis_Funcs as funcs
 
 myTree = funcs.LoadROOT("tag_1_delphes_events.root")
 
-from ROOT import TFile, TH1F
+from ROOT import TFile, TH1F, TMath
 
 outfile=TFile("GenParticles.root","RECREATE")
 
@@ -25,7 +25,7 @@ JetCountHist = funcs.Histograms('Jet', HistVariables=['Count'], HistLimits=[(0, 
 
 # Outgoing Beam electron and Q2
 FinalElectronHist = funcs.Histograms('FinalElectron')
-QSquaredHist = funcs.Histograms('QSquared', HistVariables=['Electron', 'Quark'], HistLimits=[(0, 200000), (0, 2000000)])
+QSquaredHist = funcs.Histograms('QSquared', HistVariables=['Lepton', 'Quark', 'eMethod'], HistLimits=[(0, 200000), (0, 2000000),  (0, 2000000)])
 
 # Boson Muons by leading and subleading
 LeadingMuonHist = funcs.Histograms('LeadingMuon')
@@ -218,6 +218,10 @@ for n in range(myTree['Events']):
         # For some reason Q2 is always negative?
         Q2_electron = abs(q_electron.Mag2())
         QSquaredHist[0].Fill(Q2_electron)
+
+        # Implimenting the e method
+        Q2_eMethod = abs(2*BeamElectron_P.E()*FinalElectron_P.E()*(1 - TMath.Cos(FinalElectron_P.Theta())))
+        QSquaredHist[2].Fill(Q2_eMethod)
 
     if LeadingJetCheck:
         q_quark = FinalElectron_P - BeamQuark_P
