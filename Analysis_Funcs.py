@@ -1,5 +1,5 @@
 
-from ROOT import gSystem, gInterpreter, TChain, TH1F, TLorentzVector
+from ROOT import gSystem, gInterpreter, TChain, TH1F, TMath, TLorentzVector
 
 # Path of Delphes directory 
 gSystem.AddDynamicPath("/home/nayan/MG5_aMC_v2_8_2/Delphes/")
@@ -46,31 +46,34 @@ def MakeHists(HistDict):
 
     for name, properties in HistDict.items():
         for var in properties['Vars']:
-            hist = False
-
+            hist = None
+            
             if var == 'Count': 
                 hist = TH1F(name+'_'+var, name+'_'+var+';'+var+';Frequency', 200, 0, 10)
-
-            elif var == 'Eta' or 'dEta':
+            
+            elif var == 'Eta' or var == 'dEta':
                 hist = TH1F(name+'_'+var, name+'_'+var+';'+var+';Frequency', 200, -8, 8)
 
-            elif var == 'Phi' or 'dPhi':
+            elif var == 'Phi' or var == 'dPhi':
                 hist = TH1F(name+'_'+var, name+'_'+var+';'+var+';Frequency', 200, -3.5, 3.5)
-            
-            elif var == 'Rapidity' or 'dRapidity':
+
+            elif var == 'Rapidity' or var == 'dRapidity':
                 hist = TH1F(name+'_'+var, name+'_'+var+';'+var+';Frequency', 200, -10, 10)
-            
-            elif var == 'PT':
+
+            elif var == 'Pt':
                 hist = TH1F(name+'_'+var, name+'_'+var+';'+var+';Frequency', 200, 0, 200)
             
+            elif var == 'Et':
+                hist = TH1F(name+'_'+var, name+'_'+var+';'+var+';Frequency', 200, 0, 200)
+
             elif var == 'q':
                 hist = TH1F(name+'_'+var, name+'_'+var+';'+var+';Frequency', 200, 0, 1200)
 
-            elif var == 'dR_Eta' or 'dR_Rap':
+            elif var == 'dR_Eta' or var == 'dR_Rap':
                 hist = TH1F(name+'_'+var, name+'_'+var+';'+var+';Frequency', 200, 0, 10)
             
             elif var == 'InvMass':
-                hist = TH1F(name+'_'+var, name+'_'+var+';'+var+';Frequency', 200, 0, 10)
+                hist = TH1F(name+'_'+var, name+'_'+var+';'+var+';Frequency', 200, 0, 800)
             
             HistDict[name]['Hists'][var] = hist
     
@@ -93,45 +96,55 @@ def FillHists(HistDict):
     
     ParticleProperties = ['PID', 'E', 'Eta', 'Phi', 'Rapidity', 'Theta', 'Pt', 'Et']
 
-    for Catagory, HistSubDict in HistDict:
-        for var, hist in HistSubDict['hists']:
-            if var == 'Count': 
-                hist.Fill(HistSubDict['Count'])
+    for Catagory, HistSubDict in HistDict.items():
+        if len(HistSubDict['Particles']) != 0:
+            for var, hist in HistSubDict['Hists'].items():
+                if var == 'Count': 
+                    hist.Fill(HistSubDict['Count'])
 
-            elif var in ParticleProperties:
-                hist.Fill(HistSubDict[var])
+                elif var in ParticleProperties:
+                    # print(Catagory, var)
+                    hist.Fill(HistSubDict['Particles'][0][var])
 
-            elif var == 'q':
-                if Catagory == 'q_Electron' or 'q_Quark':
-                    q = (HistSubDict['Particles'][0]['P4'] - HistSubDict['Particles'][1]['P4']).Mag()
-                elif Catagory == 'q_eMethod':
-                    q = TMath.Sqrt(2*HistSubDict['Particles'][0]['E']*HistSubDict['Particles'][1]['E']*(1 - TMath.Cos(HistSubDict['Particles'][0]['Theta'])))
-                hist.Fill(q)
+                elif var == 'q':
+                    if Catagory == 'q_Lepton' or Catagory == 'q_Quark':
+                        q = abs((HistSubDict['Particles'][0]['P4'] - HistSubDict['Particles'][1]['P4']).Mag())
+                    elif Catagory == 'q_eMethod':
+                        q = TMath.Sqrt(2*HistSubDict['Particles'][0]['E']*HistSubDict['Particles'][1]['E']*(1 - TMath.Cos(HistSubDict['Particles'][0]['Theta'])))
+                    hist.Fill(q)
 
-            elif var == 'dEta':
-                dEta = HistSubDict['Particles'][0]['Eta'] - HistSubDict['Particles'][1]['Eta']
-                hist.Fill(dEta)
-            
-            elif var == 'dPhi':
-                dPhi = HistSubDict['Particles'][0]['P4'].DeltaPhi(HistSubDict['Particles'][1]['P4'])
-                hist.Fill(dPhi)
+                elif var == 'dEta':
+                    dEta = HistSubDict['Particles'][0]['Eta'] - HistSubDict['Particles'][1]['Eta']
+                    hist.Fill(dEta)
+                
+                elif var == 'dPhi':
+                    dPhi = HistSubDict['Particles'][0]['P4'].DeltaPhi(HistSubDict['Particles'][1]['P4'])
+                    hist.Fill(dPhi)
 
-            elif var == 'dRapidity':
-                dRap = HistSubDict['Particles'][0]['Rapidity'] - HistSubDict['Particles'][1]['Rapidity']
-                hist.Fill(dRap)
+                elif var == 'dRapidity':
+                    dRap = HistSubDict['Particles'][0]['Rapidity'] - HistSubDict['Particles'][1]['Rapidity']
+                    hist.Fill(dRap)
 
-            elif var == 'dR_Eta':
-                dR_Eta = HistSubDict['Particles'][0]['P4'].DrEtaPhi(HistSubDict['Particles'][1]['P4'])
-                hist.Fill(dR_Eta)
-            elif var == 'dR_Rap':
-                dR_Rap = HistSubDict['Particles'][0]['P4'].DrRapidityPhi(HistSubDict['Particles'][1]['P4'])
-                hist.Fill(dR_Rap)                          
-            
-            elif var == 'InvMass':
-                ParticleSum = TLorentzVector()
-                for paritcle in HistSubDict['Particles']:
-                    ParticleSum = paritcle['P4'] + ParticleSum
-                hist.Fill(ParticleSum.M())
+                elif var == 'dR_Eta':
+                    dR_Eta = HistSubDict['Particles'][0]['P4'].DrEtaPhi(HistSubDict['Particles'][1]['P4'])
+                    hist.Fill(dR_Eta)
+                elif var == 'dR_Rap':
+                    dPhi = HistSubDict['Particles'][0]['P4'].DeltaPhi(HistSubDict['Particles'][1]['P4'])
+                    dRap = HistSubDict['Particles'][0]['Rapidity'] - HistSubDict['Particles'][1]['Rapidity']
+                    # DrRapidityPhi function doesnt seem to work
+                    dR_Rap = TMath.Sqrt( dPhi**2 + dRap**2 )
+                    hist.Fill(dR_Rap)                          
+                
+                elif var == 'InvMass':
+                    ParticleSum = TLorentzVector()
+                    for paritcle in HistSubDict['Particles']:
+                        ParticleSum = paritcle['P4'] + ParticleSum
+                    hist.Fill(ParticleSum.M())
+
+def DictMerge(x, y):
+    z = x.copy()   # start with x's keys and values
+    z.update(y)    # modifies z with y's keys and values & returns None
+    return z
 
 def AddParticle(name, PID, P4, OldDict):
         '''
@@ -154,7 +167,7 @@ def AddParticle(name, PID, P4, OldDict):
 
         }
         
-        NewDict = ParticleDict | OldDict
+        NewDict = DictMerge(ParticleDict, OldDict)
         return NewDict
 
 def ParticleLoop(TreeDict, EventNum):

@@ -5,127 +5,105 @@ myTree = funcs.LoadROOT("tag_1_delphes_events.root")
 from ROOT import TFile, TH1F, TMath
 
 outfile = TFile("GenParticles.root","RECREATE")
-
 HistDict = {
     'Electrons'     :   {
-        'Vars'      :   ['Count']
+        'Vars'      :   ['Count'],
     },
-
     'Muons'         :   {
-        'Vars'      :   ['Count']
+        'Vars'      :   ['Count'],
     },
-
-    'Jet'           :   {
-        'Vars'      :   ['Count']
+    'Jets'          :   {
+        'Vars'      :   ['Count'],
     },
-
     'FinalElectron' :   {
-        'Vars'      :   ['Eta', 'Phi', 'Rapidity', 'Pt']
+        'Vars'      :   ['Eta', 'Phi', 'Rapidity', 'Pt'],
     },
-
     'LeadingMuon'   :   {
-        'Vars'      :   ['Eta', 'Phi', 'Rapidity', 'Pt']
+        'Vars'      :   ['Eta', 'Phi', 'Rapidity', 'Pt'],
     },
-
     'SubLeadingMuon':   {
-        'Vars'      :   ['Eta', 'Phi', 'Rapidity', 'Pt']
+        'Vars'      :   ['Eta', 'Phi', 'Rapidity', 'Pt'],
     },
-
     'WPlusMuon'     :   {
-        'Vars'      :   ['Eta', 'Phi', 'Rapidity', 'Pt']
+        'Vars'      :   ['Eta', 'Phi', 'Rapidity', 'Pt'],
     },
-
     'WMinusMuon'    :   {
-        'Vars'      :   ['Eta', 'Phi', 'Rapidity', 'Pt']
+        'Vars'      :   ['Eta', 'Phi', 'Rapidity', 'Pt'],
     },
-
     'AllJets'       :   {
-        'Vars'      :   ['Eta', 'Phi', 'Rapidity', 'Pt']
+        'Vars'      :   ['Eta', 'Phi', 'Rapidity', 'Pt'],
     },
-
     'LeadingJet'    :   {
-        'Vars'      :   ['Eta', 'Phi', 'Rapidity', 'Pt']
+        'Vars'      :   ['Eta', 'Phi', 'Rapidity', 'Pt'],
     },
-
     'SubLeadingJet' :   {
-        'Vars'      :   ['Eta', 'Phi', 'Rapidity', 'Pt']
+        'Vars'      :   ['Eta', 'Phi', 'Rapidity', 'Pt'],
     },
-
     'ThirdJet'      :   {
-        'Vars'      :   ['Eta', 'Phi', 'Rapidity', 'Pt']
+        'Vars'      :   ['Eta', 'Phi', 'Rapidity', 'Pt'],
     },
-
+    'FourthJet'     :   {
+        'Vars'      :   ['Eta', 'Phi', 'Rapidity', 'Pt'],
+    },
     'MissingET'     :   {
-        'Vars'      :   ['Eta', 'Phi', 'Rapidity', 'Pt', 'Et']
+        'Vars'      :   ['Eta', 'Phi', 'Rapidity', 'Pt', 'Et'],
     },
-
-    'q_Lepton'      
-                    :   {
-        'Vars'      :   ['q']
+    'q_Lepton'      :   {
+        'Vars'      :   ['q'],
     },
-
-    'q_Quark'      
-                    :   {
-        'Vars'      :   ['q']
+    'q_Quark'       :   {
+        'Vars'      :   ['q'],
     },
-
-    'q_eMethod'      
-                    :   {
-        'Vars'      :   ['q']
+    'q_eMethod'     :   {
+        'Vars'      :   ['q'],
     },
-
+    'FinalElectronLeadingMuon'  :   {
+        'Vars'      :   ['dEta', 'dPhi'],
+    },
+    'FinalElectronSubLeadingMuon'  :   {
+        'Vars'      :   ['dEta', 'dPhi'],
+    },
+    'FinalElectronLeadingJet'   :   {
+        'Vars'      :   ['dEta', 'dPhi', 'dRapidity', 'dR_Eta', 'dR_Rap', 'InvMass'],
+    },
     'MuonMuon'      :   {
-        'Vars'      :   ['dEta', 'dPhi', 'dRapidity', 'dR_Eta', 'dR_Rap', 'InvMass']
+        'Vars'      :   ['dEta', 'dPhi', 'dRapidity', 'dR_Eta', 'dR_Rap', 'InvMass'],
     },
-
-    'FinalElectronLeadingMuon'  
-                    :   {
-        'Vars'      :   ['dEta', 'dPhi']
+    'LeadingMuonLeadingJet'  :   {
+        'Vars'      :   ['dEta', 'dPhi'],
     },
-
-    'ElectronJet'   :   {
-        'Vars'      :   ['dEta', 'dPhi', 'dRapidity', 'dR_Eta', 'dR_Rap', 'InvMass']
+    'SubLeadingMuonLeadingJet'  :   {
+        'Vars'      :   ['dEta', 'dPhi'],
     },
-
-    'MissingETFinalElectron'
-                    :   {
-        'Vars'      :   ['dPhi', 'InvMass']
+    'MissingETFinalElectron'    :   {
+        'Vars'      :   ['dPhi', 'InvMass'],
     },
-
-    'MissingETJet'  :   {
-        'Vars'      :   ['dPhi', 'InvMass']
+    'MissingETLeadingJet'  :   {
+        'Vars'      :   ['dPhi', 'InvMass'],
     },
-
-    'MissingETLeadingMuon'
-                    :   {
-        'Vars'      :   ['dPhi', 'InvMass']
+    'MissingETLeadingMuon'  :   {
+        'Vars'      :   ['dPhi', 'InvMass'],
     },
-
-    'MissingETSubLeadingMuon'
-                    :   {
-        'Vars'      :   ['dPhi', 'InvMass']
+    'MissingETSubLeadingMuon'   :   {
+        'Vars'      :   ['dPhi', 'InvMass'],
     },
-
-    'MissingETMuonSum'
-                    :   {
-        'Vars'      :   ['dPhi', 'InvMass']
-    }
+    'MissingETMuonSum'      :   {
+        'Vars'      :   ['dPhi', 'InvMass'],
+    },
 }
 
 
 
 for _, dictionary in HistDict.items():
-        dictionary['Particles'] = []
-        dictionary['Hists'] = {}
+    dictionary['Particles'] = []
+    dictionary['Hists'] = {}
 
-Histograms = funcs.MakeHists(HistDict)
-
+HistDict = funcs.MakeHists(HistDict)
 # Looping through events
 for n in range(myTree['Events']):
 
     for _, dictionary in HistDict.items():
         dictionary['Particles'] = []
-        dictionary['Hists'] = {}
 
     # Variables telling the loop what histograms to fill
     FinalElectronCheck = False
@@ -182,14 +160,14 @@ for n in range(myTree['Events']):
             HistDict['WMinusMuon']['Particles'].append(ParticleDict['LeadingMuon'])
 
         elif ParticleDict['LeadingMuon']['PID'] == -13:
-            HistDict['WPlusMuonHist']['Particles'].append(ParticleDict['LeadingMuon'])
+            HistDict['WPlusMuon']['Particles'].append(ParticleDict['LeadingMuon'])
 
     if SubLeadingMuonCheck:  
         if ParticleDict['SubLeadingMuon']['PID'] == 13:
             HistDict['WMinusMuon']['Particles'].append(ParticleDict['SubLeadingMuon'])
         
         elif ParticleDict['SubLeadingMuon']['PID'] == -13:
-            HistDict['WPlusMuonHist']['Particles'].append(ParticleDict['SubLeadingMuon'])
+            HistDict['WPlusMuon']['Particles'].append(ParticleDict['SubLeadingMuon'])
   
   
     numbJets = EventDict['Count']['Jets']
@@ -201,7 +179,7 @@ for n in range(myTree['Events']):
             # Selecting and checking for the leading jet
             if i == numbJets - 1 and numbJets - 1 >= 0:
                 LeadingJetCheck = True
-                ParticleDict = funcs.AddParticle('LeadingJet', Jet.PID, Jet.P4(), ParticleDict)
+                ParticleDict = funcs.AddParticle('LeadingJet', None, Jet.P4(), ParticleDict)
                 HistDict['LeadingJet']['Particles'].append(ParticleDict['LeadingJet'])
                 HistDict['AllJets']['Particles'].append(ParticleDict['LeadingJet'])
 
@@ -209,34 +187,34 @@ for n in range(myTree['Events']):
             # Selecting and checking for the subleading jet
             elif i == numbJets - 2 and numbJets - 2 >= 0:
                 SubLeadingJetCheck = True
-                ParticleDict = funcs.AddParticle('SubLeadingJet', Jet.PID, Jet.P4(), ParticleDict)
+                ParticleDict = funcs.AddParticle('SubLeadingJet', None, Jet.P4(), ParticleDict)
                 HistDict['SubLeadingJet']['Particles'].append(ParticleDict['SubLeadingJet'])
                 HistDict['AllJets']['Particles'].append(ParticleDict['SubLeadingJet'])
                             # Selecting and checking for the third jet 
             elif i == numbJets - 3 and numbJets - 3 >= 0:
-                ParticleDict = funcs.AddParticle('ThirdJet', Jet.PID, Jet.P4(), ParticleDict)
+                ParticleDict = funcs.AddParticle('ThirdJet', None, Jet.P4(), ParticleDict)
                 HistDict['ThirdJet']['Particles'].append(ParticleDict['ThirdJet'])
                 HistDict['AllJets']['Particles'].append(ParticleDict['ThirdJet'])
 
             # Selecting and checking for the fourth jet
             elif i == numbJets - 4 and numbJets - 4 >= 0:
-                ParticleDict = funcs.AddParticle('FourthJet', Jet.PID, Jet.P4(), ParticleDict)
+                ParticleDict = funcs.AddParticle('FourthJet', None, Jet.P4(), ParticleDict)
                 HistDict['FourthJet']['Particles'].append(ParticleDict['FourthJet'])
                 HistDict['AllJets']['Particles'].append(ParticleDict['FourthJet'])
 
             else:
-                ParticleDict = funcs.AddParticle(str(i+1)+'Jet', Jet.PID, Jet.P4(), ParticleDict)
+                ParticleDict = funcs.AddParticle(str(i+1)+'Jet', None, Jet.P4(), ParticleDict)
                 HistDict['AllJets']['Particles'].append(ParticleDict[str(i+1)+'Jet'])
 
     # MissingET
-    ParticleDict = funcs.AddParticle('MissingET', False, EventDict['MissingET_P'], ParticleDict)
+    ParticleDict = funcs.AddParticle('MissingET', None, EventDict['MissingET_P'], ParticleDict)
     HistDict['MissingET']['Particles'].append(ParticleDict['MissingET'])
 
     # Two different Q2 calcs
     if FinalElectronCheck:
         
-        HistDict['q_Electron']['Particles'].append(ParticleDict['FinalElectron'])
-        HistDict['q_Electron']['Particles'].append(ParticleDict['BeamElectron'])
+        HistDict['q_Lepton']['Particles'].append(ParticleDict['FinalElectron'])
+        HistDict['q_Lepton']['Particles'].append(ParticleDict['BeamElectron'])
 
         HistDict['q_eMethod']['Particles'].append(ParticleDict['FinalElectron'])
         HistDict['q_eMethod']['Particles'].append(ParticleDict['BeamElectron'])
@@ -276,6 +254,14 @@ for n in range(myTree['Events']):
         HistDict['FinalElectronLeadingJet']['Particles'].append(ParticleDict['FinalElectron'])
         HistDict['FinalElectronLeadingJet']['Particles'].append(ParticleDict['LeadingJet'])
 
+    if LeadingMuonCheck and LeadingJetCheck:
+        HistDict['LeadingMuonLeadingJet']['Particles'].append(ParticleDict['LeadingMuon'])
+        HistDict['LeadingMuonLeadingJet']['Particles'].append(ParticleDict['LeadingJet'])
+
+    if SubLeadingMuonCheck and LeadingJetCheck:
+        HistDict['SubLeadingMuonLeadingJet']['Particles'].append(ParticleDict['SubLeadingMuon'])
+        HistDict['SubLeadingMuonLeadingJet']['Particles'].append(ParticleDict['LeadingJet'])
+
 
 
     # Comparing phi of MET with other particles:
@@ -285,8 +271,8 @@ for n in range(myTree['Events']):
         HistDict['MissingETFinalElectron']['Particles'].append(ParticleDict['FinalElectron'])
 
     if LeadingJetCheck:
-        HistDict['MissingETJet']['Particles'].append(ParticleDict['MissingET'])
-        HistDict['MissingETJet']['Particles'].append(ParticleDict['Jet'])
+        HistDict['MissingETLeadingJet']['Particles'].append(ParticleDict['MissingET'])
+        HistDict['MissingETLeadingJet']['Particles'].append(ParticleDict['LeadingJet'])
 
     if LeadingMuonCheck:
         HistDict['MissingETLeadingMuon']['Particles'].append(ParticleDict['MissingET'])
@@ -303,7 +289,7 @@ for n in range(myTree['Events']):
         HistDict['MissingETMuonSum']['Particles'].append(ParticleDict['MissingET'])
         HistDict['MissingETMuonSum']['Particles'].append(ParticleDict['MuonSum'])        
 
-funcs.FillHists(HistDict)
+    funcs.FillHists(HistDict)
 
 # Writing and closing file
 outfile.Write()
