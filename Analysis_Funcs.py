@@ -22,7 +22,7 @@ def LoadROOT(filename):
 
     # Create object of class ExRootTreeReader
     myTree = ExRootTreeReader(chain)
-    Events = myTree.GetEntries()
+    NEvents = myTree.GetEntries()
 
     # Get pointers to branches used in this analysis
     branchParticle = myTree.UseBranch("Particle")
@@ -30,7 +30,7 @@ def LoadROOT(filename):
 
     TreeDict =  {
                     'Tree'      :   myTree,
-                    'Events'    :   Events,
+                    'NEvents'   :   NEvents,
                     'Branches'  :   {
                         'Particle'          :   branchParticle,
                         'GenJets'           :   branchGenJets,
@@ -39,7 +39,20 @@ def LoadROOT(filename):
 
     return TreeDict
 
-def MakeHists(HistDict):
+def GetXSec(PythiaLogPath):
+    '''
+        Given the parth to the pythia log file, will return the cross section
+        of the process. 
+    '''
+
+    with open(PythiaLogPath, "r") as file:
+        lines = file.read().splitlines()
+        # Xsec is the last element of the last line
+        Xsec = float(lines[-1].split()[-1])
+
+    return Xsec
+
+def MakeHists(HistDict, Scale):
     '''
         Given a dictionary with names being keys for a list of variables.
     '''
@@ -80,7 +93,8 @@ def MakeHists(HistDict):
             
             elif var == 'InvMass':
                 hist = TH1F(name+'_'+var, name+'_'+var+';'+var+';Frequency', 200, 0, 1000)
-            
+            hist.Scale(Scale)
+            hist.SetOption('hist')
             HistDict[name]['Hists'][var] = hist
     
     return HistDict
@@ -114,10 +128,10 @@ def FillHists(HistDict):
 
                 elif var == 'q':
                     if Catagory == 'q_Lepton' or Catagory == 'q_Quark':
-                        q = abs((HistSubDict['Particles'][0]['P4'] - HistSubDict['Particles'][1]['P4']).Mag())
+                        q = (HistSubDict['Particles'][0]['P4'] - HistSubDict['Particles'][1]['P4']).Mag()
                     elif Catagory == 'q_eMethod':
                         q = TMath.Sqrt(2*HistSubDict['Particles'][0]['E']*HistSubDict['Particles'][1]['E']*(1 - TMath.Cos(HistSubDict['Particles'][0]['Theta'])))
-                    hist.Fill(q)
+                    hist.Fill(abs(q))
 
                 elif var == 'dEta':
                     dEta = HistSubDict['Particles'][0]['Eta'] - HistSubDict['Particles'][1]['Eta']
@@ -183,11 +197,10 @@ def ParticleLoop(TreeDict, EventNum):
 
     TreeDict =  {
         'Tree'      :   myTree,
-        'Events'    :   Events,
+        'NEvents'   :   NEvents,
         'Branches'  :   {
             'Particle'          :   branchParticle,
             'GenJets'           :   branchGenJets,
-            'MissingET'   :   branchMissingET
         }
     } 
 
