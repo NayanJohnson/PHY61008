@@ -39,32 +39,27 @@ def LoadROOT(filename):
 
     return TreeDict
 
+def AddParticle(name, particle, OldDict):
+        '''
+            Given a dictionary with names being keys for a list of variables.
+        '''
 
+        ParticleDict = {
+            name    :   {
+                'name'  :   name,
+                'PID'   :   particle.PID,
+                'P4'    :   particle.P4(),
+                'E'     :   particle.P4().E(),
+                'Eta'   :   particle.P4().Eta(),
+                'Phi'   :   particle.P4().Phi(),
+                'Theta' :   particle.P4().Theta(),
+                'Pt'    :   particle.P4().Pt()
+            }
 
-def Histograms(name, Nbins=200, HistVariables=['Eta', 'Phi', 'Rapidity', 'PT'], HistLimits=[(-10, 10), (-3.5, 3.5), (-10, 10), (0, 200)]):
-    '''
-    Takes:
-    - name:str() base name of histogram.
-    - Nbins:int() Number of bins in each histogram.
-    - HistVariables:list(str(), str(), ...) List of the variables plotted in each histogram
-    - HistLimits:list(tuple(2), tuple(2), ...) List of tuples length two. Each tuple represents the 
-        min and max values of the corresponding variable. In the same order as HistVariables.
-
-    Returns a list of all hists in the same order as HistVariables.
-    '''
-    
-    Hists = []
-
-    # Loops through all variables in HistVariables list
-    for i in range(len(HistVariables)):
+        }
         
-        variable = str(HistVariables[i])
-        h = TH1F(str(name)+'_'+variable, str(name)+'_'+variable+';'+variable+';Frequency', Nbins, HistLimits[i][0], HistLimits[i][1])
-        Hists.append(h)
-
-    
-    return Hists
-
+        NewDict = ParticleDict | OldDict
+        return NewDict
 
 def Comparison(A, B, Eta=True, Phi=True, Rapidity=True, R_Eta=True, R_Rap=True):
     '''

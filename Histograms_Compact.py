@@ -6,12 +6,6 @@ from ROOT import TFile, TH1F, TMath
 
 outfile=TFile("GenParticles.root","RECREATE")
 
-Nbins = 200
-
-
-CountMin = 0
-CountMax = 5
-
 # Name = funcs.Histogram(name, Nbins=200, HistVariables=['Eta', 'Phi', 'Rapidity', 'PT'], HistLimits=[(-10, 10), (-3.5, 3.5), (-10, 10), (-200, 300)])
 
 # Number of outgoing electrons
