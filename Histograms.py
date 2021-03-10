@@ -1,10 +1,3 @@
-import Analysis_Funcs as funcs
-
-myTree = funcs.LoadROOT("tag_1_delphes_events.root")
-
-from ROOT import TFile, TH1F, TMath
-
-outfile = TFile("GenParticles.root","RECREATE")
 HistDict = {
     'Electrons'     :   {
         'Vars'      :   ['Count'],
@@ -92,15 +85,28 @@ HistDict = {
     },
 }
 
-
-
 for _, dictionary in HistDict.items():
     dictionary['Particles'] = []
     dictionary['Hists'] = {}
 
-HistDict = funcs.MakeHists(HistDict)
+
+import Analysis_Funcs as funcs
+
+myTree = funcs.LoadROOT("tag_1_delphes_events.root")
+
+from ROOT import TFile, TH1F, TMath
+
+outfile = TFile("GenParticles.root","RECREATE")
+
+Xsec = funcs.GetXSec('tag_1_pythia.log')
+
+# L_int (Data) = 1 [ab-1] = 1000000 [pb-1]
+# L_int (MC) = N/Xsec [pb-1]
+Scale = 1000000 / (myTree['NEvents']/Xsec)
+print('L_int (MC)', myTree['NEvents']/Xsec)
+HistDict = funcs.MakeHists(HistDict, Scale)
 # Looping through events
-for n in range(myTree['Events']):
+for n in range(myTree['NEvents']):
 
     for _, dictionary in HistDict.items():
         dictionary['Particles'] = []
