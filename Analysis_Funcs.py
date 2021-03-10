@@ -39,58 +39,123 @@ def LoadROOT(filename):
 
     return TreeDict
 
-def AddParticle(name, particle, OldDict):
+def MakeHists(HistDict):
+    '''
+        Given a dictionary with names being keys for a list of variables.
+    '''
+
+    for name, properties in HistDict.items():
+        for var in properties['Vars']:
+            hist = False
+
+            if var == 'Count': 
+                hist = TH1F(name+'_'+var, name+'_'+var+';'+var+';Frequency', 200, 0, 10)
+
+            elif var == 'Eta' or 'dEta':
+                hist = TH1F(name+'_'+var, name+'_'+var+';'+var+';Frequency', 200, -8, 8)
+
+            elif var == 'Phi' or 'dPhi':
+                hist = TH1F(name+'_'+var, name+'_'+var+';'+var+';Frequency', 200, -3.5, 3.5)
+            
+            elif var == 'Rapidity' or 'dRapidity':
+                hist = TH1F(name+'_'+var, name+'_'+var+';'+var+';Frequency', 200, -10, 10)
+            
+            elif var == 'PT':
+                hist = TH1F(name+'_'+var, name+'_'+var+';'+var+';Frequency', 200, 0, 200)
+            
+            elif var == 'q':
+                hist = TH1F(name+'_'+var, name+'_'+var+';'+var+';Frequency', 200, 0, 1200)
+
+            elif var == 'dR_Eta' or 'dR_Rap':
+                hist = TH1F(name+'_'+var, name+'_'+var+';'+var+';Frequency', 200, 0, 10)
+            
+            elif var == 'InvMass':
+                hist = TH1F(name+'_'+var, name+'_'+var+';'+var+';Frequency', 200, 0, 10)
+            
+            HistDict[name]['Hists'][var] = hist
+    
+    return HistDict
+    
+def FillHists(HistDict):
+    '''
+        Given a dictionary of histograms, will fill them.
+        Histogram dictionary should be in the following format:
+        HistDict = {
+            HistCatagory    :   {
+                vars    :   [],
+                particles   :   {}
+                hists       :   {
+                    var     :   hist
+                }
+            }
+        }
+    '''
+    
+    ParticleProperties = ['PID', 'E', 'Eta', 'Phi', 'Rapidity', 'Theta', 'Pt', 'Et']
+
+    for Catagory, HistSubDict in HistDict:
+        for var, hist in HistSubDict['hists']:
+            if var == 'Count': 
+                hist.Fill(HistSubDict['Count'])
+
+            elif var in ParticleProperties:
+                hist.Fill(HistSubDict[var])
+
+            elif var == 'q':
+                if Catagory == 'q_Electron' or 'q_Quark':
+                    q = (HistSubDict['Particles'][0]['P4'] - HistSubDict['Particles'][1]['P4']).Mag()
+                elif Catagory == 'q_eMethod':
+                    q = TMath.Sqrt(2*HistSubDict['Particles'][0]['E']*HistSubDict['Particles'][1]['E']*(1 - TMath.Cos(HistSubDict['Particles'][0]['Theta'])))
+                hist.Fill(q)
+
+            elif var == 'dEta':
+                dEta = HistSubDict['Particles'][0]['Eta'] - HistSubDict['Particles'][1]['Eta']
+                hist.Fill(dEta)
+            
+            elif var == 'dPhi':
+                dPhi = HistSubDict['Particles'][0]['P4'].DeltaPhi(HistSubDict['Particles'][1]['P4'])
+                hist.Fill(dPhi)
+
+            elif var == 'dRapidity':
+                dRap = HistSubDict['Particles'][0]['Rapidity'] - HistSubDict['Particles'][1]['Rapidity']
+                hist.Fill(dRap)
+
+            elif var == 'dR_Eta':
+                dR_Eta = HistSubDict['Particles'][0]['P4'].DrEtaPhi(HistSubDict['Particles'][1]['P4'])
+                hist.Fill(dR_Eta)
+            elif var == 'dR_Rap':
+                dR_Rap = HistSubDict['Particles'][0]['P4'].DrRapidityPhi(HistSubDict['Particles'][1]['P4'])
+                hist.Fill(dR_Rap)                          
+            
+            elif var == 'InvMass':
+                ParticleSum = TLorentzVector()
+                for paritcle in HistSubDict['Particles']:
+                    ParticleSum = paritcle['P4'] + ParticleSum
+                hist.Fill(ParticleSum.M())
+
+def AddParticle(name, PID, P4, OldDict):
         '''
             Given a dictionary with names being keys for a list of variables.
         '''
 
         ParticleDict = {
             name    :   {
-                'name'  :   name,
-                'PID'   :   particle.PID,
-                'P4'    :   particle.P4(),
-                'E'     :   particle.P4().E(),
-                'Eta'   :   particle.P4().Eta(),
-                'Phi'   :   particle.P4().Phi(),
-                'Theta' :   particle.P4().Theta(),
-                'Pt'    :   particle.P4().Pt()
+                'name'      :   name,
+                'PID'       :   PID,
+                'P4'        :   P4,
+                'E'         :   P4.E(),
+                'Eta'       :   P4.Eta(),
+                'Phi'       :   P4.Phi(),
+                'Rapidity'  :   P4.Rapidity(),
+                'Theta'     :   P4.Theta(),
+                'Pt'        :   P4.Pt(),
+                'Et'        :   P4.Et()
             }
 
         }
         
         NewDict = ParticleDict | OldDict
         return NewDict
-
-def Comparison(A, B, Eta=True, Phi=True, Rapidity=True, R_Eta=True, R_Rap=True):
-    '''
-    Given two TLorentzVectors will compute dEta, dPhi, dRapidty and two different versions of dR (one using dEta and one using dRapidity)
-    A, B = Particle branch
-    Eta, Phi, Rapidity, R = what comparisons to compute
-    '''
-    
-    # Default values
-    dEta, dPhi, dRapidity, dR_Eta, dR_Rap = 'NA', 'NA', 'NA', 'NA', 'NA'
-    
-    
-    if Eta:
-        dEta = A.Eta() - B.Eta()
-    
-    if Phi:
-        dPhi = A.DeltaPhi(B)
-    
-    if Rapidity:
-        dRapidity = A.Rapidity() - B.Rapidity()
-    
-    if R_Eta:
-        # TLorentzVector class has a function for calculating DrEtaPhi
-        dR_Eta = A.DrEtaPhi(B)
-        
-    if R_Rap and Phi and Rapidity:
-        # TLorentzVector class has a function for calculating DrRapidityPhi
-        dR_Rap = A.DrEtaPhi(B)
-            
-
-    return (dEta, dPhi, dRapidity, dR_Eta, dR_Rap)
 
 def ParticleLoop(TreeDict, EventNum):
     '''
@@ -199,13 +264,11 @@ def ParticleLoop(TreeDict, EventNum):
         for particle in FinalLeptons:
             
             # Only need dR_Eta
-            JetLepton = Comparison(jet.P4(), particle.P4(), Eta=False, Phi=False, Rapidity=False, R_Eta=True, R_Rap=False)
-            
-            # Comparison() returns a list of many comparison vars, dR_Eta is 
-            # the 4th in the list         
+            JetLepton_dR_Eta = jet.P4().DrEtaPhi(particle.P4())
+       
             # Small dR corresponds to overlap between the jet and the particle  
             # If the jet overlaps with this particle:
-            if JetLepton[3] < 0.4:
+            if JetLepton_dR_Eta < 0.4:
                 Overlap += 1
                 
         # Jet discared if it overlaps with any particles
