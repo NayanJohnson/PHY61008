@@ -25,7 +25,7 @@ JetCountHist = funcs.Histograms('Jet', HistVariables=['Count'], HistLimits=[(0, 
 
 # Outgoing Beam electron and Q2
 FinalElectronHist = funcs.Histograms('FinalElectron')
-QSquaredHist = funcs.Histograms('QSquared', HistVariables=['Lepton', 'Quark', 'eMethod'], HistLimits=[(0, 200000), (0, 2000000),  (0, 2000000)])
+QSquaredHist = funcs.Histograms('QSquared', HistVariables=['Lepton', 'Quark', 'eMethod'], HistLimits=[(0, 200000), (0, 200000),  (0, 200000)])
 
 # Boson Muons by leading and subleading
 LeadingMuonHist = funcs.Histograms('LeadingMuon')
@@ -224,7 +224,7 @@ for n in range(myTree['Events']):
         QSquaredHist[2].Fill(Q2_eMethod)
 
     if LeadingJetCheck:
-        q_quark = FinalElectron_P - BeamQuark_P
+        q_quark = LeadingJet_P - BeamQuark_P
         # For some reason Q2 is always negative?
         Q2_quark = abs(q_quark.Mag2())
         QSquaredHist[1].Fill(Q2_quark)
