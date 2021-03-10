@@ -103,8 +103,11 @@ myTree = funcs.LoadROOT("tag_1_delphes_events.root")
 
 from ROOT import TFile, TH1F, TMath
 
+import sys
+
 # Open output
-outfile = TFile("GenParticles.root","RECREATE")
+# sys.argv[1] returns the first argument passed to the python script
+outfile = TFile(sys.argv[1],"RECREATE")
 
 # Get scaling factor for histograms
 Scale = funcs.GetScale('tag_1_pythia.log', myTree['NEvents'])

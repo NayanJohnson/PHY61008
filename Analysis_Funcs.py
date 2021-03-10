@@ -42,8 +42,8 @@ def LoadROOT(filename):
 def GetScale(PythiaLogPath, NEvents):
     '''
         Given the parth to the pythia log file and the number of events,
-        will return the scaling factor worked out from the process 
-        cross section of the process. 
+        will return the scaling factor calculated from the process 
+        cross section. 
     '''
 
     with open(PythiaLogPath, "r") as file:
