@@ -39,28 +39,42 @@ def LoadROOT(filename):
 
     return TreeDict
 
-def GetXSec(PythiaLogPath):
+def GetScale(PythiaLogPath, NEvents):
     '''
-        Given the parth to the pythia log file, will return the cross section
-        of the process. 
+        Given the parth to the pythia log file and the number of events,
+        will return the scaling factor worked out from the process 
+        cross section of the process. 
     '''
 
     with open(PythiaLogPath, "r") as file:
         lines = file.read().splitlines()
         # Xsec is the last element of the last line
         Xsec = float(lines[-1].split()[-1])
+    
+    # L_int (Data) = 1 [ab-1] = 1000000 [pb-1]
+    # L_int (MC) = N/Xsec [pb-1]
+    Scale = 1000000 / (NEvents/Xsec)
 
-    return Xsec
+    return Scale
 
 def MakeHists(HistDict, Scale):
     '''
-        Given a dictionary with names being keys for a list of variables.
+        Given a dictionary with names being keys for a list histogram
+        properties:
+        HistDict = {
+            name    :   {
+                'Vars'  :   []
+            }
+        }
+        Will use the 'Vars' list to initialise histograms and add them
+        to the dictionary.
     '''
 
     for name, properties in HistDict.items():
         for var in properties['Vars']:
             hist = None
             
+            # Checks the variable and initialises a custom histogram
             if var == 'Count': 
                 hist = TH1F(name+'_'+var, name+'_'+var+';'+var+';Frequency', 200, 0, 10)
             
@@ -93,8 +107,11 @@ def MakeHists(HistDict, Scale):
             
             elif var == 'InvMass':
                 hist = TH1F(name+'_'+var, name+'_'+var+';'+var+';Frequency', 200, 0, 1000)
+            
+            # Scales the histogram forces the graph to be drawn as 'hist'
             hist.Scale(Scale)
             hist.SetOption('hist')
+            # Adds the hist to the dict
             HistDict[name]['Hists'][var] = hist
     
     return HistDict
@@ -104,7 +121,7 @@ def FillHists(HistDict):
         Given a dictionary of histograms, will fill them.
         Histogram dictionary should be in the following format:
         HistDict = {
-            HistCatagory    :   {
+            Catagory    :   {
                 vars    :   [],
                 particles   :   {}
                 hists       :   {
@@ -114,11 +131,14 @@ def FillHists(HistDict):
         }
     '''
     
+    # List of variables that are stored in all particles.
     ParticleProperties = ['PID', 'E', 'Eta', 'Phi', 'Rapidity', 'Theta', 'Pt', 'Et']
 
     for Catagory, HistSubDict in HistDict.items():
+        # Checks that there are particles in the hist dict
         if len(HistSubDict['Particles']) != 0:
             for var, hist in HistSubDict['Hists'].items():
+                # Checks the variable and fills the histogram
                 if var == 'Count': 
                     hist.Fill(HistSubDict['Count'])
 
@@ -161,18 +181,12 @@ def FillHists(HistDict):
                         ParticleSum = paritcle['P4'] + ParticleSum
                     hist.Fill(ParticleSum.M())
 
-def DictMerge(x, y):
-    z = x.copy()   # start with x's keys and values
-    z.update(y)    # modifies z with y's keys and values & returns None
-    return z
-
-def AddParticle(name, PID, P4, OldDict):
+def AddParticle(name, PID, P4, ParticleDict):
         '''
-            Given a dictionary with names being keys for a list of variables.
-        '''
-
-        ParticleDict = {
-            name    :   {
+            Given a name, PID, 4-momenta of a particle,
+            will add a particle dict of various properties to an existing
+            dict:
+            ParticleDict[name] = {
                 'name'      :   name,
                 'PID'       :   PID,
                 'P4'        :   P4,
@@ -184,11 +198,23 @@ def AddParticle(name, PID, P4, OldDict):
                 'Pt'        :   P4.Pt(),
                 'Et'        :   P4.Et()
             }
+        '''
 
+        ParticleDict[name] = {
+            'name'      :   name,
+            'PID'       :   PID,
+            'P4'        :   P4,
+            'E'         :   P4.E(),
+            'Eta'       :   P4.Eta(),
+            'Phi'       :   P4.Phi(),
+            'Rapidity'  :   P4.Rapidity(),
+            'Theta'     :   P4.Theta(),
+            'Pt'        :   P4.Pt(),
+            'Et'        :   P4.Et()
         }
         
-        NewDict = DictMerge(ParticleDict, OldDict)
-        return NewDict
+        return ParticleDict
+
 
 def ParticleLoop(TreeDict, EventNum):
     '''
