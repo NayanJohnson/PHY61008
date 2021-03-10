@@ -1,3 +1,10 @@
+# Running this script:
+# python script.py output.root
+import sys
+
+# sys.argv[1] returns the first argument passed to the python script
+outfilename = sys.argv[1]
+
 # Dictionary that will contain all info needed to produce histograms.
 # Vars list can be used to request specific histograms
 # Var keywords that are recognised:
@@ -103,11 +110,8 @@ myTree = funcs.LoadROOT("tag_1_delphes_events.root")
 
 from ROOT import TFile, TH1F, TMath
 
-import sys
-
 # Open output
-# sys.argv[1] returns the first argument passed to the python script
-outfile = TFile(sys.argv[1],"RECREATE")
+outfile = TFile(outfilename,"RECREATE")
 
 # Get scaling factor for histograms
 Scale = funcs.GetScale('tag_1_pythia.log', myTree['NEvents'])
