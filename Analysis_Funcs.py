@@ -51,14 +51,20 @@ def MakeHists(HistDict):
             if var == 'Count': 
                 hist = TH1F(name+'_'+var, name+'_'+var+';'+var+';Frequency', 200, 0, 10)
             
-            elif var == 'Eta' or var == 'dEta':
-                hist = TH1F(name+'_'+var, name+'_'+var+';'+var+';Frequency', 200, -8, 8)
+            elif var == 'Eta':
+                hist = TH1F(name+'_'+var, name+'_'+var+';'+var+';Frequency', 200, -10, 10)
+            
+            elif var == 'dEta':
+                hist = TH1F(name+'_'+var, name+'_'+var+';'+var+';Frequency', 200, -20, 20)
 
             elif var == 'Phi' or var == 'dPhi':
                 hist = TH1F(name+'_'+var, name+'_'+var+';'+var+';Frequency', 200, -3.5, 3.5)
 
-            elif var == 'Rapidity' or var == 'dRapidity':
+            elif var == 'Rapidity':
                 hist = TH1F(name+'_'+var, name+'_'+var+';'+var+';Frequency', 200, -10, 10)
+            
+            elif var == 'dRapidity':
+                hist = TH1F(name+'_'+var, name+'_'+var+';'+var+';Frequency', 200, -20, 20)
 
             elif var == 'Pt':
                 hist = TH1F(name+'_'+var, name+'_'+var+';'+var+';Frequency', 200, 0, 200)
@@ -73,7 +79,7 @@ def MakeHists(HistDict):
                 hist = TH1F(name+'_'+var, name+'_'+var+';'+var+';Frequency', 200, 0, 10)
             
             elif var == 'InvMass':
-                hist = TH1F(name+'_'+var, name+'_'+var+';'+var+';Frequency', 200, 0, 800)
+                hist = TH1F(name+'_'+var, name+'_'+var+';'+var+';Frequency', 200, 0, 1000)
             
             HistDict[name]['Hists'][var] = hist
     
