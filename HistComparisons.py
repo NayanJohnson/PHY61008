@@ -5,12 +5,12 @@ import sys
 
 HistFile1_name = sys.argv[1]
 HistFile2_name = sys.argv[2]
-outfile_name = sys.argv[3]
+MediaDir_name = sys.argv[3]
+
+if MediaDir_name[-1] != '/':
+    MediaDir_name = MediaDir_name+'/'
 
 from ROOT import TFile, TH1F, TCanvas, TLegend, SetOwnership
-
-# Open output
-outfile = TFile(outfile_name,"RECREATE")
 
 # Read hist files
 HistFile1 = TFile(HistFile1_name)
@@ -108,7 +108,5 @@ for key in HistFile1.GetListOfKeys():
     # Update canvas
     HistCan.Update()
     # Write canvas to outfile, needs the name for some reason.
-    outfile.WriteObject(HistCan, histname)
-
-# Closing file
-outfile.Close()
+    
+    HistCan.SaveAs(MediaDir_name+histname+'.png')
