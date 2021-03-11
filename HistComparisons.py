@@ -26,6 +26,7 @@ for key in HistFile1.GetListOfKeys():
     
     # Get the name of the hist
     histname = key.GetName()
+    histvar = histname.split('_')[-1]
 
     # Read the same hist in each file
     Hist1 = HistFile1.Get(histname+';1')
@@ -33,13 +34,15 @@ for key in HistFile1.GetListOfKeys():
 
     # Get the index of the min/max bin and the read off the value of the 
     # low edge
-    BinMax1 = Hist1.GetBinLowEdge(Hist1.FindLastBinAbove())
-    BinMin1 = Hist1.GetBinLowEdge(Hist1.FindFirstBinAbove())
+    # Set FindLastBinAbove threshold to 5 since otherwise the 
+    # hist goes on for way too long    
+    BinMax1 = Hist1.GetBinLowEdge(Hist1.FindLastBinAbove(5))
+    BinMin1 = Hist1.GetBinLowEdge(Hist1.FindFirstBinAbove(5))
     BinMax2 = Hist2.GetBinLowEdge(Hist2.FindLastBinAbove())
     BinMin2 = Hist2.GetBinLowEdge(Hist2.FindFirstBinAbove())    
     # Max/min = BinMax/min +- 5% +- 5 (prevents max=min for BinMax/Min=0)
-    XMax1 = BinMax1 + abs(BinMax1/20) + 5
-    XMin1 = BinMin1 - abs(BinMin1/20) - 5
+    XMax1 = BinMax1 + abs(BinMax1/10) + 5
+    XMin1 = BinMin1 - abs(BinMin1/10) - 5
     XMax2 = BinMax2 + abs(BinMax2/20) + 5
     XMin2 = BinMin2 - abs(BinMin2/20) - 5    
 
@@ -49,6 +52,9 @@ for key in HistFile1.GetListOfKeys():
 
     # Max/min is the max/min of the two hists
     XMax = max(XMax1, XMax2)
+    if histvar == 'Pt':
+        print(histname, (XMax1, XMax2))
+        XMax = 300
     XMin = min(XMin1, XMin2)
     Max = max(Max1, Max2)
     # Take the large Nbin value
@@ -56,7 +62,8 @@ for key in HistFile1.GetListOfKeys():
 
     # Setting universal hist options
     for hist in (Hist1, Hist2):
-        hist.SetBins(NBins, XMin, XMax)
+        # SetBins actually introduces an offset into the graph - oops
+        hist.SetAxisRange(XMin, XMax)
         hist.SetMaximum(Max)
         hist.SetStats(False)
 

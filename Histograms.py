@@ -323,6 +323,8 @@ for n in range(myTree['NEvents']):
 
     funcs.FillHists(HistDict)
 
+funcs.HistLims(HistDict)
+
 # Writing and closing file
 outfile.Write()
 outfile.Close()

@@ -75,6 +75,7 @@ def MakeHists(HistDict, Scale):
             hist = None
             
             # Checks the variable and initialises a custom histogram
+            # Set the limits much larger than they need to be since they're reset later
             if var == 'Count': 
                 hist = TH1F(name+'_'+var, name+'_'+var+';'+var+';Frequency', 200, 0, 10)
             
@@ -94,19 +95,19 @@ def MakeHists(HistDict, Scale):
                 hist = TH1F(name+'_'+var, name+'_'+var+';'+var+';Frequency', 200, -20, 20)
 
             elif var == 'Pt':
-                hist = TH1F(name+'_'+var, name+'_'+var+';'+var+';Frequency', 200, 0, 200)
+                hist = TH1F(name+'_'+var, name+'_'+var+';'+var+';Frequency', 2000, 0, 1000)
             
             elif var == 'Et':
-                hist = TH1F(name+'_'+var, name+'_'+var+';'+var+';Frequency', 200, 0, 200)
+                hist = TH1F(name+'_'+var, name+'_'+var+';'+var+';Frequency', 2000, 0, 1000)
 
             elif var == 'q':
-                hist = TH1F(name+'_'+var, name+'_'+var+';'+var+';Frequency', 200, 0, 1200)
+                hist = TH1F(name+'_'+var, name+'_'+var+';'+var+';Frequency', 2000, 0, 10000)
 
             elif var == 'dR_Eta' or var == 'dR_Rap':
                 hist = TH1F(name+'_'+var, name+'_'+var+';'+var+';Frequency', 200, 0, 10)
             
             elif var == 'InvMass':
-                hist = TH1F(name+'_'+var, name+'_'+var+';'+var+';Frequency', 200, 0, 1000)
+                hist = TH1F(name+'_'+var, name+'_'+var+';'+var+';Frequency', 2000, 0, 10000)
             
             # Scales the histogram forces the graph to be drawn as 'hist'
             hist.Scale(Scale)
@@ -182,6 +183,24 @@ def FillHists(HistDict):
                     for paritcle in HistSubDict['Particles']:
                         ParticleSum = paritcle['P4'] + ParticleSum
                     hist.Fill(ParticleSum.M())
+
+def HistLims(HistDict):
+    '''
+    '''
+    for Catagory, HistSubDict in HistDict.items():
+        for var, hist in HistSubDict['Hists'].items():
+
+            # Get the index of the min/max bin and the read off the value of the 
+            # low edge
+            # Set FindLastBinAbove threshold to 5 since otherwise the 
+            # hist goes on for way too long
+            BinMax = hist.GetBinLowEdge(hist.FindLastBinAbove(5))
+            BinMin = hist.GetBinLowEdge(hist.FindFirstBinAbove())
+            # Max/min = BinMax/min +- 5% +- 5 (prevents max=min for BinMax/Min=0)
+            XMax = BinMax + abs(BinMax/10) + 5
+            XMin = BinMin - abs(BinMin/10) - 5
+            hist.SetAxisRange(XMin, XMax)
+
 
 def AddParticle(name, PID, P4, ParticleDict):
         '''
