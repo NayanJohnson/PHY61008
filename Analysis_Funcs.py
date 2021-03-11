@@ -104,7 +104,7 @@ def MakeHists(HistDict, Scale):
                 hist = TH1F(name+'_'+var, name+'_'+var+';'+var+';Frequency', 2000, 0, 10000)
 
             elif var == 'dR_Eta' or var == 'dR_Rap':
-                hist = TH1F(name+'_'+var, name+'_'+var+';'+var+';Frequency', 200, 0, 10)
+                hist = TH1F(name+'_'+var, name+'_'+var+';'+var+';Frequency', 2000, 0, 100)
             
             elif var == 'InvMass':
                 hist = TH1F(name+'_'+var, name+'_'+var+';'+var+';Frequency', 2000, 0, 10000)
