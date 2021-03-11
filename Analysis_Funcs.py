@@ -42,8 +42,13 @@ def LoadROOT(filename):
 def GetScale(PythiaLogPath, NEvents):
     '''
         Given the parth to the pythia log file and the number of events,
+<<<<<<< HEAD
         will return the scaling factor worked out from the process 
         cross section of the process. 
+=======
+        will return the scaling factor calculated from the process 
+        cross section. 
+>>>>>>> HistComparisons
     '''
 
     with open(PythiaLogPath, "r") as file:
@@ -279,27 +284,31 @@ def ParticleLoop(TreeDict, EventNum):
         # i == 1 corresponds to beam electron
         elif i == 1:         
             BeamElectron = particle
-                    
+          
         # Final state particles                
         if particle.Status == 1:
             
             # Electrons and positrons
             if abs(particle.PID) == 11:
-                # Adding the particle to the final state list
-                FinalLeptons.append(particle)                
-                e_count += 1
-
-                # Adding the electron to the sorting list 
-                ElectronPT.append( (particle.PT, particle) )
+                # Electron cuts
+                if -4.3 <= particle.P4().Eta() <= 4.9:
+                    if particle.P4().Pt() >= 5:
+                        # Adding the particle to the final state list
+                        FinalLeptons.append(particle)                
+                        e_count += 1
+                        # Adding the electron to the sorting list 
+                        ElectronPT.append( (particle.PT, particle) )
                 
             # Selecting mu
-            elif abs(particle.PID) ==  13:                
-                # Adding the particle to the final state list
-                FinalLeptons.append(particle)              
-                mu_count += 1                
-                
-                # Adding the muon to the sorting list                 
-                MuonPT.append( (particle.PT, particle) )      
+            elif abs(particle.PID) ==  13:     
+                # Muon cuts
+                if -4 <= particle.P4().Eta() <= 4:
+                    if particle.P4().Pt() >= 5:
+                        # Adding the particle to the final state list
+                        FinalLeptons.append(particle)              
+                        mu_count += 1                
+                        # Adding the muon to the sorting list                 
+                        MuonPT.append( (particle.PT, particle) )      
                 
             # Selecting neutrinos
             elif abs(particle.PID) == 12 or abs(particle.PID) == 14:
@@ -327,8 +336,11 @@ def ParticleLoop(TreeDict, EventNum):
                 
         # Jet discared if it overlaps with any particles
         if Overlap == 0:
-            jet_count += 1
-            JetPT.append( ( jet.PT, jet) )
+            # Jet cuts
+            if -4.4 <= jet.P4().Eta() <= 5:
+                if 3 <= jet.P4().Pt:
+                    jet_count += 1
+                    JetPT.append( ( jet.PT, jet) )
     
     # Sorts ElectronPT based on the 1st element in each tuple in ascending order
     ElectronPT_sorted = sorted(ElectronPT, key=lambda x: x[0])
