@@ -42,8 +42,8 @@ def LoadROOT(filename):
 def GetScale(PythiaLogPath, NEvents):
     '''
         Given the parth to the pythia log file and the number of events,
-        will return the scaling factor worked out from the process 
-        cross section of the process. 
+        will return the scaling factor calculated from the process 
+        cross section. 
     '''
 
     with open(PythiaLogPath, "r") as file:
@@ -135,14 +135,16 @@ def FillHists(HistDict):
     ParticleProperties = ['PID', 'E', 'Eta', 'Phi', 'Rapidity', 'Theta', 'Pt', 'Et']
 
     for Catagory, HistSubDict in HistDict.items():
-        # Checks that there are particles in the hist dict
-        if len(HistSubDict['Particles']) != 0:
-            for var, hist in HistSubDict['Hists'].items():
-                # Checks the variable and fills the histogram
-                if var == 'Count': 
-                    hist.Fill(HistSubDict['Count'])
+        for var, hist in HistSubDict['Hists'].items():
 
-                elif var in ParticleProperties:
+            # Checks the variable and fills the histogram
+            if var == 'Count': 
+                hist.Fill(HistSubDict['Count'])
+
+            # Checks that there are particles in the hist dict
+            # Count histogram doesn't need any particles so is before this check
+            elif len(HistSubDict['Particles']) != 0:
+                if var in ParticleProperties:
                     # print(Catagory, var)
                     hist.Fill(HistSubDict['Particles'][0][var])
 
