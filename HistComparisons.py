@@ -74,40 +74,32 @@ for key in HistFile1.GetListOfKeys():
     LegendY_interval = 0.1
 
     Legend1 = TLegend(LegendX1, LegendY1 , LegendX1+LegendX_interval, LegendY1-LegendY_interval)
-    
     # Stops legend overwriting canvas
     SetOwnership(Legend1,False)
     Legend1.SetBorderSize(1)
     Legend1.SetShadowColor(2)
     Legend1.SetHeader("Cuts")
-    
     # Entries
     Legend1.AddEntry("entries","Entries: "+str(int(Hist1.GetEntries())))
     Legend1.AddEntry(Hist1, "Line Color", "l")
-
     Legend1.SetTextSize(0.025)
     Legend1.SetTextColor(1)
-
     # Seperation is small, but will be maximised to the bounds of the TLegend
     # box
     Legend1.SetEntrySeparation(.1)
     Legend1.Draw("same")
 
     Legend2 = TLegend(LegendX1, LegendY1-LegendY_interval , LegendX1+LegendX_interval, LegendY1-2*LegendY_interval)
-    
     # Stops legend overwriting canvas    
     SetOwnership(Legend2,False)
     Legend2.SetBorderSize(1)
     Legend2.SetShadowColor(2)
     Legend2.SetHeader("No Cuts")
-    
     # Entries
     Legend2.AddEntry("entries","Entries: "+str(int(Hist2.GetEntries())))
     Legend2.AddEntry(Hist2, "Line Color", "l")
-
     Legend2.SetTextSize(0.025)
     Legend2.SetTextColor(1)
-    
     # Seperation is small, but will be maximised to the bounds of the TLegend
     # box    
     Legend2.SetEntrySeparation(.1)
@@ -115,7 +107,6 @@ for key in HistFile1.GetListOfKeys():
 
     # Update canvas
     HistCan.Update()
-
     # Write canvas to outfile, needs the name for some reason.
     outfile.WriteObject(HistCan, histname)
 
