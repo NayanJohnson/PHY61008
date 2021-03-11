@@ -261,7 +261,7 @@ for n in range(myTree['NEvents']):
     HistDict['Electrons']['Count'] = numbElectrons
     HistDict['Muons']['Count'] = numbMuons
     HistDict['Jets']['Count'] = numbJets
-    
+
     # LeadingMuon comparison hists
     if LeadingMuonCheck and SubLeadingMuonCheck:
         HistDict['MuonMuon']['Particles'].append(ParticleDict['LeadingMuon'])
