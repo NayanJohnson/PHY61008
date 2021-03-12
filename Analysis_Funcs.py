@@ -99,7 +99,7 @@ def MakeHists(HistDict, Scale):
                 hist = TH1F(name+'_'+var, name+'_'+var+';'+var+';Frequency', 1000, 0, 1000)
             
             elif var == 'Et':
-                hist = TH1F(name+'_'+var, name+'_'+var+';'+var+';Frequency', 300, 0, 1500)
+                hist = TH1F(name+'_'+var, name+'_'+var+';'+var+';Frequency', 1500, 0, 1500)
 
             elif var == 'q':
                 hist = TH1F(name+'_'+var, name+'_'+var+';'+var+';Frequency', 1000, 0, 10000)
