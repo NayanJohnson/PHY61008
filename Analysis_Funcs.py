@@ -99,7 +99,7 @@ def MakeHists(HistDict, Scale):
                 hist = TH1F(name+'_'+var, name+'_'+var+';'+var+';Frequency', 1000, 0, 1000)
             
             elif var == 'Et':
-                hist = TH1F(name+'_'+var, name+'_'+var+';'+var+';Frequency', 1000, 0, 1000)
+                hist = TH1F(name+'_'+var, name+'_'+var+';'+var+';Frequency', 300, 0, 1500)
 
             elif var == 'q':
                 hist = TH1F(name+'_'+var, name+'_'+var+';'+var+';Frequency', 1000, 0, 10000)
@@ -136,7 +136,6 @@ def RequestParticles(HistDict, ParticleDict):
                     if jet['Check']:
                         if jet['isJet']:
                             properties['Particles'].append(jet)
-                            print(len(properties['Particles']))
 
             elif ParticleDict[particle]['Check']:
                 properties['Particles'].append(ParticleDict[particle])               
@@ -168,11 +167,14 @@ def FillHists(HistDict):
             if var == 'Count': 
                 hist.Fill(properties['Count'])
 
-            # Seperates hists into the number of required particles
-            elif len(properties['Particles']) == 1:
-                if var in ParticleProperties:
-                    hist.Fill(properties['Particles'][0][var])
+            # Normal variable hists only reqiuire 1 particle
+            # Can be calculated for one particle or multiple
+            if var in ParticleProperties:
+                if len(properties['Particles']) != 0:
+                    for i in range(0, len(properties['Particles'])):
+                        hist.Fill(properties['Particles'][i][var])
 
+            # Seperates hists into the number of required particles
             elif len(properties['Particles']) == 2:
 
                 if var == 'q':
