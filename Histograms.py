@@ -139,7 +139,7 @@ HistDict = {
                     :   {
         'Requests'      :   {
             'Vars'      :   ['dEta', 'dPhi'],
-            'Particles' :   ['FinalBeamElectron', 'FinalBeamElectron'],
+            'Particles' :   ['FinalBeamElectron', 'LeadingMuon'],
         },
     },
 
