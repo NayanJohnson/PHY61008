@@ -53,11 +53,18 @@ for key in HistFile2.GetListOfKeys():
     # Clear canvas
     HistCan = TCanvas()
     HistCan.cd()
-    
+
+    # max frequency
+    Max1 = Hist1.GetMaximum() + Hist1.GetMaximum()/10
+    Max2 = Hist2.GetMaximum() + Hist2.GetMaximum()/10
+    # Take the larger value from the two hists
+    Max = max(Max1, Max2)
+
     # Setting universal hist options
     for hist in (Hist1, Hist2):
         # SetBins actually introduces an offset into the graph
         hist.SetStats(False)
+        hist.SetMaximum(Max)
 
     # Set diffent hist options
     Hist1.SetLineColor(4)
