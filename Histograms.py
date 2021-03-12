@@ -332,6 +332,7 @@ for n in range(myTree['NEvents']):
     # MissingET
     ParticleDict = funcs.AddParticle('MissingET', ParticleDict, EventDict['MissingET_P'])
 
+    # MuonSum
     MuonSum = None 
     if ParticleDict['LeadingMuon']['Check'] and ParticleDict['SubLeadingMuon']['Check']:
         MuonSum = ParticleDict['LeadingMuon']['P4'] + ParticleDict['SubLeadingMuon']['P4']
@@ -342,9 +343,11 @@ for n in range(myTree['NEvents']):
     HistDict['Muons']['Count'] = numbMuons
     HistDict['Jets']['Count'] = numbJets
 
+    # Filling HistDict with particles then filling the hists
     HistDict = funcs.RequestParticles(HistDict, ParticleDict)
     funcs.FillHists(HistDict)
 
+# Rescaling hist lims
 funcs.HistLims(HistDict)
 
 # Writing and closing file

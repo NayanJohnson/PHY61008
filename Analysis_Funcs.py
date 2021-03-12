@@ -137,6 +137,7 @@ def RequestParticles(HistDict, ParticleDict):
                         if jet['isJet']:
                             properties['Particles'].append(jet)
 
+            # Normal particle check
             elif ParticleDict[particle]['Check']:
                 properties['Particles'].append(ParticleDict[particle])               
 
@@ -167,15 +168,20 @@ def FillHists(HistDict):
             if var == 'Count': 
                 hist.Fill(properties['Count'])
 
-            # Normal variable hists only reqiuire 1 particle
-            # Can be calculated for one particle or multiple
-            if var in ParticleProperties:
-                if len(properties['Particles']) != 0:
+            # Variables that can be calculated from one or multiple
+            # particles.
+            if len(properties['Particles']) != 0:
+                if var in ParticleProperties:
                     for i in range(0, len(properties['Particles'])):
                         hist.Fill(properties['Particles'][i][var])
+                elif var == 'InvMass':
+                    ParticleSum = TLorentzVector()
+                    for paritcle in properties['Particles']:
+                        ParticleSum = paritcle['P4'] + ParticleSum
+                    hist.Fill(ParticleSum.M())
 
             # Seperates hists into the number of required particles
-            elif len(properties['Particles']) == 2:
+            if len(properties['Particles']) == 2:
 
                 if var == 'q':
                     if catagory == 'q_Lepton' or catagory == 'q_Quark':
@@ -207,16 +213,9 @@ def FillHists(HistDict):
                     dR_Rap = TMath.Sqrt( dPhi**2 + dRap**2 )
                     hist.Fill(dR_Rap)                          
 
-            if len(properties['Particles']) != 0:
-
-                if var == 'InvMass':
-                    ParticleSum = TLorentzVector()
-                    for paritcle in properties['Particles']:
-                        ParticleSum = paritcle['P4'] + ParticleSum
-                    hist.Fill(ParticleSum.M())
-
 def HistLims(HistDict):
     '''
+        Rescales hist lims depending on the data in the hists
     '''
     for Catagory, HistSubDict in HistDict.items():
         for var, hist in HistSubDict['Hists'].items():
