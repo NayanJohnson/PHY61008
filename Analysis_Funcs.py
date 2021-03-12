@@ -9,6 +9,9 @@ gInterpreter.Declare('#include "classes/DelphesClasses.h"')
 gInterpreter.Declare('#include "external/ExRootAnalysis/ExRootTreeReader.h"')
 
 from ROOT import ExRootTreeReader
+import config
+
+
 
 def LoadROOT(filename):
     '''
@@ -72,49 +75,95 @@ def MakeHists(HistDict, Scale):
 
     for name, properties in HistDict.items():
         properties['Hists'] = {}
-        for var in properties['Requests']['Vars']:
-            hist = None
-            
-            # Checks the variable and initialises a custom histogram
-            # Set the limits much larger than they need to be since they're reset later
-            if var == 'Count': 
-                hist = TH1F(name+'_'+var, name+'_'+var+';'+var+';Frequency', 200, 0, 10)
-            
-            elif var == 'Eta':
-                hist = TH1F(name+'_'+var, name+'_'+var+';'+var+';Frequency', 200, -10, 10)
-            
-            elif var == 'dEta':
-                hist = TH1F(name+'_'+var, name+'_'+var+';'+var+';Frequency', 200, -20, 20)
+        if properties['Dimensions'] == 1
+            for var in properties['Requests']['Vars']:
+                hist = None
+                
+                # Checks the variable and initialises a custom histogram
+                # Set the limits much larger than they need to be since they're reset later
+                if var == 'Count': 
+                    hist = TH1F(name+'_'+var, name+'_'+var+';'+var+';Frequency', 200, 0, 10)
+                
+                elif var == 'Eta':
+                    hist = TH1F(name+'_'+var, name+'_'+var+';'+var+';Frequency', 200, -10, 10)
+                
+                elif var == 'dEta':
+                    hist = TH1F(name+'_'+var, name+'_'+var+';'+var+';Frequency', 200, -20, 20)
 
-            elif var == 'Phi' or var == 'dPhi':
-                hist = TH1F(name+'_'+var, name+'_'+var+';'+var+';Frequency', 200, -3.5, 3.5)
+                elif var == 'Phi' or var == 'dPhi':
+                    hist = TH1F(name+'_'+var, name+'_'+var+';'+var+';Frequency', 200, -3.5, 3.5)
 
-            elif var == 'Rapidity':
-                hist = TH1F(name+'_'+var, name+'_'+var+';'+var+';Frequency', 200, -10, 10)
-            
-            elif var == 'dRapidity':
-                hist = TH1F(name+'_'+var, name+'_'+var+';'+var+';Frequency', 200, -20, 20)
+                elif var == 'Rapidity':
+                    hist = TH1F(name+'_'+var, name+'_'+var+';'+var+';Frequency', 200, -10, 10)
+                
+                elif var == 'dRapidity':
+                    hist = TH1F(name+'_'+var, name+'_'+var+';'+var+';Frequency', 200, -20, 20)
 
-            elif var == 'Pt':
-                hist = TH1F(name+'_'+var, name+'_'+var+';'+var+';Frequency', 1000, 0, 1000)
-            
-            elif var == 'Et':
-                hist = TH1F(name+'_'+var, name+'_'+var+';'+var+';Frequency', 1500, 0, 1500)
+                elif var == 'Pt':
+                    hist = TH1F(name+'_'+var, name+'_'+var+';'+var+';Frequency', 1000, 0, 1000)
+                
+                elif var == 'Et':
+                    hist = TH1F(name+'_'+var, name+'_'+var+';'+var+';Frequency', 1500, 0, 1500)
 
-            elif var == 'q':
-                hist = TH1F(name+'_'+var, name+'_'+var+';'+var+';Frequency', 1000, 0, 10000)
+                elif var == 'q':
+                    hist = TH1F(name+'_'+var, name+'_'+var+';'+var+';Frequency', 1000, 0, 10000)
 
-            elif var == 'dR_Eta' or var == 'dR_Rap':
-                hist = TH1F(name+'_'+var, name+'_'+var+';'+var+';Frequency', 1000, 0, 100)
-            
-            elif var == 'InvMass':
-                hist = TH1F(name+'_'+var, name+'_'+var+';'+var+';Frequency', 2000, 0, 10000)
-            
-            # Scales the histogram forces the graph to be drawn as 'hist'
-            hist.Scale(Scale)
-            hist.SetOption('hist')
-            # Adds the hist to the dict
-            HistDict[name]['Hists'][var] = hist
+                elif var == 'dR_Eta' or var == 'dR_Rap':
+                    hist = TH1F(name+'_'+var, name+'_'+var+';'+var+';Frequency', 1000, 0, 100)
+                
+                elif var == 'InvMass':
+                    hist = TH1F(name+'_'+var, name+'_'+var+';'+var+';Frequency', 2000, 0, 10000)
+                
+                # Scales the histogram forces the graph to be drawn as 'hist'
+                hist.Scale(Scale)
+                hist.SetOption('hist')
+                # Adds the hist to the dict
+                HistDict[name]['Hists'][var] = hist
+        
+        if properties['Dimensions'] == 2
+            for var in properties['Requests']['Vars']:
+                hist = None
+                
+                # Checks the variable and initialises a custom histogram
+                # Set the limits much larger than they need to be since they're reset later
+                if var == 'Count': 
+                    hist = TH1F(name+'_'+var, name+'_'+var+';'+var+';Frequency', 200, 0, 10)
+                
+                elif var == 'Eta':
+                    hist = TH1F(name+'_'+var, name+'_'+var+';'+var+';Frequency', 200, -10, 10)
+                
+                elif var == 'dEta':
+                    hist = TH1F(name+'_'+var, name+'_'+var+';'+var+';Frequency', 200, -20, 20)
+
+                elif var == 'Phi' or var == 'dPhi':
+                    hist = TH1F(name+'_'+var, name+'_'+var+';'+var+';Frequency', 200, -3.5, 3.5)
+
+                elif var == 'Rapidity':
+                    hist = TH1F(name+'_'+var, name+'_'+var+';'+var+';Frequency', 200, -10, 10)
+                
+                elif var == 'dRapidity':
+                    hist = TH1F(name+'_'+var, name+'_'+var+';'+var+';Frequency', 200, -20, 20)
+
+                elif var == 'Pt':
+                    hist = TH1F(name+'_'+var, name+'_'+var+';'+var+';Frequency', 1000, 0, 1000)
+                
+                elif var == 'Et':
+                    hist = TH1F(name+'_'+var, name+'_'+var+';'+var+';Frequency', 1500, 0, 1500)
+
+                elif var == 'q':
+                    hist = TH1F(name+'_'+var, name+'_'+var+';'+var+';Frequency', 1000, 0, 10000)
+
+                elif var == 'dR_Eta' or var == 'dR_Rap':
+                    hist = TH1F(name+'_'+var, name+'_'+var+';'+var+';Frequency', 1000, 0, 100)
+                
+                elif var == 'InvMass':
+                    hist = TH1F(name+'_'+var, name+'_'+var+';'+var+';Frequency', 2000, 0, 10000)
+                
+                # Scales the histogram forces the graph to be drawn as 'hist'
+                hist.Scale(Scale)
+                hist.SetOption('hist')
+                # Adds the hist to the dict
+                HistDict[name]['Hists'][var] = hist
     
     return HistDict
 
