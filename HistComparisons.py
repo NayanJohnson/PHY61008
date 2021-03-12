@@ -4,7 +4,7 @@
 import sys
 import Analysis_Funcs as funcs
 import config
-from ROOT import TFile, TH1F, TCanvas, TLegend, SetOwnership
+from ROOT import TFile, TH1F, TCanvas, TLegend, SetOwnership, TColor
 
 HistFile1_name = sys.argv[1]
 HistFile2_name = sys.argv[2]
@@ -66,17 +66,19 @@ for key in HistFile2.GetListOfKeys():
         hist.SetStats(False)
         hist.SetMaximum(Max)
 
-    # Set diffent hist options
-    Hist1.SetLineColor(4)
-    Hist2.SetLineColor(2)
-
     if Hist1.GetDimension() == 1:
         # Force both to be drawn as hist and on the same canvas
+        Hist1.SetLineColor(4)        
         Hist1.Draw("HIST same")
+        Hist2.SetLineColor(2)
         Hist2.Draw("HIST same")
     elif Hist1.GetDimension() == 2:
-        Hist1.Draw("SURF same")
-        Hist2.Draw("SURF same")
+        #
+        TColor.SetPalette(59, 0)
+        Hist1.Draw("COLZ same")
+        
+        TColor.SetPalette(60, 0)
+        Hist2.Draw("COLZ same")
 
     # Legend properties
     LegendX1 = .8
