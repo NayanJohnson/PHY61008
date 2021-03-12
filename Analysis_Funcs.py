@@ -295,7 +295,9 @@ def HistLims(HistDict, i):
                 # Max/min = BinMax/min +- 5% +- 5 (prevents max=min for BinMax/Min=0)
                 XMax = BinMaxX + abs(BinMaxX/10) + 5
                 XMin = BinMinX - abs(BinMinX/10) - 5
-            
+
+                
+
                 hist.SetAxisRange(XMin, XMax, 'X')
             
             elif hist.GetDimension() == 2:
