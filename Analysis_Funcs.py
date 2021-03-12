@@ -99,7 +99,7 @@ def MakeHists(HistDict, Scale):
                 hist = TH1F(name+'_'+var, name+'_'+var+';'+var+';Frequency', 1000, 0, 1000)
             
             elif var == 'Et':
-                hist = TH1F(name+'_'+var, name+'_'+var+';'+var+';Frequency', 300, 0, 1500)
+                hist = TH1F(name+'_'+var, name+'_'+var+';'+var+';Frequency', 1500, 0, 1500)
 
             elif var == 'q':
                 hist = TH1F(name+'_'+var, name+'_'+var+';'+var+';Frequency', 1000, 0, 10000)
@@ -322,7 +322,7 @@ def ParticleLoop(TreeDict, EventNum):
     FinalLeptons = []
     
     # Neutrino 4momentum list
-    Neutrinos_P = []
+    MissingParticle = []
 
     # Lists for sorting by PT in this event
     ElectronPT = []
@@ -340,7 +340,7 @@ def ParticleLoop(TreeDict, EventNum):
         # i == 1 corresponds to beam electron
         elif i == 1:         
             BeamElectron = particle
-                    
+          
         # Final state particles                
         if particle.Status == 1:
             
@@ -364,8 +364,9 @@ def ParticleLoop(TreeDict, EventNum):
                 
             # Selecting neutrinos
             elif abs(particle.PID) == 12 or abs(particle.PID) == 14:
-                Neutrinos_P.append(particle.P4())
-                FinalLeptons.append(particle)
+                MissingParticle.append(particle)
+                
+            FinalLeptons = FinalLeptons + MissingParticle
                 
             
         # Loop through generated Jets
@@ -397,11 +398,11 @@ def ParticleLoop(TreeDict, EventNum):
     JetPT_sorted = sorted(JetPT, key=lambda x: x[0])
 
     # MissingE is the sum of all neutrino momenta in the event
-    MissingE_P = TLorentzVector()
-    for neutrino in Neutrinos_P:
-        neutrino.SetPz(0)
-        neutrino.SetE(neutrino.Et())
-        MissingET_P = MissingE_P + neutrino
+    MissingET_P = TLorentzVector()
+    for particle in MissingParticle:
+        particle.P4().SetPz(0)
+        particle.P4().SetE(particle.P4().Et())
+        MissingET_P = MissingET_P + particle.P4()
 
     EventDict   =   {
         'Count'     :   {
