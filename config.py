@@ -7,6 +7,9 @@ VarKeywords = [
     'dEta', 'dPhi', 'dRapidity', 'dR_Eta', 'dR_Rap', 'InvMass'
 ]
 
+# Touples of two variables will be treated as 2 dimensions in a 2D histogram
+
+
 # Particle keywords:
 ParticleKeywords = [
     'BeamElectron', 'FinalBeamElectron', 'LeadingMuon', 'SubLeadingMuon', 'MuonSum', 
@@ -221,69 +224,59 @@ HistDict = {
 
 }
 
+# Initial Parameters for the
+
 VarParams = {
+    'Nbins'     :   10000,
     'Count'     :   {
-        'Nbins'     :   200,
         'Range'     :   (0, 10)
     },
 
     'Eta'       :   {
-        'Nbins'     :   200,
         'Range'     :   (-10, 10)
     },
 
     'Phi'       :   {
-        'Nbins'     :   200,
         'Range'     :   (-3.5, 3.5)
     },
 
     'Rapidity'  :   {
-        'Nbins'     :   200,
         'Range'     :   (-10, 10)
     },
     
     'Pt'        :   {
-        'Nbins'     :   1000,
         'Range'     :   (0, 1000)
     },
     
     'Et'        :   {
-        'Nbins'     :   1500,
         'Range'     :   (0, 1500)
     },
     
     'q'         :   {
-        'Nbins'     :   1000,
         'Range'     :   (0, 10000)
     },
 
     'dEta'      :   {
-        'Nbins'     :   200,
         'Range'     :   (-10, 10)
     },
     
     'dPhi'      :   {
-        'Nbins'     :   200,
         'Range'     :   (-3.5, 3.5)
     },
     
     'dRapidity' :   {
-        'Nbins'     :   200,
         'Range'     :   (-20, 20)
     },
     
     'dR_Eta'    :   {
-        'Nbins'     :   1000,
         'Range'     :   (0, 100)
     },
     
     'dR_Rap'    :   {
-        'Nbins'     :   1000,
         'Range'     :   (0, 100)
     },
     
     'InvMass'   :   {
-        'Nbins'     :   2000,
         'Range'     :   (0, 10000)
     },
 }

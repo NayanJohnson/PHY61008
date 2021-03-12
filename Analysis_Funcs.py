@@ -72,6 +72,7 @@ def MakeHists(HistDict, Scale):
         to the dictionary.
     '''
     VarParams = config.VarParams
+    histNbins = VarParams['Nbins']
 
     for name, properties in HistDict.items():
         properties['Hists'] = {}
@@ -83,14 +84,12 @@ def MakeHists(HistDict, Scale):
                 if len(var) == 2:
                     histName = name+'_'+var[0]+'_'+var[1]
                     histTitle = histName+';'+var[0]+';'+var[1]+';Frequency'
-                    histNbinsx = VarParams[var[0]]['Nbins']
                     histXlow = VarParams[var[0]]['Range'][0]
                     histXup = VarParams[var[0]]['Range'][1]
-                    histNbinsy = VarParams[var[1]]['Nbins']
                     histYlow = VarParams[var[1]]['Range'][0]
                     histYup = VarParams[var[1]]['Range'][1]        
 
-                    hist = TH2F(histName, histTitle, histNbinsx, histXlow, histXup, histNbinsy, histYlow, histYup)
+                    hist = TH2F(histName, histTitle, histNbins, histXlow, histXup, histNbins, histYlow, histYup)
                     
                     # Scales the histogram forces the graph to be drawn as 'hist'
                     hist.Scale(Scale)
@@ -101,11 +100,11 @@ def MakeHists(HistDict, Scale):
             elif type(var) == str:
                 histName = name+'_'+var
                 histTitle = histName+';'+var+';Frequency'
-                histNbinsx = VarParams[var]['Nbins']
                 histXlow = VarParams[var]['Range'][0]
                 histXup = VarParams[var]['Range'][1]
                  
-                hist = TH1F(histName, histTitle, histNbinsx, histXlow, histXup)
+                hist = TH1F(histName, histTitle, histNbins, histXlow, histXup)
+
 
                 # Scales the histogram forces the graph to be drawn as 'hist'
                 hist.Scale(Scale)
@@ -247,16 +246,47 @@ def GetVariable(catagory, var, properties, dims=1):
             return dR_Rap    
     return False
 
+def GetDividers(n):
+    '''
+    '''
+    Dividers = []
+    i = 1
+    while i <= n : 
+        if (n % i==0) : 
+            NbinsDivisors.append(i), 
+        i += 1
+    return Dividers
 
 def HistLims(HistDict):
     '''
         Rescales hist lims depending on the data in the hists
     '''
-    for Catagory, HistSubDict in HistDict.items():
-        for var, hist in HistSubDict['Hists'].items():
+
+    # Will return a list of the dividers of NBins
+    NbinsDivisors = GetDividers(config.VarParams['Nbins'])
+
+    for catagory, properties in HistDict.items():
+        for var, hist in properties['Hists'].items():
             
             # print(hist.GetDimension())
             if hist.GetDimension() == 1:
+                
+                # First version of Max Min using a threshold of 0 since the 
+                # bin width is very small
+                BinMaxX = hist.GetBinLowEdge(hist.FindLastBinAbove(0, 1))
+                BinMinX = hist.GetBinLowEdge(hist.FindFirstBinAbove(0, 1))
+
+                # Rescales bin number so the plotted range has Nbins = 200
+                XRange = (config.VarParams[var]['Range'][1]-config.VarParams[var]['Range'][0])
+                NewNbinsX = 100/(BinMaxX-BinMinX) * XRange
+                NGroupX = config.VarParams['Nbins']/NewNbinsX
+
+                # Finds divisor closest to NGroup
+                NGroupDivisorX = min(NbinsDivisors, key=lambda x:abs(x-NGroupX))
+                hist.RebinX(int(NGroupDivisorX))
+
+                # Recalculating Max Min with higher threshold - this is possible as 
+                # the hists have been rebinned to a large width
                 # Get the index of the min/max bin and the read off the value of the 
                 # low edge
                 # Set FindLastBinAbove threshold to 5 since otherwise the 
@@ -266,9 +296,43 @@ def HistLims(HistDict):
                 # Max/min = BinMax/min +- 5% +- 5 (prevents max=min for BinMax/Min=0)
                 XMax = BinMaxX + abs(BinMaxX/10) + 5
                 XMin = BinMinX - abs(BinMinX/10) - 5
+            
+
                 hist.SetAxisRange(XMin, XMax, 'X')
+                # print(XMin, XMax, catagory, var)
             
             elif hist.GetDimension() == 2:
+
+                xVar  = var.split('_')[-2]
+                yVar  = var.split('_')[-1]
+
+                # First version of Max Min using a threshold of 0 since the 
+                # bin width is very small
+                BinMaxX = hist.GetXaxis().GetBinLowEdge(hist.FindLastBinAbove(0, 1))
+                BinMinX = hist.GetXaxis().GetBinLowEdge(hist.FindFirstBinAbove(0, 1))
+                BinMaxY = hist.GetYaxis().GetBinLowEdge(hist.FindLastBinAbove(0, 2))
+                BinMinY = hist.GetYaxis().GetBinLowEdge(hist.FindFirstBinAbove(0, 2))     
+
+                # Rescales bin number so the plotted range has Nbins = 200
+                XRange = (config.VarParams[xVar]['Range'][1]-config.VarParams[xVar]['Range'][0])
+                NewNbinsX = 100/(BinMaxX-BinMinX) * XRange
+                NGroupX = config.VarParams['Nbins']/NewNbinsX
+
+                # Finds divisor closest to NGroup
+                NGroupDivisorX = min(NbinsDivisors, key=lambda x:abs(x-NGroupX))
+                hist.RebinX(int(NGroupDivisorX))
+
+                # Rescales bin number so the range has Nbins 200
+                YRange = (config.VarParams[yVar]['Range'][1]-config.VarParams[yVar]['Range'][0])
+                NewNbinsY = 200/(BinMaxY-BinMinY) * YRange
+                NGroupY = config.VarParams['Nbins']/NewNbinsY
+
+                # Finds divisor closest to NGroup
+                NGroupDivisorY = min(NbinsDivisors, key=lambda x:abs(x-NGroupY))
+                hist.RebinY(int(NGroupDivisorY))
+
+                # Recalculating Max Min with higher threshold - this is possible as 
+                # the hists have been rebinned to a large width
                 # Get the index of the min/max bin and the read off the value of the 
                 # low edge
                 # Set FindLastBinAbove threshold to 2 since the particles are now spread
