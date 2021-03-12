@@ -45,7 +45,7 @@ HistDict = {
     'FinalBeamElectron' 
                     :   {
         'Requests'      :   {
-            'Vars'      :   ['Eta', 'Phi', 'Rapidity', 'Pt', ('Eta', 'Pt')],
+            'Vars'      :   ['Eta', 'Phi', 'Rapidity', 'Pt', ('Pt', 'Eta')],
             'Particles' :   ['FinalBeamElectron'],
         },
     },
