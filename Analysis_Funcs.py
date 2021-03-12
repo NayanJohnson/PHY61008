@@ -246,16 +246,16 @@ def GetVariable(catagory, var, properties, dims=1):
             return dR_Rap    
     return False
 
-def GetDividers(n):
+def GetDivisors(n):
     '''
     '''
-    Dividers = []
+    Divisors = []
     i = 1
     while i <= n : 
         if (n % i==0) : 
-            NbinsDivisors.append(i), 
+            Divisors.append(i), 
         i += 1
-    return Dividers
+    return Divisors
 
 def HistLims(HistDict):
     '''
@@ -263,7 +263,7 @@ def HistLims(HistDict):
     '''
 
     # Will return a list of the dividers of NBins
-    NbinsDivisors = GetDividers(config.VarParams['Nbins'])
+    NbinsDivisors = GetDivisors(config.VarParams['Nbins'])
 
     for catagory, properties in HistDict.items():
         for var, hist in properties['Hists'].items():
