@@ -73,6 +73,7 @@ def MakeHists(HistDict, Scale):
     '''
     VarParams = config.VarParams
     histNbins = VarParams['Nbins']
+
     for name, properties in HistDict.items():
         properties['Hists'] = {}
 
@@ -176,7 +177,6 @@ def FillHists(HistDict):
                             hist.Fill(V)
                     else:
                         hist.Fill(xVar)
-            
 
 
 def GetVariable(catagory, var, properties, dims=1):
@@ -263,7 +263,7 @@ def HistLims(HistDict):
     '''
 
     # Will return a list of the dividers of NBins
-    NbinsDivisors = GetDivisors(config.VarParams['Nbins'])
+    
 
     for catagory, properties in HistDict.items():
         for var, hist in properties['Hists'].items():
@@ -278,8 +278,8 @@ def HistLims(HistDict):
                 # Rescales bin number so the plotted range has Nbins = 200
                 XRange = (config.VarParams[var]['Range'][1]-config.VarParams[var]['Range'][0])
                 NewNbinsX = 100/(BinMaxX-BinMinX) * XRange
-                NGroupX = config.VarParams['Nbins']/NewNbinsX
-
+                NGroupX = hist.GetNbinsX()/NewNbinsX
+                NbinsDivisors = GetDivisors(hist.GetNbinsX())
                 # Finds divisor closest to NGroup
                 NGroupDivisorX = min(NbinsDivisors, key=lambda x:abs(x-NGroupX))
                 hist.RebinX(int(NGroupDivisorX))
@@ -295,7 +295,8 @@ def HistLims(HistDict):
                 # Max/min = BinMax/min +- 5% +- 5 (prevents max=min for BinMax/Min=0)
                 XMax = BinMaxX + abs(BinMaxX/10) + 5
                 XMin = BinMinX - abs(BinMinX/10) - 5
-            
+
+
                 hist.SetAxisRange(XMin, XMax, 'X')
             
             elif hist.GetDimension() == 2:
@@ -313,8 +314,8 @@ def HistLims(HistDict):
                 # Rescales bin number so the plotted range has Nbins = 200
                 XRange = (config.VarParams[xVar]['Range'][1]-config.VarParams[xVar]['Range'][0])
                 NewNbinsX = 100/(BinMaxX-BinMinX) * XRange
-                NGroupX = config.VarParams['Nbins']/NewNbinsX
-
+                NGroupX = hist.GetNbinsX()/NewNbinsX
+                NbinsDivisors = GetDivisors(hist.GetNbinsX())
                 # Finds divisor closest to NGroup
                 NGroupDivisorX = min(NbinsDivisors, key=lambda x:abs(x-NGroupX))
                 hist.RebinX(int(NGroupDivisorX))
@@ -322,8 +323,8 @@ def HistLims(HistDict):
                 # Rescales bin number so the range has Nbins 200
                 YRange = (config.VarParams[yVar]['Range'][1]-config.VarParams[yVar]['Range'][0])
                 NewNbinsY = 200/(BinMaxY-BinMinY) * YRange
-                NGroupY = config.VarParams['Nbins']/NewNbinsY
-
+                NGroupY = hist.GetNbinsY()/NewNbinsY
+                NbinsDivisors = GetDivisors(hist.GetNbinsY())
                 # Finds divisor closest to NGroup
                 NGroupDivisorY = min(NbinsDivisors, key=lambda x:abs(x-NGroupY))
                 hist.RebinY(int(NGroupDivisorY))

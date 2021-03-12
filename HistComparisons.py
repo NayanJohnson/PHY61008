@@ -2,6 +2,9 @@
 # python script.py hists1.root hists2.root output.root
 
 import sys
+import Analysis_Funcs as funcs
+import config
+from ROOT import TFile, TH1F, TCanvas, TLegend, SetOwnership
 
 HistFile1_name = sys.argv[1]
 HistFile2_name = sys.argv[2]
@@ -10,66 +13,63 @@ MediaDir_name = sys.argv[3]
 if MediaDir_name[-1] != '/':
     MediaDir_name = MediaDir_name+'/'
 
-from ROOT import TFile, TH1F, TCanvas, TLegend, SetOwnership
-
 # Read hist files
 HistFile1 = TFile(HistFile1_name)
 HistFile2 = TFile(HistFile2_name)
 
+HistDict1 = config.HistDict.copy()
+HistDict2 = config.HistDict.copy()
 # Hist1.GetListOfKeys() returns an object of type THashList
 # key is of type TKey
-for key in HistFile1.GetListOfKeys():
+for key in HistFile2.GetListOfKeys():
+
+    # Get the name of the hist
+    histname = key.GetName()
+
+    # Read the same hist in each file
+    Hist1 = HistFile1.Get(histname+';1')
+    Hist2 = HistFile2.Get(histname+';1')      
+
+    if Hist1.GetDimension() == 1:
+        histvar = histname.split('_')[-1]
+        category = histname.split('_')[0:-1]
+        category = "_".join(category)
+    elif Hist1.GetDimension() == 2:
+        histvar = histname.split('_')[-2]+'_'+histname.split('_')[-1]
+        category = histname.split('_')[0:-2]
+        category = "_".join(category)
+
+        
+    for key, properties in HistDict2.items():
+        properties['Hists'] = {}
+    HistDict2[category]['Hists'][histvar] = Hist2
+    for key, properties in HistDict1.items():
+        properties['Hists'] = {}
+    HistDict1[category]['Hists'][histvar] = Hist1
+
+    funcs.HistLims(HistDict1)
+    funcs.HistLims(HistDict2)
 
     # Clear canvas
     HistCan = TCanvas()
     HistCan.cd()
     
-    # Get the name of the hist
-    histname = key.GetName()
-    histvar = histname.split('_')[-1]
-
-    # Read the same hist in each file
-    Hist1 = HistFile1.Get(histname+';1')
-    Hist2 = HistFile2.Get(histname+';1')    
-
-    # Get the index of the min/max bin and the read off the value of the 
-    # low edge
-    # Set FindLastBinAbove threshold to 5 since otherwise the 
-    # hist goes on for way too long    
-    BinMax1 = Hist1.GetBinLowEdge(Hist1.FindLastBinAbove(5))
-    BinMin1 = Hist1.GetBinLowEdge(Hist1.FindFirstBinAbove())
-    BinMax2 = Hist2.GetBinLowEdge(Hist2.FindLastBinAbove(5))
-    BinMin2 = Hist2.GetBinLowEdge(Hist2.FindFirstBinAbove())    
-    # Max/min = BinMax/min +- 5% +- 5 (prevents max=min for BinMax/Min=0)
-    XMax1 = BinMax1 + abs(BinMax1/10) + 5
-    XMin1 = BinMin1 - abs(BinMin1/10) - 5
-    XMax2 = BinMax2 + abs(BinMax2/20) + 5
-    XMin2 = BinMin2 - abs(BinMin2/20) - 5    
-
-    # max frequency
-    Max1 = Hist1.GetMaximum() + Hist1.GetMaximum()/10
-    Max2 = Hist2.GetMaximum() + Hist2.GetMaximum()/10
-
-    # Max/min is the max/min of the two hists
-    XMax = max(XMax1, XMax2)
-    XMin = min(XMin1, XMin2)
-    Max = max(Max1, Max2)
-    # Take the large Nbin value
-    NBins = max(Hist1.GetNbinsX(), Hist2.GetNbinsX())
-
     # Setting universal hist options
     for hist in (Hist1, Hist2):
-        # SetBins actually introduces an offset into the graph - oops
-        hist.SetAxisRange(XMin, XMax)
-        hist.SetMaximum(Max)
+        # SetBins actually introduces an offset into the graph
         hist.SetStats(False)
 
     # Set diffent hist options
     Hist1.SetLineColor(4)
     Hist2.SetLineColor(2)
-    # Force both to be drawn as hist and on the same canvas
-    Hist1.Draw("hist same")
-    Hist2.Draw("hist same")
+
+    if Hist1.GetDimension() == 1:
+        # Force both to be drawn as hist and on the same canvas
+        Hist1.Draw("HIST same")
+        Hist2.Draw("HIST same")
+    elif Hist1.GetDimension() == 2:
+        Hist1.Draw("SURF same")
+        Hist2.Draw("SURF same")
 
     # Legend properties
     LegendX1 = .8
