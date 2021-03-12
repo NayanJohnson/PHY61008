@@ -37,8 +37,8 @@ for key in HistFile1.GetListOfKeys():
     # Set FindLastBinAbove threshold to 5 since otherwise the 
     # hist goes on for way too long    
     BinMax1 = Hist1.GetBinLowEdge(Hist1.FindLastBinAbove(5))
-    BinMin1 = Hist1.GetBinLowEdge(Hist1.FindFirstBinAbove(5))
-    BinMax2 = Hist2.GetBinLowEdge(Hist2.FindLastBinAbove())
+    BinMin1 = Hist1.GetBinLowEdge(Hist1.FindFirstBinAbove())
+    BinMax2 = Hist2.GetBinLowEdge(Hist2.FindLastBinAbove(5))
     BinMin2 = Hist2.GetBinLowEdge(Hist2.FindFirstBinAbove())    
     # Max/min = BinMax/min +- 5% +- 5 (prevents max=min for BinMax/Min=0)
     XMax1 = BinMax1 + abs(BinMax1/10) + 5
@@ -52,9 +52,6 @@ for key in HistFile1.GetListOfKeys():
 
     # Max/min is the max/min of the two hists
     XMax = max(XMax1, XMax2)
-    if histvar == 'Pt':
-        print(histname, (XMax1, XMax2))
-        XMax = 300
     XMin = min(XMin1, XMin2)
     Max = max(Max1, Max2)
     # Take the large Nbin value
