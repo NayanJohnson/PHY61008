@@ -268,12 +268,11 @@ def HistLims(HistDict):
     for catagory, properties in HistDict.items():
         for var, hist in properties['Hists'].items():
             
-            # print(hist.GetDimension())
             if hist.GetDimension() == 1:
                 
                 # First version of Max Min using a threshold of 0 since the 
                 # bin width is very small
-                BinMaxX = hist.GetBinLowEdge(hist.FindLastBinAbove(0, 1))
+                BinMaxX = hist.GetBinLowEdge(hist.FindLastBinAbove(0, 1)) + 1
                 BinMinX = hist.GetBinLowEdge(hist.FindFirstBinAbove(0, 1))
 
                 # Rescales bin number so the plotted range has Nbins = 200
@@ -297,9 +296,7 @@ def HistLims(HistDict):
                 XMax = BinMaxX + abs(BinMaxX/10) + 5
                 XMin = BinMinX - abs(BinMinX/10) - 5
             
-
                 hist.SetAxisRange(XMin, XMax, 'X')
-                # print(XMin, XMax, catagory, var)
             
             elif hist.GetDimension() == 2:
 
@@ -308,9 +305,9 @@ def HistLims(HistDict):
 
                 # First version of Max Min using a threshold of 0 since the 
                 # bin width is very small
-                BinMaxX = hist.GetXaxis().GetBinLowEdge(hist.FindLastBinAbove(0, 1))
+                BinMaxX = hist.GetXaxis().GetBinLowEdge(hist.FindLastBinAbove(0, 1)) + 1
                 BinMinX = hist.GetXaxis().GetBinLowEdge(hist.FindFirstBinAbove(0, 1))
-                BinMaxY = hist.GetYaxis().GetBinLowEdge(hist.FindLastBinAbove(0, 2))
+                BinMaxY = hist.GetYaxis().GetBinLowEdge(hist.FindLastBinAbove(0, 2)) + 1
                 BinMinY = hist.GetYaxis().GetBinLowEdge(hist.FindFirstBinAbove(0, 2))     
 
                 # Rescales bin number so the plotted range has Nbins = 200
