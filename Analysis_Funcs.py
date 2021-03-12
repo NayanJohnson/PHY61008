@@ -71,7 +71,8 @@ def MakeHists(HistDict, Scale):
     '''
 
     for name, properties in HistDict.items():
-        for var in properties['Vars']:
+        properties['Hists'] = {}
+        for var in properties['Requests']['Vars']:
             hist = None
             
             # Checks the variable and initialises a custom histogram
@@ -95,16 +96,16 @@ def MakeHists(HistDict, Scale):
                 hist = TH1F(name+'_'+var, name+'_'+var+';'+var+';Frequency', 200, -20, 20)
 
             elif var == 'Pt':
-                hist = TH1F(name+'_'+var, name+'_'+var+';'+var+';Frequency', 2000, 0, 1000)
+                hist = TH1F(name+'_'+var, name+'_'+var+';'+var+';Frequency', 1000, 0, 1000)
             
             elif var == 'Et':
-                hist = TH1F(name+'_'+var, name+'_'+var+';'+var+';Frequency', 2000, 0, 1000)
+                hist = TH1F(name+'_'+var, name+'_'+var+';'+var+';Frequency', 1000, 0, 1000)
 
             elif var == 'q':
-                hist = TH1F(name+'_'+var, name+'_'+var+';'+var+';Frequency', 2000, 0, 10000)
+                hist = TH1F(name+'_'+var, name+'_'+var+';'+var+';Frequency', 1000, 0, 10000)
 
             elif var == 'dR_Eta' or var == 'dR_Rap':
-                hist = TH1F(name+'_'+var, name+'_'+var+';'+var+';Frequency', 2000, 0, 100)
+                hist = TH1F(name+'_'+var, name+'_'+var+';'+var+';Frequency', 1000, 0, 100)
             
             elif var == 'InvMass':
                 hist = TH1F(name+'_'+var, name+'_'+var+';'+var+';Frequency', 2000, 0, 10000)
@@ -116,7 +117,32 @@ def MakeHists(HistDict, Scale):
             HistDict[name]['Hists'][var] = hist
     
     return HistDict
-    
+
+def RequestParticles(HistDict, ParticleDict):
+    '''
+        Adds requested particles to the HistDict
+    '''
+
+    # Itterating through histogram categories
+    for category, properties in HistDict.items():
+        
+        # Itterating through particle requests
+        for particle in properties['Requests']['Particles']:
+
+            # Special check for AllJet request
+            # Ignore BeamJet to prevent double counting
+            if particle == 'AllJets' and particle != 'BeamJet':
+                for key, jet in ParticleDict.items():
+                    if jet['Check']:
+                        if jet['isJet']:
+                            properties['Particles'].append(jet)
+                            print(len(properties['Particles']))
+
+            elif ParticleDict[particle]['Check']:
+                properties['Particles'].append(ParticleDict[particle])               
+
+    return HistDict
+
 def FillHists(HistDict):
     '''
         Given a dictionary of histograms, will fill them.
@@ -135,52 +161,55 @@ def FillHists(HistDict):
     # List of variables that are stored in all particles.
     ParticleProperties = ['PID', 'E', 'Eta', 'Phi', 'Rapidity', 'Theta', 'Pt', 'Et']
 
-    for Catagory, HistSubDict in HistDict.items():
-        for var, hist in HistSubDict['Hists'].items():
+    for catagory, properties in HistDict.items():
+        for var, hist in properties['Hists'].items():
 
             # Checks the variable and fills the histogram
             if var == 'Count': 
-                hist.Fill(HistSubDict['Count'])
+                hist.Fill(properties['Count'])
 
-            # Checks that there are particles in the hist dict
-            # Count histogram doesn't need any particles so is before this check
-            elif len(HistSubDict['Particles']) != 0:
+            # Seperates hists into the number of required particles
+            elif len(properties['Particles']) == 1:
                 if var in ParticleProperties:
-                    # print(Catagory, var)
-                    hist.Fill(HistSubDict['Particles'][0][var])
+                    hist.Fill(properties['Particles'][0][var])
 
-                elif var == 'q':
-                    if Catagory == 'q_Lepton' or Catagory == 'q_Quark':
-                        q = (HistSubDict['Particles'][0]['P4'] - HistSubDict['Particles'][1]['P4']).Mag()
-                    elif Catagory == 'q_eMethod':
-                        q = TMath.Sqrt(2*HistSubDict['Particles'][0]['E']*HistSubDict['Particles'][1]['E']*(1 - TMath.Cos(HistSubDict['Particles'][0]['Theta'])))
+            elif len(properties['Particles']) == 2:
+
+                if var == 'q':
+                    if catagory == 'q_Lepton' or catagory == 'q_Quark':
+                        q = (properties['Particles'][0]['P4'] - properties['Particles'][1]['P4']).Mag()
+                    elif catagory == 'q_eMethod':
+                        q = TMath.Sqrt(2*properties['Particles'][0]['E']*properties['Particles'][1]['E']*(1 - TMath.Cos(properties['Particles'][0]['Theta'])))
                     hist.Fill(abs(q))
 
                 elif var == 'dEta':
-                    dEta = HistSubDict['Particles'][0]['Eta'] - HistSubDict['Particles'][1]['Eta']
+                    dEta = properties['Particles'][0]['Eta'] - properties['Particles'][1]['Eta']
                     hist.Fill(dEta)
                 
                 elif var == 'dPhi':
-                    dPhi = HistSubDict['Particles'][0]['P4'].DeltaPhi(HistSubDict['Particles'][1]['P4'])
+                    dPhi = properties['Particles'][0]['P4'].DeltaPhi(properties['Particles'][1]['P4'])
                     hist.Fill(dPhi)
 
                 elif var == 'dRapidity':
-                    dRap = HistSubDict['Particles'][0]['Rapidity'] - HistSubDict['Particles'][1]['Rapidity']
+                    dRap = properties['Particles'][0]['Rapidity'] - properties['Particles'][1]['Rapidity']
                     hist.Fill(dRap)
 
                 elif var == 'dR_Eta':
-                    dR_Eta = HistSubDict['Particles'][0]['P4'].DrEtaPhi(HistSubDict['Particles'][1]['P4'])
+                    dR_Eta = properties['Particles'][0]['P4'].DrEtaPhi(properties['Particles'][1]['P4'])
                     hist.Fill(dR_Eta)
+
                 elif var == 'dR_Rap':
-                    dPhi = HistSubDict['Particles'][0]['P4'].DeltaPhi(HistSubDict['Particles'][1]['P4'])
-                    dRap = HistSubDict['Particles'][0]['Rapidity'] - HistSubDict['Particles'][1]['Rapidity']
+                    dPhi = properties['Particles'][0]['P4'].DeltaPhi(properties['Particles'][1]['P4'])
+                    dRap = properties['Particles'][0]['Rapidity'] - properties['Particles'][1]['Rapidity']
                     # DrRapidityPhi function doesnt seem to work
                     dR_Rap = TMath.Sqrt( dPhi**2 + dRap**2 )
                     hist.Fill(dR_Rap)                          
-                
-                elif var == 'InvMass':
+
+            if len(properties['Particles']) != 0:
+
+                if var == 'InvMass':
                     ParticleSum = TLorentzVector()
-                    for paritcle in HistSubDict['Particles']:
+                    for paritcle in properties['Particles']:
                         ParticleSum = paritcle['P4'] + ParticleSum
                     hist.Fill(ParticleSum.M())
 
@@ -202,13 +231,14 @@ def HistLims(HistDict):
             hist.SetAxisRange(XMin, XMax)
 
 
-def AddParticle(name, PID, P4, ParticleDict):
+def AddParticle(name, ParticleDict, P4=None, PID=None, isJet=False):
         '''
             Given a name, PID, 4-momenta of a particle,
             will add a particle dict of various properties to an existing
             dict:
             ParticleDict[name] = {
-                'name'      :   name,
+                'Check'     :   check,
+                'Name'      :   name,
                 'PID'       :   PID,
                 'P4'        :   P4,
                 'E'         :   P4.E(),
@@ -221,18 +251,27 @@ def AddParticle(name, PID, P4, ParticleDict):
             }
         '''
 
-        ParticleDict[name] = {
-            'name'      :   name,
-            'PID'       :   PID,
-            'P4'        :   P4,
-            'E'         :   P4.E(),
-            'Eta'       :   P4.Eta(),
-            'Phi'       :   P4.Phi(),
-            'Rapidity'  :   P4.Rapidity(),
-            'Theta'     :   P4.Theta(),
-            'Pt'        :   P4.Pt(),
-            'Et'        :   P4.Et()
-        }
+        # Checks if a particle is present
+        if P4 == None:
+            ParticleDict[name] = {
+                'Check'     :   False
+            }
+
+        else:
+            ParticleDict[name] = {
+                'Check'     :   True,
+                'Name'      :   name,
+                'PID'       :   PID,
+                'P4'        :   P4,
+                'E'         :   P4.E(),
+                'Eta'       :   P4.Eta(),
+                'Phi'       :   P4.Phi(),
+                'Rapidity'  :   P4.Rapidity(),
+                'Theta'     :   P4.Theta(),
+                'Pt'        :   P4.Pt(),
+                'Et'        :   P4.Et(),
+                'isJet'     :   isJet,
+            }
         
         return ParticleDict
 
