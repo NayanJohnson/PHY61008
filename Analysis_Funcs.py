@@ -73,7 +73,6 @@ def MakeHists(HistDict, Scale):
     '''
     VarParams = config.VarParams
     histNbins = VarParams['Nbins']
-
     for name, properties in HistDict.items():
         properties['Hists'] = {}
 
@@ -177,6 +176,7 @@ def FillHists(HistDict):
                             hist.Fill(V)
                     else:
                         hist.Fill(xVar)
+            
 
 
 def GetVariable(catagory, var, properties, dims=1):
