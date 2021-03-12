@@ -8,7 +8,7 @@
 
 # Particle keywords:
 ParticleKeywords = [
-    'BeamElectron', 'FinalBeamElectron', 'LeadingMuon', 'SubLeadingMuon',
+    'BeamElectron', 'FinalBeamElectron', 'LeadingMuon', 'SubLeadingMuon', 'MuonSum', 
     'AllMuons', 'WPlusMuon', 'WMinusMuon', 'MissingET', 'BeamQuark', 'BeamJet',
     'LeadingJet', 'SubLeadingJet', 'ThirdJet', 'FourthJet',
 ]
