@@ -15,7 +15,7 @@ outfile = TFile(outfilename,"RECREATE")
 myTree = funcs.LoadROOT("tag_1_delphes_events.root")
 
 ParticleKeywords = config.ParticleKeywords
-HistDict = congig.HistDict
+HistDict = config.HistDict
 
 # Get scaling factor for histograms
 Scale = funcs.GetScale('tag_1_pythia.log', myTree['NEvents'])

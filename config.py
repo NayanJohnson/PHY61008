@@ -2,9 +2,10 @@
 # 'Request' dictionary is used to tell the script what variables to
 # plot and what particles the histogram requires
 
-# Var keywords:
-# ['Count', 'Eta', 'Phi', 'Rapidity', 'Pt', 'Et', 'q', 
-# 'dEta', 'dPhi', 'dRapidity', 'dR_Eta', 'dR_Rap', 'InvMass']
+VarKeywords = [
+    'Count', 'Eta', 'Phi', 'Rapidity', 'Pt', 'Et', 'q', 
+    'dEta', 'dPhi', 'dRapidity', 'dR_Eta', 'dR_Rap', 'InvMass'
+]
 
 # Particle keywords:
 ParticleKeywords = [
@@ -18,7 +19,6 @@ ParticleKeywords = [
 
 HistDict = {
     'Electrons'     :   {
-        'Dimensions'    :   1,
         'Requests'      :   {
             'Vars'      :   ['Count'],
             'Particles' :   [],
@@ -26,7 +26,6 @@ HistDict = {
     },
     
     'Muons'         :   {
-        'Dimensions'    :   1,
         'Requests'      :   {
             'Vars'      :   ['Count'],
             'Particles' :   [],
@@ -34,7 +33,6 @@ HistDict = {
     },
     
     'Jets'          :   {
-        'Dimensions'    :   1,
         'Requests'      :   {
             'Vars'      :   ['Count'],
             'Particles' :   [],
@@ -43,15 +41,13 @@ HistDict = {
     
     'FinalBeamElectron' 
                     :   {
-        'Dimensions'    :   1,
         'Requests'      :   {
-            'Vars'      :   ['Eta', 'Phi', 'Rapidity', 'Pt'],
+            'Vars'      :   ['Eta', 'Phi', 'Rapidity', 'Pt', ('Eta', 'Pt')],
             'Particles' :   ['FinalBeamElectron'],
         },
     },
     
     'LeadingMuon'   :   {
-        'Dimensions'    :   1,
         'Requests'      :   {
             'Vars'      :   ['Eta', 'Phi', 'Rapidity', 'Pt'],
             'Particles' :   ['LeadingMuon'],
@@ -59,7 +55,6 @@ HistDict = {
     },
     
     'SubLeadingMuon':   {
-        'Dimensions'    :   1,
         'Requests'      :   {
             'Vars'      :   ['Eta', 'Phi', 'Rapidity', 'Pt'],
             'Particles' :   ['SubLeadingMuon'],
@@ -67,7 +62,6 @@ HistDict = {
     },
     
     'WPlusMuon'     :   {
-        'Dimensions'    :   1,
         'Requests'      :   {
             'Vars'      :   ['Eta', 'Phi', 'Rapidity', 'Pt'],
             'Particles' :   ['WPlusMuon'],
@@ -75,7 +69,6 @@ HistDict = {
     },
         
     'WMinusMuon'    :   {
-        'Dimensions'    :   1,
         'Requests'      :   {
             'Vars'      :   ['Eta', 'Phi', 'Rapidity', 'Pt'],
             'Particles' :   ['WMinusMuon'],
@@ -83,7 +76,6 @@ HistDict = {
     },
         
     'AllJets'       :   {
-        'Dimensions'    :   1,
         'Requests'      :   {
             'Vars'      :   ['Eta', 'Phi', 'Rapidity', 'Pt'],
             'Particles' :   ['AllJets'],
@@ -91,7 +83,6 @@ HistDict = {
     },
         
     'LeadingJet'    :   {
-        'Dimensions'    :   1,
         'Requests'      :   {
             'Vars'      :   ['Eta', 'Phi', 'Rapidity', 'Pt'],
             'Particles' :   ['LeadingJet'],
@@ -99,7 +90,6 @@ HistDict = {
     },
         
     'SubLeadingJet' :   {
-        'Dimensions'    :   1,
         'Requests'      :   {
             'Vars'      :   ['Eta', 'Phi', 'Rapidity', 'Pt'],
             'Particles' :   ['SubLeadingJet'],
@@ -107,7 +97,6 @@ HistDict = {
     },
         
     'ThirdJet'      :   {
-        'Dimensions'    :   1,
         'Requests'      :   {
             'Vars'      :   ['Eta', 'Phi', 'Rapidity', 'Pt'],
             'Particles' :   ['ThirdJet'],
@@ -115,7 +104,6 @@ HistDict = {
     },
         
     'FourthJet'     :   {
-        'Dimensions'    :   1,
         'Requests'      :   {
             'Vars'      :   ['Eta', 'Phi', 'Rapidity', 'Pt'],
             'Particles' :   ['FourthJet'],
@@ -123,7 +111,6 @@ HistDict = {
     },
         
     'MissingET'     :   {
-        'Dimensions'    :   1,
         'Requests'      :   {
             'Vars'      :   ['Eta', 'Phi', 'Rapidity', 'Pt', 'Et'],
             'Particles' :   ['MissingET'],
@@ -131,7 +118,6 @@ HistDict = {
     },
         
     'q_Lepton'      :   {
-        'Dimensions'    :   1,
         'Requests'      :   {
             'Vars'      :   ['q'],
             'Particles' :   ['BeamElectron', 'FinalBeamElectron'],
@@ -139,7 +125,6 @@ HistDict = {
     },
         
     'q_Quark'       :   {
-        'Dimensions'    :   1,
         'Requests'      :   {
             'Vars'      :   ['q'],
             'Particles' :   ['BeamQuark', 'BeamJet'],
@@ -147,7 +132,6 @@ HistDict = {
     },
 
     'q_eMethod'     :   {
-        'Dimensions'    :   1,
         'Requests'      :   {
             'Vars'      :   ['q'],
             'Particles' :   ['BeamElectron', 'FinalBeamElectron'],
@@ -156,7 +140,6 @@ HistDict = {
 
     'FinalBeamElectronLeadingMuon'  
                     :   {
-        'Dimensions'    :   1,
         'Requests'      :   {
             'Vars'      :   ['dEta', 'dPhi'],
             'Particles' :   ['FinalBeamElectron', 'LeadingMuon'],
@@ -165,7 +148,6 @@ HistDict = {
 
     'FinalBeamElectronSubLeadingMuon'  
                     :   {
-        'Dimensions'    :   1,
         'Requests'      :   {
             'Vars'      :   ['dEta', 'dPhi'],
             'Particles' :   ['FinalBeamElectron', 'SubLeadingMuon'],
@@ -174,7 +156,6 @@ HistDict = {
 
     'FinalBeamElectronLeadingJet'   
                     :   {
-        'Dimensions'    :   1,
         'Requests'      :   {
             'Vars'      :   ['dEta', 'dPhi'],
             'Particles' :   ['FinalBeamElectron', 'LeadingJet'],
@@ -182,7 +163,6 @@ HistDict = {
     },
 
     'MuonMuon'      :   {
-        'Dimensions'    :   1,
         'Requests'      :   {
             'Vars'      :   ['dEta', 'dPhi', 'dRapidity', 'dR_Eta', 'dR_Rap', 'InvMass'],
             'Particles' :   ['LeadingMuon', 'SubLeadingMuon'],
@@ -193,7 +173,6 @@ HistDict = {
 
     'SubLeadingMuonLeadingJet'  
                     :   {
-        'Dimensions'    :   1,
         'Requests'      :   {
             'Vars'      :   ['dEta', 'dPhi'],
             'Particles' :   ['SubLeadingMuon', 'LeadingJet'],
@@ -202,7 +181,6 @@ HistDict = {
     
     'MissingETFinalElectron'    
                     :   {
-        'Dimensions'    :   1,
         'Requests'      :   {
             'Vars'      :   ['dEta', 'dPhi'],
             'Particles' :   ['MissingET', 'FinalBeamElectron'],
@@ -211,7 +189,6 @@ HistDict = {
     
     'MissingETLeadingJet'  
                     :   {
-        'Dimensions'    :   1,
         'Requests'      :   {
             'Vars'      :   ['dEta', 'dPhi'],
             'Particles' :   ['MissingET', 'LeadingJet'],
@@ -220,7 +197,6 @@ HistDict = {
     
     'MissingETLeadingMuon'  
                     :   {
-        'Dimensions'    :   1,
         'Requests'      :   {
             'Vars'      :   ['dEta', 'dPhi'],
             'Particles' :   ['MissingET', 'LeadingMuon'],
@@ -229,7 +205,6 @@ HistDict = {
     
     'MissingETSubLeadingMuon'   
                     :   {
-        'Dimensions'    :   1,
         'Requests'      :   {
             'Vars'      :   ['dEta', 'dPhi'],
             'Particles' :   ['MissingET', 'SubLeadingMuon'],
@@ -238,14 +213,12 @@ HistDict = {
     
     'MissingETMuonSum'      
                     :   {
-        'Dimensions'    :   1,
         'Requests'      :   {
             'Vars'      :   ['dEta', 'dPhi'],
             'Particles' :   ['MissingET', 'MuonSum'],
         },
     },
-    
-    'Final'
+
 }
 
 VarParams = {
@@ -282,7 +255,7 @@ VarParams = {
     'q'         :   {
         'Nbins'     :   1000,
         'Range'     :   (0, 10000)
-    }
+    },
 
     'dEta'      :   {
         'Nbins'     :   200,
