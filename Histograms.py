@@ -212,7 +212,7 @@ HistDict = {
                     :   {
         'Requests'      :   {
             'Vars'      :   ['dEta', 'dPhi'],
-            'Particles' :   ['MissingET', 'LeadingMuon', 'SubLeadingMuon'],
+            'Particles' :   ['MissingET', 'MuonSum'],
         },
     },
     
@@ -336,7 +336,7 @@ for n in range(myTree['NEvents']):
     MuonSum = None 
     if ParticleDict['LeadingMuon']['Check'] and ParticleDict['SubLeadingMuon']['Check']:
         MuonSum = ParticleDict['LeadingMuon']['P4'] + ParticleDict['SubLeadingMuon']['P4']
-        ParticleDict = funcs.AddParticle('MuonSum', ParticleDict)
+        ParticleDict = funcs.AddParticle('MuonSum', ParticleDict, MuonSum)
 
     # Count hists
     HistDict['Electrons']['Count'] = numbElectrons
