@@ -1,5 +1,5 @@
 
-from ROOT import gSystem, gInterpreter, TChain, TH1F, TMath, TLorentzVector
+from ROOT import gSystem, gInterpreter, TChain, TH1F, TH2F, TMath, TLorentzVector
 
 # Path of Delphes directory 
 gSystem.AddDynamicPath("/home/nayan/MG5_aMC_v2_8_2/Delphes/")
@@ -9,6 +9,8 @@ gInterpreter.Declare('#include "classes/DelphesClasses.h"')
 gInterpreter.Declare('#include "external/ExRootAnalysis/ExRootTreeReader.h"')
 
 from ROOT import ExRootTreeReader
+import config
+
 
 def LoadROOT(filename):
     '''
@@ -69,53 +71,47 @@ def MakeHists(HistDict, Scale):
         Will use the 'Vars' list to initialise histograms and add them
         to the dictionary.
     '''
+    VarParams = config.VarParams
+    histNbins = VarParams['Nbins']
 
     for name, properties in HistDict.items():
         properties['Hists'] = {}
+
         for var in properties['Requests']['Vars']:
-            hist = None
             
-            # Checks the variable and initialises a custom histogram
-            # Set the limits much larger than they need to be since they're reset later
-            if var == 'Count': 
-                hist = TH1F(name+'_'+var, name+'_'+var+';'+var+';Frequency', 200, 0, 10)
-            
-            elif var == 'Eta':
-                hist = TH1F(name+'_'+var, name+'_'+var+';'+var+';Frequency', 200, -10, 10)
-            
-            elif var == 'dEta':
-                hist = TH1F(name+'_'+var, name+'_'+var+';'+var+';Frequency', 200, -20, 20)
+            # If var is a tuple the hist is multiple dims
+            if type(var) == tuple:
+                if len(var) == 2:
+                    histName = name+'_'+var[0]+'_'+var[1]
+                    histTitle = histName+';'+var[0]+';'+var[1]+';Frequency'
+                    histXlow = VarParams[var[0]]['Range'][0]
+                    histXup = VarParams[var[0]]['Range'][1]
+                    histYlow = VarParams[var[1]]['Range'][0]
+                    histYup = VarParams[var[1]]['Range'][1]        
 
-            elif var == 'Phi' or var == 'dPhi':
-                hist = TH1F(name+'_'+var, name+'_'+var+';'+var+';Frequency', 200, -3.5, 3.5)
+                    hist = TH2F(histName, histTitle, histNbins, histXlow, histXup, histNbins, histYlow, histYup)
+                    
+                    # Scales the histogram forces the graph to be drawn as 'hist'
+                    hist.Scale(Scale)
+                    hist.SetOption('HIST COLZ')
+                    # Adds the hist to the dict
+                    HistDict[name]['Hists'][var[0]+'_'+var[1]] = hist
 
-            elif var == 'Rapidity':
-                hist = TH1F(name+'_'+var, name+'_'+var+';'+var+';Frequency', 200, -10, 10)
-            
-            elif var == 'dRapidity':
-                hist = TH1F(name+'_'+var, name+'_'+var+';'+var+';Frequency', 200, -20, 20)
+            elif type(var) == str:
+                histName = name+'_'+var
+                histTitle = histName+';'+var+';Frequency'
+                histXlow = VarParams[var]['Range'][0]
+                histXup = VarParams[var]['Range'][1]
+                 
+                hist = TH1F(histName, histTitle, histNbins, histXlow, histXup)
 
-            elif var == 'Pt':
-                hist = TH1F(name+'_'+var, name+'_'+var+';'+var+';Frequency', 1000, 0, 1000)
-            
-            elif var == 'Et':
-                hist = TH1F(name+'_'+var, name+'_'+var+';'+var+';Frequency', 1500, 0, 1500)
 
-            elif var == 'q':
-                hist = TH1F(name+'_'+var, name+'_'+var+';'+var+';Frequency', 1000, 0, 10000)
+                # Scales the histogram forces the graph to be drawn as 'hist'
+                hist.Scale(Scale)
+                hist.SetOption('HIST')
+                # Adds the hist to the dict
+                HistDict[name]['Hists'][var] = hist
 
-            elif var == 'dR_Eta' or var == 'dR_Rap':
-                hist = TH1F(name+'_'+var, name+'_'+var+';'+var+';Frequency', 1000, 0, 100)
-            
-            elif var == 'InvMass':
-                hist = TH1F(name+'_'+var, name+'_'+var+';'+var+';Frequency', 2000, 0, 10000)
-            
-            # Scales the histogram forces the graph to be drawn as 'hist'
-            hist.Scale(Scale)
-            hist.SetOption('hist')
-            # Adds the hist to the dict
-            HistDict[name]['Hists'][var] = hist
-    
     return HistDict
 
 def RequestParticles(HistDict, ParticleDict):
@@ -163,73 +159,200 @@ def FillHists(HistDict):
 
     for catagory, properties in HistDict.items():
         for var, hist in properties['Hists'].items():
+            
+            # If var contains 2 variables
+            if len(var.split('_')) == 2:
+                xVar = GetVariable(catagory, var.split('_')[0], properties, 2)
+                yVar = GetVariable(catagory, var.split('_')[1], properties, 2)
+                if xVar and yVar:
+                    hist.Fill(xVar, yVar)
 
-            # Checks the variable and fills the histogram
-            if var == 'Count': 
-                hist.Fill(properties['Count'])
+            else:
+                xVar = GetVariable(catagory, var, properties)
+                if xVar != False:
+                    # If the function returns a list fill the hist for each
+                    # element in list
+                    if type(xVar) == list:
+                        for V in xVar:
+                            hist.Fill(V)
+                    else:
+                        hist.Fill(xVar)
 
-            # Variables that can be calculated from one or multiple
-            # particles.
-            if len(properties['Particles']) != 0:
-                if var in ParticleProperties:
-                    for i in range(0, len(properties['Particles'])):
-                        hist.Fill(properties['Particles'][i][var])
-                elif var == 'InvMass':
-                    ParticleSum = TLorentzVector()
-                    for paritcle in properties['Particles']:
-                        ParticleSum = paritcle['P4'] + ParticleSum
-                    hist.Fill(ParticleSum.M())
 
-            # Seperates hists into the number of required particles
-            if len(properties['Particles']) == 2:
+def GetVariable(catagory, var, properties, dims=1):
+    '''
+    '''
 
-                if var == 'q':
-                    if catagory == 'q_Lepton' or catagory == 'q_Quark':
-                        q = (properties['Particles'][0]['P4'] - properties['Particles'][1]['P4']).Mag()
-                    elif catagory == 'q_eMethod':
-                        q = TMath.Sqrt(2*properties['Particles'][0]['E']*properties['Particles'][1]['E']*(1 - TMath.Cos(properties['Particles'][0]['Theta'])))
-                    hist.Fill(abs(q))
+    # List of variables that are stored in all particles.
+    ParticleProperties = ['PID', 'E', 'Eta', 'Phi', 'Rapidity', 'Theta', 'Pt', 'Et']
 
-                elif var == 'dEta':
-                    dEta = properties['Particles'][0]['Eta'] - properties['Particles'][1]['Eta']
-                    hist.Fill(dEta)
-                
-                elif var == 'dPhi':
-                    dPhi = properties['Particles'][0]['P4'].DeltaPhi(properties['Particles'][1]['P4'])
-                    hist.Fill(dPhi)
+    # Checks the variable and fills the histogram
+    if var == 'Count': 
+        return properties['Count']
 
-                elif var == 'dRapidity':
-                    dRap = properties['Particles'][0]['Rapidity'] - properties['Particles'][1]['Rapidity']
-                    hist.Fill(dRap)
+    # Variables that can be calculated from one or multiple
+    # particles.
+    if len(properties['Particles']) != 0:
 
-                elif var == 'dR_Eta':
-                    dR_Eta = properties['Particles'][0]['P4'].DrEtaPhi(properties['Particles'][1]['P4'])
-                    hist.Fill(dR_Eta)
+        # Variables in ParticleProperties only require one particle so
+        # the hist can be filled by all particles in the list.
+        if var in ParticleProperties:
+            # Only alow 1D hists to return a list
+            if dims ==1:
+                ParticleVars = []
+                for i in range(0, len(properties['Particles'])):
+                    ParticleVars.append(properties['Particles'][i][var])
+                return ParticleVars
+            else:
+                return properties['Particles'][0][var]
 
-                elif var == 'dR_Rap':
-                    dPhi = properties['Particles'][0]['P4'].DeltaPhi(properties['Particles'][1]['P4'])
-                    dRap = properties['Particles'][0]['Rapidity'] - properties['Particles'][1]['Rapidity']
-                    # DrRapidityPhi function doesnt seem to work
-                    dR_Rap = TMath.Sqrt( dPhi**2 + dRap**2 )
-                    hist.Fill(dR_Rap)                          
+        elif var == 'InvMass':
+            ParticleSum = TLorentzVector()
+            for paritcle in properties['Particles']:
+                ParticleSum = paritcle['P4'] + ParticleSum
+            return ParticleSum.M()
+
+    # Seperates hists into the number of required particles
+    if len(properties['Particles']) == 2:
+
+        if var == 'q':
+            if catagory == 'q_Lepton' or catagory == 'q_Quark':
+                q = (properties['Particles'][0]['P4'] - properties['Particles'][1]['P4']).Mag()
+            elif catagory == 'q_eMethod':
+                q = TMath.Sqrt(2*properties['Particles'][0]['E']*properties['Particles'][1]['E']*(1 - TMath.Cos(properties['Particles'][0]['Theta'])))
+            return abs(q)
+
+        elif var == 'dEta':
+            dEta = properties['Particles'][0]['Eta'] - properties['Particles'][1]['Eta']
+            return dEta
+        
+        elif var == 'dPhi':
+            dPhi = properties['Particles'][0]['P4'].DeltaPhi(properties['Particles'][1]['P4'])
+            return dPhi
+
+        elif var == 'dRapidity':
+            dRap = properties['Particles'][0]['Rapidity'] - properties['Particles'][1]['Rapidity']
+            return dRap
+
+        elif var == 'dR_Eta':
+            dR_Eta = properties['Particles'][0]['P4'].DrEtaPhi(properties['Particles'][1]['P4'])
+            return dR_Eta
+
+        elif var == 'dR_Rap':
+            dPhi = properties['Particles'][0]['P4'].DeltaPhi(properties['Particles'][1]['P4'])
+            dRap = properties['Particles'][0]['Rapidity'] - properties['Particles'][1]['Rapidity']
+            # DrRapidityPhi function doesnt seem to work
+            dR_Rap = TMath.Sqrt( dPhi**2 + dRap**2 )
+            return dR_Rap    
+    return False
+
+def GetDividers(n):
+    '''
+    '''
+    Dividers = []
+    i = 1
+    while i <= n : 
+        if (n % i==0) : 
+            NbinsDivisors.append(i), 
+        i += 1
+    return Dividers
 
 def HistLims(HistDict):
     '''
         Rescales hist lims depending on the data in the hists
     '''
-    for Catagory, HistSubDict in HistDict.items():
-        for var, hist in HistSubDict['Hists'].items():
 
-            # Get the index of the min/max bin and the read off the value of the 
-            # low edge
-            # Set FindLastBinAbove threshold to 5 since otherwise the 
-            # hist goes on for way too long
-            BinMax = hist.GetBinLowEdge(hist.FindLastBinAbove(5))
-            BinMin = hist.GetBinLowEdge(hist.FindFirstBinAbove())
-            # Max/min = BinMax/min +- 5% +- 5 (prevents max=min for BinMax/Min=0)
-            XMax = BinMax + abs(BinMax/10) + 5
-            XMin = BinMin - abs(BinMin/10) - 5
-            hist.SetAxisRange(XMin, XMax)
+    # Will return a list of the dividers of NBins
+    NbinsDivisors = GetDividers(config.VarParams['Nbins'])
+
+    for catagory, properties in HistDict.items():
+        for var, hist in properties['Hists'].items():
+            
+            # print(hist.GetDimension())
+            if hist.GetDimension() == 1:
+                
+                # First version of Max Min using a threshold of 0 since the 
+                # bin width is very small
+                BinMaxX = hist.GetBinLowEdge(hist.FindLastBinAbove(0, 1))
+                BinMinX = hist.GetBinLowEdge(hist.FindFirstBinAbove(0, 1))
+
+                # Rescales bin number so the plotted range has Nbins = 200
+                XRange = (config.VarParams[var]['Range'][1]-config.VarParams[var]['Range'][0])
+                NewNbinsX = 100/(BinMaxX-BinMinX) * XRange
+                NGroupX = config.VarParams['Nbins']/NewNbinsX
+
+                # Finds divisor closest to NGroup
+                NGroupDivisorX = min(NbinsDivisors, key=lambda x:abs(x-NGroupX))
+                hist.RebinX(int(NGroupDivisorX))
+
+                # Recalculating Max Min with higher threshold - this is possible as 
+                # the hists have been rebinned to a large width
+                # Get the index of the min/max bin and the read off the value of the 
+                # low edge
+                # Set FindLastBinAbove threshold to 5 since otherwise the 
+                # hist goes on for way too long
+                BinMaxX = hist.GetBinLowEdge(hist.FindLastBinAbove(5, 1))
+                BinMinX = hist.GetBinLowEdge(hist.FindFirstBinAbove(0, 1))
+                # Max/min = BinMax/min +- 5% +- 5 (prevents max=min for BinMax/Min=0)
+                XMax = BinMaxX + abs(BinMaxX/10) + 5
+                XMin = BinMinX - abs(BinMinX/10) - 5
+            
+
+                hist.SetAxisRange(XMin, XMax, 'X')
+                # print(XMin, XMax, catagory, var)
+            
+            elif hist.GetDimension() == 2:
+
+                xVar  = var.split('_')[-2]
+                yVar  = var.split('_')[-1]
+
+                # First version of Max Min using a threshold of 0 since the 
+                # bin width is very small
+                BinMaxX = hist.GetXaxis().GetBinLowEdge(hist.FindLastBinAbove(0, 1))
+                BinMinX = hist.GetXaxis().GetBinLowEdge(hist.FindFirstBinAbove(0, 1))
+                BinMaxY = hist.GetYaxis().GetBinLowEdge(hist.FindLastBinAbove(0, 2))
+                BinMinY = hist.GetYaxis().GetBinLowEdge(hist.FindFirstBinAbove(0, 2))     
+
+                # Rescales bin number so the plotted range has Nbins = 200
+                XRange = (config.VarParams[xVar]['Range'][1]-config.VarParams[xVar]['Range'][0])
+                NewNbinsX = 100/(BinMaxX-BinMinX) * XRange
+                NGroupX = config.VarParams['Nbins']/NewNbinsX
+
+                # Finds divisor closest to NGroup
+                NGroupDivisorX = min(NbinsDivisors, key=lambda x:abs(x-NGroupX))
+                hist.RebinX(int(NGroupDivisorX))
+
+                # Rescales bin number so the range has Nbins 200
+                YRange = (config.VarParams[yVar]['Range'][1]-config.VarParams[yVar]['Range'][0])
+                NewNbinsY = 200/(BinMaxY-BinMinY) * YRange
+                NGroupY = config.VarParams['Nbins']/NewNbinsY
+
+                # Finds divisor closest to NGroup
+                NGroupDivisorY = min(NbinsDivisors, key=lambda x:abs(x-NGroupY))
+                hist.RebinY(int(NGroupDivisorY))
+
+                # Recalculating Max Min with higher threshold - this is possible as 
+                # the hists have been rebinned to a large width
+                # Get the index of the min/max bin and the read off the value of the 
+                # low edge
+                # Set FindLastBinAbove threshold to 2 since the particles are now spread
+                # between two vars so the bins will be less filled 
+                # hist goes on for way too long
+                # For 2D hist must first get axis before using TH1 methods
+                BinMaxX = hist.GetXaxis().GetBinLowEdge(hist.FindLastBinAbove(2, 1))
+                BinMinX = hist.GetXaxis().GetBinLowEdge(hist.FindFirstBinAbove(0, 1))
+                BinMaxY = hist.GetYaxis().GetBinLowEdge(hist.FindLastBinAbove(2, 2))
+                BinMinY = hist.GetYaxis().GetBinLowEdge(hist.FindFirstBinAbove(0, 2))                
+                # Max/min = BinMax/min +- 5% +- 5 (prevents max=min for BinMax/Min=0)
+                XMax = BinMaxX + abs(BinMaxX/10) + 5
+                XMin = BinMinX - abs(BinMinX/10) - 5
+                YMax = BinMaxY + abs(BinMaxY/10) + 5
+                YMin = BinMinY - abs(BinMinY/10) - 5        
+
+                hist.SetAxisRange(XMin, XMax, 'X')
+                hist.SetAxisRange(YMin, YMax, 'Y')
+
+
 
 
 def AddParticle(name, ParticleDict, P4=None, PID=None, isJet=False):
