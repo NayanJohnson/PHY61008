@@ -216,9 +216,9 @@ def GetVariable(catagory, var, properties, dims=1):
     if len(properties['Particles']) == 2:
 
         if var == 'q':
-            if catagory == 'q_Lepton' or catagory == 'q_Quark':
+            if catagory == 'qLepton' or catagory == 'qQuark':
                 q = (properties['Particles'][0]['P4'] - properties['Particles'][1]['P4']).Mag()
-            elif catagory == 'q_eMethod':
+            elif catagory == 'qeMethod':
                 q = TMath.Sqrt(2*properties['Particles'][0]['E']*properties['Particles'][1]['E']*(1 - TMath.Cos(properties['Particles'][0]['Theta'])))
             return abs(q)
 
@@ -366,15 +366,15 @@ def CompareHist(Hist1, Hist2, HistDict, hist1name, hist2name, MediaDir_name):
 
     # If hist 1D
     if len(hist1name.split('_')) == 2:
-        name = '-'.join(hist1name.split('_')[0:-1])
+        name = '_'.join(hist1name.split('_')[0:-1])
         hist1var = hist1name.split('_')[-1]
         hist2var = hist1name.split('_')[-1]
 
     # If hist is 2D
     elif len(hist1name.split('_')) == 3:
-        name = '-'.join(hist1name.split('_')[0:-2])
-        hist1var = '-'.join(hist1name.split('_')[-2:])
-        hist2var = '-'.join(hist1name.split('_')[-2:])
+        name = '_'.join(hist1name.split('_')[0:-2])
+        hist1var = '_'.join(hist1name.split('_')[-2:])
+        hist2var = '_'.join(hist1name.split('_')[-2:])
 
     HistDict1[name]['Hists'][hist1var] = Hist1
     HistDict2[name]['Hists'][hist2var] = Hist2
