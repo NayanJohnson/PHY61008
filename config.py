@@ -19,6 +19,63 @@ ParticleKeywords = [
 
 # 'AllJets' also accepted as keyword, but is not initialised as a particle
 
+# Initial parameters for specific var histograms
+
+VarParams = {
+    # Initial Nbins is large so that the bins can later be rescaled
+    'Nbins'     :   10000,
+    'Count'     :   {
+        'Range'     :   (0, 10)
+    },
+
+    'Eta'       :   {
+        'Range'     :   (-10, 10)
+    },
+
+    'Phi'       :   {
+        'Range'     :   (-3.5, 3.5)
+    },
+
+    'Rapidity'  :   {
+        'Range'     :   (-10, 10)
+    },
+    
+    'Pt'        :   {
+        'Range'     :   (0, 1000)
+    },
+    
+    'Et'        :   {
+        'Range'     :   (0, 1500)
+    },
+    
+    'q'         :   {
+        'Range'     :   (0, 10000)
+    },
+
+    'dEta'      :   {
+        'Range'     :   (-20, 20)
+    },
+    
+    'dPhi'      :   {
+        'Range'     :   (-3.5, 3.5)
+    },
+    
+    'dRapidity' :   {
+        'Range'     :   (-20, 20)
+    },
+    
+    'dR_Eta'    :   {
+        'Range'     :   (0, 100)
+    },
+    
+    'dR_Rap'    :   {
+        'Range'     :   (0, 100)
+    },
+    
+    'InvMass'   :   {
+        'Range'     :   (0, 10000)
+    },
+}
 
 HistDict = {
     'Electrons'     :   {
@@ -45,7 +102,7 @@ HistDict = {
     'FinalBeamElectron' 
                     :   {
         'Requests'      :   {
-            'Vars'      :   ['Eta', 'Phi', 'Rapidity', 'Pt', ('Pt', 'Eta')],
+            'Vars'      :   ['Eta', 'Phi', 'Rapidity', 'Pt', ('Eta', 'Pt')],
             'Particles' :   ['FinalBeamElectron'],
         },
     },
@@ -224,59 +281,8 @@ HistDict = {
 
 }
 
-# Initial Parameters for the
-
-VarParams = {
-    'Nbins'     :   10000,
-    'Count'     :   {
-        'Range'     :   (0, 10)
-    },
-
-    'Eta'       :   {
-        'Range'     :   (-10, 10)
-    },
-
-    'Phi'       :   {
-        'Range'     :   (-3.5, 3.5)
-    },
-
-    'Rapidity'  :   {
-        'Range'     :   (-10, 10)
-    },
-    
-    'Pt'        :   {
-        'Range'     :   (0, 1000)
-    },
-    
-    'Et'        :   {
-        'Range'     :   (0, 1500)
-    },
-    
-    'q'         :   {
-        'Range'     :   (0, 10000)
-    },
-
-    'dEta'      :   {
-        'Range'     :   (-10, 10)
-    },
-    
-    'dPhi'      :   {
-        'Range'     :   (-3.5, 3.5)
-    },
-    
-    'dRapidity' :   {
-        'Range'     :   (-20, 20)
-    },
-    
-    'dR_Eta'    :   {
-        'Range'     :   (0, 100)
-    },
-    
-    'dR_Rap'    :   {
-        'Range'     :   (0, 100)
-    },
-    
-    'InvMass'   :   {
-        'Range'     :   (0, 10000)
-    },
+HistComparisonDict = {
+    'Hists'     :   {
+        ''
+    }
 }
