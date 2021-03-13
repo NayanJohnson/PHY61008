@@ -177,21 +177,21 @@ HistDict = {
         },
     },
         
-    'q_Lepton'      :   {
+    'qLepton'      :   {
         'Requests'      :   {
             'Vars'      :   ['q'],
             'Particles' :   ['BeamElectron', 'FinalBeamElectron'],
         },
     },
         
-    'q_Quark'       :   {
+    'qQuark'       :   {
         'Requests'      :   {
             'Vars'      :   ['q'],
             'Particles' :   ['BeamQuark', 'BeamJet'],
         },
     },
 
-    'q_eMethod'     :   {
+    'qeMethod'     :   {
         'Requests'      :   {
             'Vars'      :   ['q'],
             'Particles' :   ['BeamElectron', 'FinalBeamElectron'],
