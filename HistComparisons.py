@@ -4,7 +4,7 @@
 import sys
 import Analysis_Funcs as funcs
 import config
-from ROOT import TFile, TH1F, TCanvas, TLegend, SetOwnership, TColor
+from ROOT import TFile, TH1F
 
 HistFile1_name = sys.argv[1]
 HistFile2_name = sys.argv[2]
@@ -17,109 +17,26 @@ if MediaDir_name[-1] != '/':
 HistFile1 = TFile(HistFile1_name)
 HistFile2 = TFile(HistFile2_name)
 
-HistDict1 = config.HistDict.copy()
-HistDict2 = config.HistDict.copy()
+HistDict = config.HistDict
+
 # Hist1.GetListOfKeys() returns an object of type THashList
 # key is of type TKey
-for key in HistFile2.GetListOfKeys():
+for name, properties in HistDict.items():
 
-    # Get the name of the hist
-    histname = key.GetName()
+    for var in properties['Requests']['Vars']:
+        # If the hist is 2D
+        if type(var) == tuple and len(var) == 2:
+            histvar = var[0]+'_'+var[1]
+            histname = name+'_'+histvar
+        else:
+            histvar = var
+            histname = name+'_'+histvar
 
-    # Read the same hist in each file
-    Hist1 = HistFile1.Get(histname+';1')
-    Hist2 = HistFile2.Get(histname+';1')      
-
-    if Hist1.GetDimension() == 1:
-        histvar = histname.split('_')[-1]
-        category = histname.split('_')[0:-1]
-        category = "_".join(category)
-    elif Hist1.GetDimension() == 2:
-        histvar = histname.split('_')[-2]+'_'+histname.split('_')[-1]
-        category = histname.split('_')[0:-2]
-        category = "_".join(category)
-
+        # Read the same hist in each file
+        Hist1 = HistFile1.Get(histname+';1')
+        Hist2 = HistFile2.Get(histname+';1')  
+        print(histname)  
+        Hist2.ls()  
         
-    for key, properties in HistDict2.items():
-        properties['Hists'] = {}
-    HistDict2[category]['Hists'][histvar] = Hist2
-    for key, properties in HistDict1.items():
-        properties['Hists'] = {}
-    HistDict1[category]['Hists'][histvar] = Hist1
+        funcs.CompareHist(Hist1, Hist2, HistDict, histname, histname, MediaDir_name)
 
-    funcs.HistLims(HistDict1)
-    funcs.HistLims(HistDict2)
-
-    # Clear canvas
-    HistCan = TCanvas()
-    HistCan.cd()
-
-    # max frequency
-    Max1 = Hist1.GetMaximum() + Hist1.GetMaximum()/10
-    Max2 = Hist2.GetMaximum() + Hist2.GetMaximum()/10
-    # Take the larger value from the two hists
-    Max = max(Max1, Max2)
-
-    # Setting universal hist options
-    for hist in (Hist1, Hist2):
-        # SetBins actually introduces an offset into the graph
-        hist.SetStats(False)
-        hist.SetMaximum(Max)
-
-    if Hist1.GetDimension() == 1:
-        # Force both to be drawn as hist and on the same canvas
-        Hist1.SetLineColor(4)        
-        Hist1.Draw("HIST same")
-        Hist2.SetLineColor(2)
-        Hist2.Draw("HIST same")
-    elif Hist1.GetDimension() == 2:
-        #
-        TColor.SetPalette(59, 0)
-        Hist1.Draw("COLZ same")
-        
-        TColor.SetPalette(60, 0)
-        Hist2.Draw("COLZ same")
-
-    # Legend properties
-    LegendX1 = .8
-    LegendX_interval = 0.15
-    LegendY1 = .95
-    LegendY_interval = 0.1
-
-    Legend1 = TLegend(LegendX1, LegendY1 , LegendX1+LegendX_interval, LegendY1-LegendY_interval)
-    # Stops legend overwriting canvas
-    SetOwnership(Legend1,False)
-    Legend1.SetBorderSize(1)
-    Legend1.SetShadowColor(2)
-    Legend1.SetHeader("Cuts")
-    # Entries
-    Legend1.AddEntry("entries","Entries: "+str(int(Hist1.GetEntries())))
-    Legend1.AddEntry(Hist1, "Line Color", "l")
-    Legend1.SetTextSize(0.025)
-    Legend1.SetTextColor(1)
-    # Seperation is small, but will be maximised to the bounds of the TLegend
-    # box
-    Legend1.SetEntrySeparation(.1)
-    Legend1.Draw("same")
-
-    Legend2 = TLegend(LegendX1, LegendY1-LegendY_interval , LegendX1+LegendX_interval, LegendY1-2*LegendY_interval)
-    # Stops legend overwriting canvas    
-    SetOwnership(Legend2,False)
-    Legend2.SetBorderSize(1)
-    Legend2.SetShadowColor(2)
-    Legend2.SetHeader("No Cuts")
-    # Entries
-    Legend2.AddEntry("entries","Entries: "+str(int(Hist2.GetEntries())))
-    Legend2.AddEntry(Hist2, "Line Color", "l")
-    Legend2.SetTextSize(0.025)
-    Legend2.SetTextColor(1)
-    # Seperation is small, but will be maximised to the bounds of the TLegend
-    # box    
-    Legend2.SetEntrySeparation(.1)
-    Legend2.Draw("same")
-
-    # Update canvas
-    HistCan.Update()
-    # Write canvas to outfile, needs the name for some reason.
-    
-    HistCan.SaveAs(MediaDir_name+histname+'.png')
