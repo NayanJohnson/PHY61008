@@ -133,70 +133,70 @@ HistDict =  {
     
     'LeadingMuon'   :   {
         'Requests'      :   {
-            'Vars'      :   ['Eta', 'Phi', 'Rapidity', 'Pt'],
+            'Vars'      :   ['Eta', 'Phi', 'Rapidity', 'Pt', ('Eta', 'Pt')],
             'Particles' :   ['LeadingMuon'],
         },
     },
     
     'SubLeadingMuon':   {
         'Requests'      :   {
-            'Vars'      :   ['Eta', 'Phi', 'Rapidity', 'Pt'],
+            'Vars'      :   ['Eta', 'Phi', 'Rapidity', 'Pt', ('Eta', 'Pt')],
             'Particles' :   ['SubLeadingMuon'],
         },
     },
     
     'WPlusMuon'     :   {
         'Requests'      :   {
-            'Vars'      :   ['Eta', 'Phi', 'Rapidity', 'Pt'],
+            'Vars'      :   ['Eta', 'Phi', 'Rapidity', 'Pt', ('Eta', 'Pt')],
             'Particles' :   ['WPlusMuon'],
         },
     },
         
     'WMinusMuon'    :   {
         'Requests'      :   {
-            'Vars'      :   ['Eta', 'Phi', 'Rapidity', 'Pt'],
+            'Vars'      :   ['Eta', 'Phi', 'Rapidity', 'Pt', ('Eta', 'Pt')],
             'Particles' :   ['WMinusMuon'],
         },
     },
         
     'AllJets'       :   {
         'Requests'      :   {
-            'Vars'      :   ['Eta', 'Phi', 'Rapidity', 'Pt'],
+            'Vars'      :   ['Eta', 'Phi', 'Rapidity', 'Pt', ('Eta', 'Pt')],
             'Particles' :   ['AllJets'],
         },
     },
         
     'LeadingJet'    :   {
         'Requests'      :   {
-            'Vars'      :   ['Eta', 'Phi', 'Rapidity', 'Pt'],
+            'Vars'      :   ['Eta', 'Phi', 'Rapidity', 'Pt', ('Eta', 'Pt')],
             'Particles' :   ['LeadingJet'],
         },
     },
         
     'SubLeadingJet' :   {
         'Requests'      :   {
-            'Vars'      :   ['Eta', 'Phi', 'Rapidity', 'Pt'],
+            'Vars'      :   ['Eta', 'Phi', 'Rapidity', 'Pt', ('Eta', 'Pt')],
             'Particles' :   ['SubLeadingJet'],
         },
     },
         
     'ThirdJet'      :   {
         'Requests'      :   {
-            'Vars'      :   ['Eta', 'Phi', 'Rapidity', 'Pt'],
+            'Vars'      :   ['Eta', 'Phi', 'Rapidity', 'Pt', ('Eta', 'Pt')],
             'Particles' :   ['ThirdJet'],
         },
     },
         
     'FourthJet'     :   {
         'Requests'      :   {
-            'Vars'      :   ['Eta', 'Phi', 'Rapidity', 'Pt'],
+            'Vars'      :   ['Eta', 'Phi', 'Rapidity', 'Pt', ('Eta', 'Pt')],
             'Particles' :   ['FourthJet'],
         },
     },
         
     'MissingET'     :   {
         'Requests'      :   {
-            'Vars'      :   ['Eta', 'Phi', 'Rapidity', 'Pt', 'Et'],
+            'Vars'      :   ['Eta', 'Phi', 'Rapidity', 'Pt', 'Et', ('Eta', 'Pt')],
             'Particles' :   ['MissingET'],
         },
     },
