@@ -528,7 +528,7 @@ def CompareHist(HistProps, HistDict):
     SetOwnership(Legend1,False)
     Legend1.SetBorderSize(1)
     Legend1.SetShadowColor(2)
-    Legend1.SetHeader(Hist1FileName+'_'+Hist1Name)
+    Legend1.SetHeader(Hist1Name)
     # Entries
     Legend1.AddEntry("entries","Entries: "+str(int(Hist1.GetEntries())))
     Legend1.AddEntry(Hist1, "Line Color", "l")
@@ -544,7 +544,7 @@ def CompareHist(HistProps, HistDict):
     SetOwnership(Legend2,False)
     Legend2.SetBorderSize(1)
     Legend2.SetShadowColor(2)
-    Legend2.SetHeader(Hist2FileName+'_'+Hist2Name)
+    Legend2.SetHeader(Hist2Name)
     # Entries
     Legend2.AddEntry("entries","Entries: "+str(int(Hist2.GetEntries())))
     Legend2.AddEntry(Hist2, "Line Color", "l")
@@ -556,7 +556,7 @@ def CompareHist(HistProps, HistDict):
 
     HistCan.Update()
     # Write canvas to outfile, needs the name for some reason.
-    HistCan.SaveAs(MediaDir_name+Hist1FileName+'_'+Hist1Name+'_'+Hist1Var+'_'+Hist2FileName+'_'+Hist2Name+'_'+Hist1Var+'.png')
+    HistCan.SaveAs(MediaDir_name+'/'+Hist1FileName+'-'+Hist2FileName+'/'+Hist1Name+'_'+Hist1Var+'_'+'_'+Hist2Name+'_'+Hist1Var+'.png')
   
 
 
