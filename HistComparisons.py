@@ -10,10 +10,7 @@ from ROOT import TFile, TH1F
 # (sys.argv[0] is the script itself)
 HistFile1_name = sys.argv[1]
 HistFile2_name = sys.argv[2]
-MediaDir_name = sys.argv[3]
 
-if MediaDir_name[-1] != '/':
-    MediaDir_name = MediaDir_name+'/'
 
 # Read hist files
 HistFiles = {
@@ -66,9 +63,7 @@ for name, properties in HistDict.items():
                 'HistFileName'  
                 # Take the name without the .root
                             :   HistFiles[2]['Name'].split('.')[0] 
-            },
-
-            'MediaDir'  :   MediaDir_name
+            }
         }
 
         funcs.CompareHist(HistProps, HistDict)
@@ -107,9 +102,7 @@ for key, properties in HistCompDict.items():
                 'HistVar'   :   HistVar,
                 'HistFileName'  
                             :   HistFiles[Hist2FileIndex]['Name'].split('.')[0]    
-            },
-
-            'MediaDir'  :   MediaDir_name
+            }
         }
 
         funcs.CompareHist(HistProps, HistDict)
