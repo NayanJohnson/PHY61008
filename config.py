@@ -31,7 +31,7 @@ ParticleKeywords = [
 
 VarParams = {
     # Initial Nbins is large so that the bins can later be rescaled
-    'Nbins'     :   10000,
+    'Nbins'     :   5000,
     'Count'     :   {
         'Range'     :   (0, 10)
     },
