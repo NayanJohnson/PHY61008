@@ -513,7 +513,7 @@ def CompareHist(HistProps, HistDict):
     for hist in (Hist1, Hist2):
         # SetBins actually introduces an offset into the graph
         hist.SetStats(False)
-        hist.SetTitle(Hist1FileName+'_'+Hist1Name+'_'+Hist2FileName+'_'+Hist2Name)
+        hist.SetTitle(Hist1Name+'_'+Hist2Name)
         hist.SetMaximum(Max)
 
     if Hist1.GetDimension() == 1:
@@ -540,7 +540,7 @@ def CompareHist(HistProps, HistDict):
     SetOwnership(Legend1,False)
     Legend1.SetBorderSize(1)
     Legend1.SetShadowColor(2)
-    Legend1.SetHeader(Hist1FileName+'_'+Hist1Name)
+    Legend1.SetHeader(Hist1Name)
     # Entries
     Legend1.AddEntry("entries","Entries: "+str(int(Hist1.GetEntries())))
     Legend1.AddEntry(Hist1, "Line Color", "l")
@@ -556,7 +556,7 @@ def CompareHist(HistProps, HistDict):
     SetOwnership(Legend2,False)
     Legend2.SetBorderSize(1)
     Legend2.SetShadowColor(2)
-    Legend2.SetHeader(Hist2FileName+'_'+Hist2Name)
+    Legend2.SetHeader(Hist2Name)
     # Entries
     Legend2.AddEntry("entries","Entries: "+str(int(Hist2.GetEntries())))
     Legend2.AddEntry(Hist2, "Line Color", "l")
