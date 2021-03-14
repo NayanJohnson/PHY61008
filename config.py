@@ -12,9 +12,11 @@ VarKeywords = [
 
 # Particle keywords:
 ParticleKeywords = [
-    'BeamElectron', 'FinalBeamElectron', 'LeadingMuon', 'SubLeadingMuon', 'MuonSum', 
-    'AllMuons', 'WPlusMuon', 'WMinusMuon', 'MissingET', 'BeamQuark', 'BeamJet',
-    'LeadingJet', 'SubLeadingJet', 'ThirdJet', 'FourthJet',
+    'BeamElectron', 'LeadingElectron', 'FinalBeamElectron', 
+    'LeadingMuon', 'SubLeadingMuon', 'ThirdMuon', 'MuonSum', 'AllMuons', 
+    'WPlusMuon', 'WMinusMuon', 'ZLeadingMuon', 'ZSubLeadingMuon', 
+    'MissingET', 'BeamQuark', 
+    'BeamJet', 'LeadingJet', 'SubLeadingJet', 'ThirdJet', 'FourthJet',
 ]
 
 # 'AllJets' also accepted as keyword, but is not initialised as a particle
@@ -29,7 +31,7 @@ ParticleKeywords = [
 
 VarParams = {
     # Initial Nbins is large so that the bins can later be rescaled
-    'Nbins'     :   10000,
+    'Nbins'     :   5000,
     'Count'     :   {
         'Range'     :   (0, 10)
     },
