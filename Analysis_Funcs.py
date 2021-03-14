@@ -68,7 +68,7 @@ def MakeHists(HistDict, Scale):
 
         Histogram dictionary should be in the following format:
         HistDict =        {
-            Catagory        :   {
+            category        :   {
                 Requests        :   {
                     Vars            :   [],
                     Particles       :   []
@@ -132,7 +132,7 @@ def RequestParticles(HistDict, ParticleDict):
         Adds requested particles to the HistDict.
         Histogram dictionary should be in the following format:
         HistDict =        {
-            Catagory        :   {
+            category        :   {
                 Requests        :   {
                     Vars            :   [],
                     Particles       :   []
@@ -188,7 +188,7 @@ def FillHists(HistDict):
         Given a dictionary of histograms, will fill them.
         Histogram dictionary should be in the following format:
         HistDict =        {
-            Catagory        :   {
+            category        :   {
                 Requests        :   {
                     Vars            :   [],
                     Particles       :   []
@@ -207,18 +207,22 @@ def FillHists(HistDict):
     # List of variables that are stored in all particles.
     ParticleProperties = ['PID', 'E', 'Eta', 'Phi', 'Rapidity', 'Theta', 'Pt', 'Et']
 
-    for catagory, properties in HistDict.items():
+    for category, properties in HistDict.items():
         for var, hist in properties['Hists'].items():
-            
+
+            # Count var can be read straight from properties
+            if var == 'Count': 
+                hist.Fill(properties['Count'])
+
             # If var contains 2 variables
-            if len(var.split('_')) == 2:
-                xVar = GetVariable(catagory, var.split('_')[0], properties, 2)
-                yVar = GetVariable(catagory, var.split('_')[1], properties, 2)
+            elif len(var.split('_')) == 2:
+                xVar = GetParticleVariable(var.split('_')[0], properties['Particles'], category, 2)
+                yVar = GetParticleVariable(var.split('_')[1], properties['Particles'], category, 2)
                 if xVar and yVar:
                     hist.Fill(xVar, yVar)
 
             else:
-                xVar = GetVariable(catagory, var, properties)
+                xVar = GetParticleVariable(var, properties['Particles'], category)
                 if xVar != False:
                     # If the function returns a list fill the hist for each
                     # element in list
@@ -229,21 +233,33 @@ def FillHists(HistDict):
                         hist.Fill(xVar)
 
 
-def GetVariable(catagory, var, properties, dims=1):
+def GetParticleVariable(var, ParticleList, category=None, dims=1):
     '''
         Returns the value or list of variables for the given category : var
+        Category is only used for q calcs.
+        var is a string.
+        properties is in the format:
+        properties = {
+            Requests        :   {
+                Vars            :   [],
+                Particles       :   []
+            },
+
+            Vars        :   [],
+            Particles   :   [],
+            Hists       :   {
+                Var1        :   Hist1,
+                Var2        :   Hist2
+            }
+        }
     '''
 
     # List of variables that are stored in all particles.
     ParticleProperties = ['PID', 'E', 'Eta', 'Phi', 'Rapidity', 'Theta', 'Pt', 'Et']
 
-    # Checks the variable and fills the histogram
-    if var == 'Count': 
-        return properties['Count']
-
     # Variables that can be calculated from one or multiple
     # particles.
-    if len(properties['Particles']) != 0:
+    if len(ParticleList) != 0:
 
         # Variables in ParticleProperties only require one particle so
         # the hist can be filled by all particles in the list.
@@ -251,47 +267,47 @@ def GetVariable(catagory, var, properties, dims=1):
             # Only alow 1D hists to return a list
             if dims ==1:
                 ParticleVars = []
-                for i in range(0, len(properties['Particles'])):
-                    ParticleVars.append(properties['Particles'][i][var])
+                for i in range(0, len(ParticleList)):
+                    ParticleVars.append(ParticleList[i][var])
                 return ParticleVars
             else:
-                return properties['Particles'][0][var]
+                return ParticleList[0][var]
 
         elif var == 'InvMass':
             ParticleSum = TLorentzVector()
-            for paritcle in properties['Particles']:
-                ParticleSum = paritcle['P4'] + ParticleSum
+            for particle in ParticleList:
+                ParticleSum = particle['P4'] + ParticleSum
             return ParticleSum.M()
 
     # Seperates hists into the number of required particles
-    if len(properties['Particles']) == 2:
+    if len(ParticleList) == 2:
 
         if var == 'q':
-            if catagory == 'qLepton' or catagory == 'qQuark':
-                q = (properties['Particles'][0]['P4'] - properties['Particles'][1]['P4']).Mag()
-            elif catagory == 'qeMethod':
-                q = TMath.Sqrt(2*properties['Particles'][0]['E']*properties['Particles'][1]['E']*(1 - TMath.Cos(properties['Particles'][0]['Theta'])))
+            if category == 'qLepton' or category == 'qQuark':
+                q = (ParticleList[0]['P4'] - ParticleList[1]['P4']).Mag()
+            elif category == 'qeMethod':
+                q = TMath.Sqrt(2*ParticleList[0]['E']*ParticleList[1]['E']*(1 - TMath.Cos(ParticleList[0]['Theta'])))
             return abs(q)
 
         elif var == 'dEta':
-            dEta = properties['Particles'][0]['Eta'] - properties['Particles'][1]['Eta']
+            dEta = ParticleList[0]['Eta'] - ParticleList[1]['Eta']
             return dEta
         
         elif var == 'dPhi':
-            dPhi = properties['Particles'][0]['P4'].DeltaPhi(properties['Particles'][1]['P4'])
+            dPhi = ParticleList[0]['P4'].DeltaPhi(ParticleList[1]['P4'])
             return dPhi
 
         elif var == 'dRapidity':
-            dRap = properties['Particles'][0]['Rapidity'] - properties['Particles'][1]['Rapidity']
+            dRap = ParticleList[0]['Rapidity'] - ParticleList[1]['Rapidity']
             return dRap
 
         elif var == 'dR_Eta':
-            dR_Eta = properties['Particles'][0]['P4'].DrEtaPhi(properties['Particles'][1]['P4'])
+            dR_Eta = ParticleList[0]['P4'].DrEtaPhi(ParticleList[1]['P4'])
             return dR_Eta
 
         elif var == 'dR_Rap':
-            dPhi = properties['Particles'][0]['P4'].DeltaPhi(properties['Particles'][1]['P4'])
-            dRap = properties['Particles'][0]['Rapidity'] - properties['Particles'][1]['Rapidity']
+            dPhi = ParticleList[0]['P4'].DeltaPhi(ParticleList[1]['P4'])
+            dRap = ParticleList[0]['Rapidity'] - ParticleList[1]['Rapidity']
             # DrRapidityPhi function doesnt seem to work
             dR_Rap = TMath.Sqrt( dPhi**2 + dRap**2 )
             return dR_Rap    
@@ -314,7 +330,7 @@ def HistLims(HistDict):
         Rescales hist lims depending on the data in the hists.
         Histogram dictionary should be in the following format:
         HistDict =        {
-            Catagory        :   {
+            category        :   {
                 Requests        :   {
                     Vars            :   [],
                     Particles       :   []
@@ -333,7 +349,7 @@ def HistLims(HistDict):
     # Will return a list of the dividers of NBins
     
 
-    for catagory, properties in HistDict.items():
+    for category, properties in HistDict.items():
         for var, hist in properties['Hists'].items():
 
             # Skip if hist = False
@@ -426,7 +442,7 @@ def CompareHist(HistProps, HistDict):
      
         Histogram dictionary should be in the following format:
         HistDict =        {
-            Catagory        :   {
+            category        :   {
                 Requests        :   {
                     Vars            :   [],
                     Particles       :   []

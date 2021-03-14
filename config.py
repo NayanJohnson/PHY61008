@@ -12,9 +12,11 @@ VarKeywords = [
 
 # Particle keywords:
 ParticleKeywords = [
-    'BeamElectron', 'FinalBeamElectron', 'LeadingMuon', 'SubLeadingMuon', 'MuonSum', 
-    'AllMuons', 'WPlusMuon', 'WMinusMuon', 'MissingET', 'BeamQuark', 'BeamJet',
-    'LeadingJet', 'SubLeadingJet', 'ThirdJet', 'FourthJet',
+    'BeamElectron', 'LeadingElectron', 'FinalBeamElectron', 
+    'LeadingMuon', 'SubLeadingMuon', 'ThirdMuon', 'MuonSum', 'AllMuons', 
+    'WPlusMuon', 'WMinusMuon', 'ZLeadingMuon', 'ZSubLeadingMuon', 
+    'MissingET', 'BeamQuark', 
+    'BeamJet', 'LeadingJet', 'SubLeadingJet', 'ThirdJet', 'FourthJet',
 ]
 
 # 'AllJets' also accepted as keyword, but is not initialised as a particle
@@ -145,17 +147,31 @@ HistDict =  {
         },
     },
     
+    'ZLeadingMuon'  :   {
+        'Requests'      :   {
+            'Vars'      :   ['Eta', 'Phi', 'Rapidity', 'Pt', ('Eta', 'Pt')],
+            'Particles' :   ['ZLeadingMuon'],
+        },
+    },
+
+    'ZSubLeadingMuon'  :   {
+        'Requests'      :   {
+            'Vars'      :   ['Eta', 'Phi', 'Rapidity', 'Pt', ('Eta', 'Pt')],
+            'Particles' :   ['ZSubLeadingMuon'],
+        },
+    },   
+
+    'ZMuons'  :   {
+        'Requests'      :   {
+            'Vars'      :   ['Eta', 'Phi', 'Rapidity', 'Pt', ('Eta', 'Pt'), 'InvMass'],
+            'Particles' :   ['ZLeadingMuon', 'ZSubLeadingMuon'],
+        },
+    }, 
+
     'WPlusMuon'     :   {
         'Requests'      :   {
             'Vars'      :   ['Eta', 'Phi', 'Rapidity', 'Pt', ('Eta', 'Pt')],
             'Particles' :   ['WPlusMuon'],
-        },
-    },
-        
-    'WMinusMuon'    :   {
-        'Requests'      :   {
-            'Vars'      :   ['Eta', 'Phi', 'Rapidity', 'Pt', ('Eta', 'Pt')],
-            'Particles' :   ['WMinusMuon'],
         },
     },
         

@@ -48,7 +48,7 @@ for n in range(myTree['NEvents']):
         # Checking that there is at least one electron present
         if numbElectrons != 0:
             LeadingElectron = EventDict['PTSorted']['Electron'][-1][1]
-            ParticleDict = funcs.AddParticle('FinalBeamElectron', ParticleDict, LeadingElectron.P4())
+            ParticleDict = funcs.AddParticle('LeadingElectron', ParticleDict, LeadingElectron.P4())
 
     # Leading and SubLeading muons
     numbMuons = EventDict['Count']['Muons']
@@ -62,29 +62,36 @@ for n in range(myTree['NEvents']):
                 ParticleDict = funcs.AddParticle('LeadingMuon', ParticleDict, Muon.P4(), Muon.PID)
 
             # SubLeading Muon
-            elif i == numbMuons - 2 and 0 <= numbMuons - 2:
+            elif i == numbMuons - 2 and numbMuons - 2 >= 0:
                 ParticleDict = funcs.AddParticle('SubLeadingMuon', ParticleDict, Muon.P4(), Muon.PID)
 
+            elif i == numbMuons - 3 and numbMuons - 3 >= 0:
+                ParticleDict = funcs.AddParticle('ThirdMuon', ParticleDict, Muon.P4(), Muon.PID)
 
-    # WPlus and WMinus hists
-    # Leading and SubLeading muons will always be from the W bosons 
-    # (in this process) so I seperate them by charge to determine which
-    # boson they came from
+    # Seperating out boson muons 
+    # Only attempt this if all muons are present
+    ZMuonInvMassList = []
+    if ParticleDict['LeadingMuon']['Check'] and ParticleDict['SubLeadingMuon']['Check'] and ParticleDict['ThirdMuon']['Check']:  
+        MuonPermutations = [
+            (ParticleDict['LeadingMuon'], ParticleDict['SubLeadingMuon'], ParticleDict['ThirdMuon']),
+            (ParticleDict['LeadingMuon'], ParticleDict['ThirdMuon'], ParticleDict['SubLeadingMuon']),
+            (ParticleDict['SubLeadingMuon'], ParticleDict['ThirdMuon'], ParticleDict['LeadingMuon'])
+        ]
 
-    # Will only run if that muon is present
-    Muon = ParticleDict['LeadingMuon']
-    if Muon['Check']:    
-        if Muon['PID'] == 13:
-            ParticleDict = funcs.AddParticle('WMinusMuon', ParticleDict, Muon['P4'])
-        elif Muon['PID'] == -13:
-            ParticleDict = funcs.AddParticle('WPlusMuon', ParticleDict, Muon['P4'])
+        # Calculating InvMass of the three different muon pairs
+        for MuonPair in MuonPermutations:
+            ZMuonInvMassList.append(funcs.GetParticleVariable('InvMass', MuonPair[0:2]))
 
-    Muon = ParticleDict['SubLeadingMuon']
-    if Muon['Check']:  
-        if Muon['PID'] == 13:
-            ParticleDict = funcs.AddParticle('WMinusMuon', ParticleDict, Muon['P4'])
-        elif Muon['PID'] == -13:
-            ParticleDict = funcs.AddParticle('WPlusMuon', ParticleDict, Muon['P4'])
+        # Find the closest InvMass to the Z mass
+        ZMuonPairInvMass = min(ZMuonInvMassList, key=lambda x:abs(x-91.1876))
+        ZMuonPairIndex = ZMuonInvMassList.index(ZMuonPairInvMass)
+        if MuonPermutations[ZMuonPairIndex][0]['Pt'] < MuonPermutations[ZMuonPairIndex][1]['Pt']:
+            ParticleDict['ZLeadingMuon'] = MuonPermutations[ZMuonPairIndex][1]
+            ParticleDict['ZSubLeadingMuon'] = MuonPermutations[ZMuonPairIndex][0]
+        else:        
+            ParticleDict['ZSubLeadingMuon'] = MuonPermutations[ZMuonPairIndex][1]
+            ParticleDict['ZLeadingMuon'] = MuonPermutations[ZMuonPairIndex][0]
+        ParticleDict['WPlusMuon'] = MuonPermutations[ZMuonPairIndex][2]
 
     # Jets
     numbJets = EventDict['Count']['Jets']
@@ -124,6 +131,9 @@ for n in range(myTree['NEvents']):
     HistDict['Electrons']['Count'] = numbElectrons
     HistDict['Muons']['Count'] = numbMuons
     HistDict['Jets']['Count'] = numbJets
+
+    # Setting FinalBeamElectron
+    ParticleDict['FinalBeamElectron'] = ParticleDict['LeadingElectron']
 
     # Filling HistDict with particles then filling the hists
     HistDict = funcs.RequestParticles(HistDict, ParticleDict)
