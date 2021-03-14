@@ -54,7 +54,7 @@ for EventNum in range(myTree['NEvents']):
         else:        
             ParticleDict['ZSubLeadingMuon'] = MuonPermutations[ZMuonPairIndex][1]
             ParticleDict['ZLeadingMuon'] = MuonPermutations[ZMuonPairIndex][0]
-        ParticleDict['WPlusMuon'] = MuonPermutations[ZMuonPairIndex][2]
+        ParticleDict['WMuon'] = MuonPermutations[ZMuonPairIndex][2]
 
     # Filling HistDict with particles then filling the hists
     HistDict = funcs.RequestParticles(HistDict, ParticleDict)
