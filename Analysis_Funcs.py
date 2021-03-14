@@ -471,9 +471,7 @@ def CompareHist(HistProps, HistDict):
                 'HistName'      :   Hist2Name,
                 'HistVar'       :   HistVar,
                 'HistFileName'  :   Hist2FileName    
-            },
-
-            'MediaDir'  :   MediaDir_name
+            }
         }
     '''
     
@@ -494,9 +492,7 @@ def CompareHist(HistProps, HistDict):
     Hist2Name = HistProps['Hist2']['HistName']
     Hist2Var = HistProps['Hist2']['HistVar']
     Hist2FileName = HistProps['Hist2']['HistFileName']
-    
-    MediaDir_name = HistProps['MediaDir']
-    
+        
     HistDict1[Hist1Name]['Hists'][Hist1Var] = Hist1
     HistDict2[Hist2Name]['Hists'][Hist2Var] = Hist2
 
@@ -572,7 +568,8 @@ def CompareHist(HistProps, HistDict):
 
     HistCan.Update()
     # Write canvas to outfile, needs the name for some reason.
-    HistCan.SaveAs(MediaDir_name+'/'+Hist1FileName+'-'+Hist2FileName+'/'+Hist1Name+'_'+Hist1Var+'_'+'_'+Hist2Name+'_'+Hist1Var+'.png')
+    gSystem.Exec('mkdir '+Hist1FileName+'-'+Hist2FileName+'/')
+    HistCan.SaveAs(Hist1FileName+'-'+Hist2FileName+'/'+Hist1Name+'_'+Hist1Var+'_'+Hist2Name+'_'+Hist1Var+'.png')
   
 
 
