@@ -20,6 +20,12 @@ ParticleKeywords = [
 # 'AllJets' also accepted as keyword, but is not initialised as a particle
 
 # Initial parameters for specific var histograms
+# Format:
+# VarParams =       {
+#   Var         :   {
+#       Range       :   (min, max)
+#   }
+# }
 
 VarParams = {
     # Initial Nbins is large so that the bins can later be rescaled
@@ -77,7 +83,25 @@ VarParams = {
     },
 }
 
-HistDict = {
+# No entries here can have _ as this is how variables are seperated in the code
+# When fully filled:
+# HistDict =        {
+#   Catagory        :   {
+#       Requests        :   {
+#           Vars            :   [],
+#           Particles       :   []
+#       },
+
+#       Vars        :   [],
+#       Particles   :   [],
+#       Hists       :   {
+#           Var1        :   Hist1,
+#           Var2        :   Hist2
+#       }
+#   }
+# }
+    
+HistDict =  {
     'Electrons'     :   {
         'Requests'      :   {
             'Vars'      :   ['Count'],
@@ -281,8 +305,50 @@ HistDict = {
 
 }
 
-HistComparisonDict = {
-    'Hists'     :   {
-        ''
+# Dictionary to request hist comparisons
+# Format:
+# HistComparisonDict =  {
+#   'HistKey'           :   {
+#       'Hist1'             :   {
+#           'Name'              :   Hist1Name,
+#           'File'              :   Hist1FileIndex
+#       },
+#       
+#       'Hist2'         :   {
+#           'Name'          :   Hist1Name,
+#           'File'          :   Hist2FileIndex
+#       },
+#
+#       'Var'           :   HistVars
+#   },
+
+HistComparisonDict =    {
+
+    '1'             :   {
+        'Hist1'         :   {
+            'Name'          :   'FinalBeamElectron',
+            'File'          :   1
+        },
+        
+        'Hist2'         :   {
+            'Name'          :   'WPlusMuon',
+            'File'          :   1
+        },
+
+        'Var'           :   ['Eta', 'Pt']
+    },
+
+    '2'             :   {
+        'Hist1'         :   {
+            'Name'          :   'FinalBeamElectron',
+            'File'          :   1
+        },
+        
+        'Hist2'         :   {
+            'Name'          :   'WMinusMuon',
+            'File'          :   1
+        },
+
+        'Var'           :   ['Eta', 'Pt']
     }
 }

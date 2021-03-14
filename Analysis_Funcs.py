@@ -43,7 +43,7 @@ def LoadROOT(filename):
 
 def GetScale(PythiaLogPath, NEvents):
     '''
-        Given the parth to the pythia log file and the number of events,
+        Given the path to the pythia log file and the number of events,
         will return the scaling factor calculated from the process 
         cross section. 
     '''
@@ -53,24 +53,37 @@ def GetScale(PythiaLogPath, NEvents):
         # Xsec is the last element of the last line
         Xsec = float(lines[-1].split()[-1])
     
-    # L_int (Data) = 1 [ab-1] = 1000000 [pb-1]
-    # L_int (MC) = N/Xsec [pb-1]
+    # L_int(Data) = 1 [ab-1] = 1000000 [pb-1]
+    # L_int(MC) = N/Xsec [pb-1]
+    # Scale = L_int(Data) / L_int(MC)
     Scale = 1000000 / (NEvents/Xsec)
 
     return Scale
 
 def MakeHists(HistDict, Scale):
     '''
-        Given a dictionary with names being keys for a list histogram
-        properties:
-        HistDict = {
-            name    :   {
-                'Vars'  :   []
+        Will initialise histograms using HistDict[Category][Requests][Vars] list
+        and add them to HistDict[Category][Hists].
+        Will also scale the hist using the GetScale() function.
+
+        Histogram dictionary should be in the following format:
+        HistDict =        {
+            Catagory        :   {
+                Requests        :   {
+                    Vars            :   [],
+                    Particles       :   []
+                },
+
+                Vars        :   [],
+                Particles   :   [],
+                Hists       :   {
+                    Var1        :   Hist1,
+                    Var2        :   Hist2
+                }
             }
         }
-        Will use the 'Vars' list to initialise histograms and add them
-        to the dictionary.
     '''
+
     VarParams = config.VarParams
     histNbins = VarParams['Nbins']
 
@@ -116,7 +129,38 @@ def MakeHists(HistDict, Scale):
 
 def RequestParticles(HistDict, ParticleDict):
     '''
-        Adds requested particles to the HistDict
+        Adds requested particles to the HistDict.
+        Histogram dictionary should be in the following format:
+        HistDict =        {
+            Catagory        :   {
+                Requests        :   {
+                    Vars            :   [],
+                    Particles       :   []
+                },
+
+                Vars        :   [],
+                Particles   :   [],
+                Hists       :   {
+                    Var1        :   Hist1,
+                    Var2        :   Hist2
+                }
+            }
+        }
+        
+        Particle dictionary should be in the following format:
+        ParticleDict[name] = {
+            'Check'     :   check,
+            'Name'      :   name,
+            'PID'       :   PID,
+            'P4'        :   P4,
+            'E'         :   P4.E(),
+            'Eta'       :   P4.Eta(),
+            'Phi'       :   P4.Phi(),
+            'Rapidity'  :   P4.Rapidity(),
+            'Theta'     :   P4.Theta(),
+            'Pt'        :   P4.Pt(),
+            'Et'        :   P4.Et()
+        }
     '''
 
     # Itterating through histogram categories
@@ -143,12 +187,18 @@ def FillHists(HistDict):
     '''
         Given a dictionary of histograms, will fill them.
         Histogram dictionary should be in the following format:
-        HistDict = {
-            Catagory    :   {
-                vars    :   [],
-                particles   :   {}
-                hists       :   {
-                    var     :   hist
+        HistDict =        {
+            Catagory        :   {
+                Requests        :   {
+                    Vars            :   [],
+                    Particles       :   []
+                },
+
+                Vars        :   [],
+                Particles   :   [],
+                Hists       :   {
+                    Var1        :   Hist1,
+                    Var2        :   Hist2
                 }
             }
         }
@@ -179,8 +229,9 @@ def FillHists(HistDict):
                         hist.Fill(xVar)
 
 
-def GetVariable(catagory, var, properties, dims=1):
+def GetVariable(catagory, var, properties, dims=2):
     '''
+        Returns the value or list of variables for the given category : var
     '''
 
     # List of variables that are stored in all particles.
@@ -248,6 +299,7 @@ def GetVariable(catagory, var, properties, dims=1):
 
 def GetDivisors(n):
     '''
+        Given an int, will return a list of perfect divisors.
     '''
     Divisors = []
     i = 1
@@ -259,7 +311,23 @@ def GetDivisors(n):
 
 def HistLims(HistDict):
     '''
-        Rescales hist lims depending on the data in the hists
+        Rescales hist lims depending on the data in the hists.
+        Histogram dictionary should be in the following format:
+        HistDict =        {
+            Catagory        :   {
+                Requests        :   {
+                    Vars            :   [],
+                    Particles       :   []
+                },
+
+                Vars        :   [],
+                Particles   :   [],
+                Hists       :   {
+                    Var1        :   Hist1,
+                    Var2        :   Hist2
+                }
+            }
+        }
     '''
 
     # Will return a list of the dividers of NBins
@@ -352,8 +420,45 @@ def HistLims(HistDict):
                     hist.SetAxisRange(XMin, XMax, 'X')
                     hist.SetAxisRange(YMin, YMax, 'Y')
 
-def CompareHist(Hist1, Hist2, HistDict, hist1name, hist2name, MediaDir_name):
+def CompareHist(HistProps, HistDict):
     '''
+        Given a histogram dictionary and 
+     
+        Histogram dictionary should be in the following format:
+        HistDict =        {
+            Catagory        :   {
+                Requests        :   {
+                    Vars            :   [],
+                    Particles       :   []
+                },
+
+                Vars        :   [],
+                Particles   :   [],
+                Hists       :   {
+                    Var1        :   Hist1,
+                    Var2        :   Hist2
+                }
+            }
+        }
+         
+        Histogram properties dictionary should be in the following format:
+        HistProps =     {
+            'Hist1'     :       {
+                'Hist'          :   Hist1,
+                'HistName'      :   Hist1Name,
+                'HistVar'       :   HistVar,
+                'HistFileName'  :   Hist1FileName    
+            },
+
+            'Hist2'     :       {
+                'Hist'          :   Hist2,
+                'HistName'      :   Hist2Name,
+                'HistVar'       :   HistVar,
+                'HistFileName'  :   Hist2FileName    
+            },
+
+            'MediaDir'  :   MediaDir_name
+        }
     '''
     
     HistDict1 = config.HistDict.copy()
@@ -363,21 +468,21 @@ def CompareHist(Hist1, Hist2, HistDict, hist1name, hist2name, MediaDir_name):
         properties['Hists'] = {}
     for key, properties in HistDict1.items():
         properties['Hists'] = {}
+    
+    Hist1 = HistProps['Hist1']['Hist']
+    Hist1Name = HistProps['Hist1']['HistName']
+    Hist1Var = HistProps['Hist1']['HistVar']
+    Hist1FileName = HistProps['Hist1']['HistFileName']
 
-    # If hist 1D
-    if len(hist1name.split('_')) == 2:
-        name = '_'.join(hist1name.split('_')[0:-1])
-        hist1var = hist1name.split('_')[-1]
-        hist2var = hist1name.split('_')[-1]
-
-    # If hist is 2D
-    elif len(hist1name.split('_')) == 3:
-        name = '_'.join(hist1name.split('_')[0:-2])
-        hist1var = '_'.join(hist1name.split('_')[-2:])
-        hist2var = '_'.join(hist1name.split('_')[-2:])
-
-    HistDict1[name]['Hists'][hist1var] = Hist1
-    HistDict2[name]['Hists'][hist2var] = Hist2
+    Hist2 = HistProps['Hist2']['Hist']
+    Hist2Name = HistProps['Hist2']['HistName']
+    Hist2Var = HistProps['Hist2']['HistVar']
+    Hist2FileName = HistProps['Hist2']['HistFileName']
+    
+    MediaDir_name = HistProps['MediaDir']
+    
+    HistDict1[Hist1Name]['Hists'][Hist1Var] = Hist1
+    HistDict2[Hist2Name]['Hists'][Hist2Var] = Hist2
 
     HistLims(HistDict1)
     HistLims(HistDict2)
@@ -396,6 +501,7 @@ def CompareHist(Hist1, Hist2, HistDict, hist1name, hist2name, MediaDir_name):
     for hist in (Hist1, Hist2):
         # SetBins actually introduces an offset into the graph
         hist.SetStats(False)
+        hist.SetTitle(Hist1FileName+'_'+Hist1Name+'_'+Hist2FileName+'_'+Hist2Name)
         hist.SetMaximum(Max)
 
     if Hist1.GetDimension() == 1:
@@ -422,7 +528,7 @@ def CompareHist(Hist1, Hist2, HistDict, hist1name, hist2name, MediaDir_name):
     SetOwnership(Legend1,False)
     Legend1.SetBorderSize(1)
     Legend1.SetShadowColor(2)
-    Legend1.SetHeader("Cuts")
+    Legend1.SetHeader(Hist1FileName+'_'+Hist1Name)
     # Entries
     Legend1.AddEntry("entries","Entries: "+str(int(Hist1.GetEntries())))
     Legend1.AddEntry(Hist1, "Line Color", "l")
@@ -438,14 +544,19 @@ def CompareHist(Hist1, Hist2, HistDict, hist1name, hist2name, MediaDir_name):
     SetOwnership(Legend2,False)
     Legend2.SetBorderSize(1)
     Legend2.SetShadowColor(2)
-    Legend2.SetHeader("No Cuts")
+    Legend2.SetHeader(Hist2FileName+'_'+Hist2Name)
     # Entries
     Legend2.AddEntry("entries","Entries: "+str(int(Hist2.GetEntries())))
     Legend2.AddEntry(Hist2, "Line Color", "l")
     Legend2.SetTextSize(0.025)       
+    # Seperation is small, but will be maximised to the bounds of the TLegend
+    # box
+    Legend2.SetEntrySeparation(.1)
+    Legend2.Draw("same")
 
+    HistCan.Update()
     # Write canvas to outfile, needs the name for some reason.
-    HistCan.SaveAs(MediaDir_name+hist1name+'_'+hist2name+'.png')
+    HistCan.SaveAs(MediaDir_name+Hist1FileName+'_'+Hist1Name+'_'+Hist1Var+'_'+Hist2FileName+'_'+Hist2Name+'_'+Hist1Var+'.png')
   
 
 
