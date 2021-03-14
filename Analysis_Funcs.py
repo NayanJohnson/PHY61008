@@ -572,7 +572,7 @@ def CompareHist(HistProps, HistDict):
 
     HistCan.Update()
     # Write canvas to outfile, needs the name for some reason.
-    HistCan.SaveAs(MediaDir_name+'/'+Hist1FileName+'-'+Hist2FileName+'/'+Hist1Name+'_'+Hist1Var+'_'+'_'+Hist2Name+'_'+Hist1Var+'.png')
+    HistCan.SaveAs(MediaDir_name+Hist1FileName+'-'+Hist2FileName+'/'+Hist1Name+'_'+Hist1Var+'_'+'_'+Hist2Name+'_'+Hist1Var+'.png')
   
 
 
