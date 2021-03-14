@@ -853,8 +853,8 @@ def GetParticles(myTree, HistDict, EventNum):
 
     # MuonSum
     MuonSum = None 
-    if ParticleDict['LeadingMuon']['Check'] and ParticleDict['SubLeadingMuon']['Check']:
-        MuonSum = ParticleDict['LeadingMuon']['P4'] + ParticleDict['SubLeadingMuon']['P4']
+    if ParticleDict['LeadingMuon']['Check'] and ParticleDict['SubLeadingMuon']['Check'] and ParticleDict['ThirdMuon']['Check']:
+        MuonSum = ParticleDict['LeadingMuon']['P4'] + ParticleDict['SubLeadingMuon']['P4'] +ParticleDict['ThirdMuon']['P4']
         ParticleDict = AddParticle('MuonSum', ParticleDict, MuonSum)
 
     # Count hists

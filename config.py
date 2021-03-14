@@ -14,7 +14,7 @@ VarKeywords = [
 ParticleKeywords = [
     'BeamElectron', 'LeadingElectron', 'FinalBeamElectron', 
     'LeadingMuon', 'SubLeadingMuon', 'ThirdMuon', 'MuonSum', 'AllMuons', 
-    'WPlusMuon', 'WMinusMuon', 'ZLeadingMuon', 'ZSubLeadingMuon', 
+    'WMuon', 'WPlusMuon', 'WMinusMuon', 'ZLeadingMuon', 'ZSubLeadingMuon', 
     'MissingET', 'BeamQuark', 
     'BeamJet', 'LeadingJet', 'SubLeadingJet', 'ThirdJet', 'FourthJet',
 ]
@@ -280,7 +280,15 @@ HistDict =  {
             'Particles' :   ['MissingET', 'LeadingJet'],
         },
     },
-    
+
+    'MissingETWMuon'  
+                    :   {
+        'Requests'      :   {
+            'Vars'      :   ['dEta', 'dPhi'],
+            'Particles' :   ['MissingET', 'WMuon'],
+        },
+    },
+
     'MissingETLeadingMuon'  
                     :   {
         'Requests'      :   {
@@ -294,6 +302,14 @@ HistDict =  {
         'Requests'      :   {
             'Vars'      :   ['dEta', 'dPhi'],
             'Particles' :   ['MissingET', 'SubLeadingMuon'],
+        },
+    },
+
+    'MissingETThirdMuon'   
+                    :   {
+        'Requests'      :   {
+            'Vars'      :   ['dEta', 'dPhi'],
+            'Particles' :   ['MissingET', 'ThirdMuon'],
         },
     },
     
