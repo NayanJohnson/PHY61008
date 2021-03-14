@@ -229,7 +229,7 @@ def FillHists(HistDict):
                         hist.Fill(xVar)
 
 
-def GetVariable(catagory, var, properties, dims=2):
+def GetVariable(catagory, var, properties, dims=1):
     '''
         Returns the value or list of variables for the given category : var
     '''
