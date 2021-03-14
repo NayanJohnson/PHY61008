@@ -540,7 +540,7 @@ def CompareHist(HistProps, HistDict):
     SetOwnership(Legend1,False)
     Legend1.SetBorderSize(1)
     Legend1.SetShadowColor(2)
-    Legend1.SetHeader(Hist1Name)
+    Legend1.SetHeader(Hist1FileName+'_'+Hist1Name)
     # Entries
     Legend1.AddEntry("entries","Entries: "+str(int(Hist1.GetEntries())))
     Legend1.AddEntry(Hist1, "Line Color", "l")
@@ -556,7 +556,7 @@ def CompareHist(HistProps, HistDict):
     SetOwnership(Legend2,False)
     Legend2.SetBorderSize(1)
     Legend2.SetShadowColor(2)
-    Legend2.SetHeader(Hist2Name)
+    Legend2.SetHeader(Hist2FileName+'_'+Hist2Name)
     # Entries
     Legend2.AddEntry("entries","Entries: "+str(int(Hist2.GetEntries())))
     Legend2.AddEntry(Hist2, "Line Color", "l")
@@ -841,8 +841,8 @@ def GetParticles(myTree, HistDict, EventNum):
 
     # MuonSum
     MuonSum = None 
-    if ParticleDict['LeadingMuon']['Check'] and ParticleDict['SubLeadingMuon']['Check']:
-        MuonSum = ParticleDict['LeadingMuon']['P4'] + ParticleDict['SubLeadingMuon']['P4']
+    if ParticleDict['LeadingMuon']['Check'] and ParticleDict['SubLeadingMuon']['Check'] and ParticleDict['ThirdMuon']['Check']:
+        MuonSum = ParticleDict['LeadingMuon']['P4'] + ParticleDict['SubLeadingMuon']['P4'] +ParticleDict['ThirdMuon']['P4']
         ParticleDict = AddParticle('MuonSum', ParticleDict, MuonSum)
 
     # Count hists
