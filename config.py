@@ -147,6 +147,13 @@ HistDict =  {
         },
     },
     
+    'ThirdMuon':   {
+        'Requests'      :   {
+            'Vars'      :   ['Eta', 'Phi', 'Rapidity', 'Pt', ('Eta', 'Pt')],
+            'Particles' :   ['ThirdMuon'],
+        },
+    },    
+    
     'ZLeadingMuon'  :   {
         'Requests'      :   {
             'Vars'      :   ['Eta', 'Phi', 'Rapidity', 'Pt', ('Eta', 'Pt')],
