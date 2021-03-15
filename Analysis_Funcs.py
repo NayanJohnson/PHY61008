@@ -488,7 +488,13 @@ def CompareHist(HistProps, HistDict):
 
     Hist2 = HistProps['Hist2']['Hist']
     Hist2Name = HistProps['Hist2']['HistName']
-    Hist2Var = HistProps['Hist2']
+    Hist2Var = HistProps['Hist2']['HistVar']
+    Hist2FileName = HistProps['Hist2']['HistFileName']
+        
+    HistDict1[Hist1Name]['Hists'][Hist1Var] = Hist1
+    HistDict2[Hist2Name]['Hists'][Hist2Var] = Hist2
+
+    HistLims(HistDict1)
     HistLims(HistDict2)
 
     # Clear canvas
