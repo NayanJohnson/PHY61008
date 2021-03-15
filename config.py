@@ -278,7 +278,7 @@ HistDict =  {
     'FinalBeamElectronLeadingJet'   
                     :   {
         'Requests'      :   {
-            'Vars'      :   ['dEta', 'dPhi'],
+            'Vars'      :   ['dEta', 'dPhi', 'InvMass'],
             'Particles' :   ['FinalBeamElectron', 'LeadingJet'],
         },
     },
