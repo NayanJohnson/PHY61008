@@ -347,7 +347,11 @@ def HistLims(HistDict, Scale=1):
     for category, properties in HistDict.items():
         for var, hist in properties['Hists'].items():
 
+            hist.Scale(Scale)
             # Skip if hist = False
+
+            ThresholdMin = (hist.Integral()/200)*.05
+
             if hist:
                 if hist.GetDimension() == 1:
                     
@@ -371,7 +375,7 @@ def HistLims(HistDict, Scale=1):
                     # low edge
                     # Set FindLastBinAbove threshold to 5 since otherwise the 
                     # hist goes on for way too long
-                    BinMaxX = hist.GetBinLowEdge(hist.FindLastBinAbove(5, 1))
+                    BinMaxX = hist.GetBinLowEdge(hist.FindLastBinAbove(ThresholdMin, 1))
                     BinMinX = hist.GetBinLowEdge(hist.FindFirstBinAbove(0, 1))
                     # Max/min = BinMax/min +- 5% +- 5 (prevents max=min for BinMax/Min=0)
                     XMax = BinMaxX + abs(BinMaxX/10) + 5
@@ -418,9 +422,9 @@ def HistLims(HistDict, Scale=1):
                     # between two vars so the bins will be less filled 
                     # hist goes on for way too long
                     # For 2D hist must first get axis before using TH1 methods
-                    BinMaxX = hist.GetXaxis().GetBinLowEdge(hist.FindLastBinAbove(2, 1))
+                    BinMaxX = hist.GetXaxis().GetBinLowEdge(hist.FindLastBinAbove(ThresholdMin, 1))
                     BinMinX = hist.GetXaxis().GetBinLowEdge(hist.FindFirstBinAbove(0, 1))
-                    BinMaxY = hist.GetYaxis().GetBinLowEdge(hist.FindLastBinAbove(2, 2))
+                    BinMaxY = hist.GetYaxis().GetBinLowEdge(hist.FindLastBinAbove(ThresholdMin, 2))
                     BinMinY = hist.GetYaxis().GetBinLowEdge(hist.FindFirstBinAbove(0, 2))                
                     # Max/min = BinMax/min +- 5% +- 5 (prevents max=min for BinMax/Min=0)
                     XMax = BinMaxX + abs(BinMaxX/10) + 5
@@ -430,8 +434,6 @@ def HistLims(HistDict, Scale=1):
 
                     hist.SetAxisRange(XMin, XMax, 'X')
                     hist.SetAxisRange(YMin, YMax, 'Y')
-                # Scales the histogram forces the graph to be drawn as 'hist'
-                hist.Scale(Scale)
 
 
 def CompareHist(HistProps, HistDict):
@@ -686,21 +688,28 @@ def ParticleLoop(TreeDict, EventNum):
             
             # Electrons and positrons
             if abs(particle.PID) == 11:
-                # Adding the particle to the final state list
-                FinalLeptons.append(particle)                
-                e_count += 1
+                # Electron cuts
+                if -4.3 <= particle.P4().Eta() <= 4.9:
+                    if particle.P4().Pt() >= 5:
+                        # Adding the particle to the final state list
+                        FinalLeptons.append(particle)                
+                        e_count += 1
+                        # Adding the electron to the sorting list 
+                        ElectronPT.append( (particle.PT, particle) )
 
-                # Adding the electron to the sorting list 
-                ElectronPT.append( (particle.PT, particle) )
-                
+
             # Selecting mu
-            elif abs(particle.PID) ==  13:                
-                # Adding the particle to the final state list
-                FinalLeptons.append(particle)              
-                mu_count += 1                
-                
-                # Adding the muon to the sorting list                 
-                MuonPT.append( (particle.PT, particle) )      
+            elif abs(particle.PID) ==  13:     
+                # Muon cuts
+                if -4 <= particle.P4().Eta() <= 4:
+                    if particle.P4().Pt() >= 5:
+                        # Adding the particle to the final state list
+                        FinalLeptons.append(particle)              
+                        mu_count += 1                
+                        # Adding the muon to the sorting list                 
+                        MuonPT.append( (particle.PT, particle) )   
+
+                   
                 
             # Selecting neutrinos
             elif abs(particle.PID) == 12 or abs(particle.PID) == 14:
@@ -729,8 +738,11 @@ def ParticleLoop(TreeDict, EventNum):
                 
         # Jet discared if it overlaps with any particles
         if Overlap == 0:
-            jet_count += 1
-            JetPT.append( ( jet.PT, jet) )
+            # Jet cuts
+            if -4.4 <= jet.P4().Eta() <= 5:
+                if 3 <= jet.P4().Pt:
+                    jet_count += 1
+                    JetPT.append( ( jet.PT, jet) )
     
     # Sorts ElectronPT based on the 1st element in each tuple in ascending order
     ElectronPT_sorted = sorted(ElectronPT, key=lambda x: x[0])
