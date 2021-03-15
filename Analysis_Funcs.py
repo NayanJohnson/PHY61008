@@ -41,26 +41,9 @@ def LoadROOT(filename):
 
     return TreeDict
 
-def GetScale(PythiaLogPath, NEvents):
-    '''
-        Given the path to the pythia log file and the number of events,
-        will return the scaling factor calculated from the process 
-        cross section. 
-    '''
 
-    with open(PythiaLogPath, "r") as file:
-        lines = file.read().splitlines()
-        # Xsec is the last element of the last line
-        Xsec = float(lines[-1].split()[-1])
-    
-    # L_int(Data) = 1 [ab-1] = 1000000 [pb-1]
-    # L_int(MC) = N/Xsec [pb-1]
-    # Scale = L_int(Data) / L_int(MC)
-    Scale = 1000000 / (NEvents/Xsec)
 
-    return Scale
-
-def MakeHists(HistDict, Scale):
+def MakeHists(HistDict):
     '''
         Will initialise histograms using HistDict[Category][Requests][Vars] list
         and add them to HistDict[Category][Hists].
@@ -104,8 +87,6 @@ def MakeHists(HistDict, Scale):
 
                     hist = TH2F(histName, histTitle, histNbins, histXlow, histXup, histNbins, histYlow, histYup)
                     
-                    # Scales the histogram forces the graph to be drawn as 'hist'
-                    hist.Scale(Scale)
                     hist.SetOption('HIST COLZ')
                     # Adds the hist to the dict
                     HistDict[name]['Hists'][var[0]+'_'+var[1]] = hist
@@ -119,8 +100,6 @@ def MakeHists(HistDict, Scale):
                 hist = TH1F(histName, histTitle, histNbins, histXlow, histXup)
 
 
-                # Scales the histogram forces the graph to be drawn as 'hist'
-                hist.Scale(Scale)
                 hist.SetOption('HIST')
                 # Adds the hist to the dict
                 HistDict[name]['Hists'][var] = hist
@@ -325,7 +304,26 @@ def GetDivisors(n):
         i += 1
     return Divisors
 
-def HistLims(HistDict):
+def GetScale(PythiaLogPath, NEvents):
+    '''
+        Given the path to the pythia log file and the number of events,
+        will return the scaling factor calculated from the process 
+        cross section. 
+    '''
+
+    with open(PythiaLogPath, "r") as file:
+        lines = file.read().splitlines()
+        # Xsec is the last element of the last line
+        Xsec = float(lines[-1].split()[-1])
+    
+    # L_int(Data) = 1 [ab-1] = 1000000 [pb-1]
+    # L_int(MC) = N/Xsec [pb-1]
+    # Scale = L_int(Data) / L_int(MC)
+    Scale = 1000000 / (NEvents/Xsec)
+
+    return Scale
+
+def HistLims(HistDict, Scale):
     '''
         Rescales hist lims depending on the data in the hists.
         Histogram dictionary should be in the following format:
@@ -435,6 +433,9 @@ def HistLims(HistDict):
 
                     hist.SetAxisRange(XMin, XMax, 'X')
                     hist.SetAxisRange(YMin, YMax, 'Y')
+                # Scales the histogram forces the graph to be drawn as 'hist'
+                hist.Scale(Scale)
+
 
 def CompareHist(HistProps, HistDict):
     '''
@@ -696,8 +697,7 @@ def ParticleLoop(TreeDict, EventNum):
                         e_count += 1
                         # Adding the electron to the sorting list 
                         ElectronPT.append( (particle.PT, particle) )
-                else:
-                    MissingParticle.append(particle)
+
 
             # Selecting mu
             elif abs(particle.PID) ==  13:     
@@ -709,8 +709,7 @@ def ParticleLoop(TreeDict, EventNum):
                         mu_count += 1                
                         # Adding the muon to the sorting list                 
                         MuonPT.append( (particle.PT, particle) )   
-                else:
-                    MissingParticle.append(particle)
+
                    
                 
             # Selecting neutrinos
@@ -862,4 +861,4 @@ def GetParticles(myTree, HistDict, EventNum):
     HistDict['Muons']['Count'] = numbMuons
     HistDict['Jets']['Count'] = numbJets
 
-    return HistDict, ParticleDict
+    return HistDict, ParticleDict, EventDict
