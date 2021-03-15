@@ -342,10 +342,7 @@ def HistLims(HistDict, Scale):
                 }
             }
         }
-    '''
-
-    # Will return a list of the dividers of NBins
-    
+    '''    
 
     for category, properties in HistDict.items():
         for var, hist in properties['Hists'].items():
