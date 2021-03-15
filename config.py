@@ -1,3 +1,42 @@
+EventLoopParams = {
+    "ParticleLevel"     :   {
+        "Cuts"              :   {
+            'e_Eta'             :   (-4.3, 4.9),
+            'e_Pt'              :   5,
+            'mu_Eta'            :   (-4, 4),
+            'mu_Pt'             :   5,  
+            'jet_Eta'           :   (-4.4, 5),
+            'jet_Pt'            :   3,                   
+        },
+
+        "NoCuts"            :   {
+            'e_Eta'             :   (float('-inf'), float('inf')),
+            'e_Pt'              :   float('inf'),
+            'mu_Eta'            :   (float('-inf'), float('inf')),
+            'mu_Pt'             :   float('inf'),  
+            'jet_Eta'           :   (float('-inf'), float('inf')),
+            'jet_Pt'            :   float('inf'),                   
+        }
+    },
+    
+    'EventLevel'        :   {
+        "Cuts"              :   {
+            'Electrons'         :   1,
+            'Muons'             :   2,
+            'Jets'              :   1
+        },
+
+        "NoCuts"            :   {
+            'Electrons'         :   0,
+            'Muons'             :   0,
+            'Jets'              :   0
+        },            
+
+    }
+
+}   
+
+
 # Dictionary that will contain all info needed to produce histograms.
 # 'Request' dictionary is used to tell the script what variables to
 # plot and what particles the histogram requires

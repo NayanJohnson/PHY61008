@@ -619,7 +619,7 @@ def AddParticle(name, ParticleDict, P4=None, PID=None, isJet=False):
         return ParticleDict
 
 
-def ParticleLoop(TreeDict, EventNum):
+def ParticleLoop(TreeDict, EventNum, Run):
     '''
     Main particle loop.
     Given a dictionary:
@@ -651,6 +651,7 @@ def ParticleLoop(TreeDict, EventNum):
         }
     }
     '''
+    Cuts = config.EventLoopParams['ParticleLevel'][Run]
 
     # Reading a specific event 
     TreeDict['Tree'].ReadEntry(EventNum)
@@ -688,21 +689,31 @@ def ParticleLoop(TreeDict, EventNum):
             
             # Electrons and positrons
             if abs(particle.PID) == 11:
-                # Adding the particle to the final state list
-                FinalLeptons.append(particle)                
-                e_count += 1
+                # Electron cuts
+                if Cuts['e_Eta'][0] <= particle.P4().Eta() <= Cuts['e_Eta'][1]:
+                    if particle.P4().Pt() >= Cuts['e_Pt']:
+                        # Adding the particle to the final state list
+                        FinalLeptons.append(particle)                
+                        e_count += 1
+                        # Adding the electron to the sorting list 
+                        ElectronPT.append( (particle.PT, particle) )
+
 
                 # Adding the electron to the sorting list 
                 ElectronPT.append( (particle.PT, particle) )
                 
             # Selecting mu
-            elif abs(particle.PID) ==  13:                
-                # Adding the particle to the final state list
-                FinalLeptons.append(particle)              
-                mu_count += 1                
-                
-                # Adding the muon to the sorting list                 
-                MuonPT.append( (particle.PT, particle) )      
+            elif abs(particle.PID) ==  13:     
+                # Muon cuts
+                if Cuts['mu_Eta'][0] <= particle.P4().Eta() <= Cuts['mu_Eta'][1]:
+                    if particle.P4().Pt() >= Cuts['mu_Pt']:
+                        # Adding the particle to the final state list
+                        FinalLeptons.append(particle)              
+                        mu_count += 1                
+                        # Adding the muon to the sorting list                 
+                        MuonPT.append( (particle.PT, particle) )   
+
+                   
                 
             # Selecting neutrinos
             elif abs(particle.PID) == 12 or abs(particle.PID) == 14:
@@ -731,8 +742,11 @@ def ParticleLoop(TreeDict, EventNum):
                 
         # Jet discared if it overlaps with any particles
         if Overlap == 0:
-            jet_count += 1
-            JetPT.append( ( jet.PT, jet) )
+            # Jet cuts
+            if Cuts['jet_Eta'][0] <= particle.P4().Eta() <= Cuts['e_Eta'][1]:
+                if particle.P4().Pt() >= Cuts['jet_Pt']:
+                    jet_count += 1
+                    JetPT.append( ( jet.PT, jet) )
     
     # Sorts ElectronPT based on the 1st element in each tuple in ascending order
     ElectronPT_sorted = sorted(ElectronPT, key=lambda x: x[0])
@@ -764,10 +778,11 @@ def ParticleLoop(TreeDict, EventNum):
 
     return EventDict
 
-def GetParticles(myTree, HistDict, EventNum):
+def GetParticles(myTree, Run, HistDict, EventNum):
     '''
 
     '''
+
     ParticleKeywords = config.ParticleKeywords
     # Reset particle list for the new event
     for _, dictionary in HistDict.items():
@@ -779,7 +794,7 @@ def GetParticles(myTree, HistDict, EventNum):
         ParticleDict = AddParticle(keyword, ParticleDict)
 
     # Particle loop with cuts
-    EventDict = ParticleLoop(myTree, EventNum)
+    EventDict = ParticleLoop(myTree, EventNum, Run)
 
     # Adding BeamElectron and BeamQuark
     ParticleDict = AddParticle('BeamElectron', ParticleDict, EventDict['BeamElectron'].P4())
