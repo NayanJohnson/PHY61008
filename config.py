@@ -384,7 +384,7 @@ HistComparisonDict =    {
         },
         
         'Hist2'         :   {
-            'Name'          :   'WMuon',
+            'Name'          :   'WPlusMuon',
             'File'          :   1
         },
 
@@ -398,24 +398,10 @@ HistComparisonDict =    {
         },
         
         'Hist2'         :   {
-            'Name'          :   'ZMuons',
+            'Name'          :   'WMinusMuon',
             'File'          :   1
         },
 
         'Var'           :   ['Eta', 'Pt']
-    },
-
-    '3'             :   {
-        'Hist1'         :   {
-            'Name'          :   'WMuon',
-            'File'          :   1
-        },
-        
-        'Hist2'         :   {
-            'Name'          :   'ZMuons',
-            'File'          :   1
-        },
-
-        'Var'           :   ['Eta', 'Pt']
-    },    
+    }
 }
