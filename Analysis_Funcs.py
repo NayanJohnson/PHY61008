@@ -41,26 +41,9 @@ def LoadROOT(filename):
 
     return TreeDict
 
-def GetScale(PythiaLogPath, NEvents):
-    '''
-        Given the path to the pythia log file and the number of events,
-        will return the scaling factor calculated from the process 
-        cross section. 
-    '''
 
-    with open(PythiaLogPath, "r") as file:
-        lines = file.read().splitlines()
-        # Xsec is the last element of the last line
-        Xsec = float(lines[-1].split()[-1])
-    
-    # L_int(Data) = 1 [ab-1] = 1000000 [pb-1]
-    # L_int(MC) = N/Xsec [pb-1]
-    # Scale = L_int(Data) / L_int(MC)
-    Scale = 1000000 / (NEvents/Xsec)
 
-    return Scale
-
-def MakeHists(HistDict, Scale):
+def MakeHists(HistDict):
     '''
         Will initialise histograms using HistDict[Category][Requests][Vars] list
         and add them to HistDict[Category][Hists].
@@ -104,8 +87,6 @@ def MakeHists(HistDict, Scale):
 
                     hist = TH2F(histName, histTitle, histNbins, histXlow, histXup, histNbins, histYlow, histYup)
                     
-                    # Scales the histogram forces the graph to be drawn as 'hist'
-                    hist.Scale(Scale)
                     hist.SetOption('HIST COLZ')
                     # Adds the hist to the dict
                     HistDict[name]['Hists'][var[0]+'_'+var[1]] = hist
@@ -119,8 +100,6 @@ def MakeHists(HistDict, Scale):
                 hist = TH1F(histName, histTitle, histNbins, histXlow, histXup)
 
 
-                # Scales the histogram forces the graph to be drawn as 'hist'
-                hist.Scale(Scale)
                 hist.SetOption('HIST')
                 # Adds the hist to the dict
                 HistDict[name]['Hists'][var] = hist
@@ -325,7 +304,26 @@ def GetDivisors(n):
         i += 1
     return Divisors
 
-def HistLims(HistDict):
+def GetScale(PythiaLogPath, NEvents):
+    '''
+        Given the path to the pythia log file and the number of events,
+        will return the scaling factor calculated from the process 
+        cross section. 
+    '''
+
+    with open(PythiaLogPath, "r") as file:
+        lines = file.read().splitlines()
+        # Xsec is the last element of the last line
+        Xsec = float(lines[-1].split()[-1])
+    
+    # L_int(Data) = 1 [ab-1] = 1000000 [pb-1]
+    # L_int(MC) = N/Xsec [pb-1]
+    # Scale = L_int(Data) / L_int(MC)
+    Scale = 1000000 / (NEvents/Xsec)
+
+    return Scale
+
+def HistLims(HistDict, Scale):
     '''
         Rescales hist lims depending on the data in the hists.
         Histogram dictionary should be in the following format:
@@ -435,6 +433,9 @@ def HistLims(HistDict):
 
                     hist.SetAxisRange(XMin, XMax, 'X')
                     hist.SetAxisRange(YMin, YMax, 'Y')
+                # Scales the histogram forces the graph to be drawn as 'hist'
+                hist.Scale(Scale)
+
 
 def CompareHist(HistProps, HistDict):
     '''
@@ -513,7 +514,7 @@ def CompareHist(HistProps, HistDict):
     for hist in (Hist1, Hist2):
         # SetBins actually introduces an offset into the graph
         hist.SetStats(False)
-        hist.SetTitle(Hist1FileName+'_'+Hist1Name+'_'+Hist2FileName+'_'+Hist2Name)
+        hist.SetTitle(Hist1Name+'_'+Hist2Name)
         hist.SetMaximum(Max)
 
     if Hist1.GetDimension() == 1:
@@ -540,7 +541,7 @@ def CompareHist(HistProps, HistDict):
     SetOwnership(Legend1,False)
     Legend1.SetBorderSize(1)
     Legend1.SetShadowColor(2)
-    Legend1.SetHeader(Hist1Name)
+    Legend1.SetHeader(Hist1FileName+Hist1Name)
     # Entries
     Legend1.AddEntry("entries","Entries: "+str(int(Hist1.GetEntries())))
     Legend1.AddEntry(Hist1, "Line Color", "l")
@@ -556,7 +557,7 @@ def CompareHist(HistProps, HistDict):
     SetOwnership(Legend2,False)
     Legend2.SetBorderSize(1)
     Legend2.SetShadowColor(2)
-    Legend2.SetHeader(Hist2Name)
+    Legend2.SetHeader(Hist2FileName+Hist2Name)
     # Entries
     Legend2.AddEntry("entries","Entries: "+str(int(Hist2.GetEntries())))
     Legend2.AddEntry(Hist2, "Line Color", "l")
@@ -850,4 +851,4 @@ def GetParticles(myTree, HistDict, EventNum):
     HistDict['Muons']['Count'] = numbMuons
     HistDict['Jets']['Count'] = numbJets
 
-    return HistDict, ParticleDict
+    return HistDict, ParticleDict, EventDict
