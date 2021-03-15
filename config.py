@@ -175,14 +175,14 @@ HistDict =  {
         },
     },
 
-        'WPlusMuon'     :   {
+    'WPlusMuon'     :   {
         'Requests'      :   {
             'Vars'      :   ['Eta', 'Phi', 'Rapidity', 'Pt', ('Eta', 'Pt')],
             'Particles' :   ['WPlusMuon'],
         },
     },
 
-        'WMinusMuon'     :   {
+    'WMinusMuon'     :   {
         'Requests'      :   {
             'Vars'      :   ['Eta', 'Phi', 'Rapidity', 'Pt', ('Eta', 'Pt')],
             'Particles' :   ['WMinusMuon'],
