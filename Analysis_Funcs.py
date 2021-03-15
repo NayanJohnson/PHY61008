@@ -347,7 +347,11 @@ def HistLims(HistDict, Scale=1):
     for category, properties in HistDict.items():
         for var, hist in properties['Hists'].items():
 
+            hist.Scale(Scale)
             # Skip if hist = False
+
+            ThresholdMin = (hist.Integral()/200)*.05
+
             if hist:
                 if hist.GetDimension() == 1:
                     
@@ -371,7 +375,7 @@ def HistLims(HistDict, Scale=1):
                     # low edge
                     # Set FindLastBinAbove threshold to 5 since otherwise the 
                     # hist goes on for way too long
-                    BinMaxX = hist.GetBinLowEdge(hist.FindLastBinAbove(5, 1))
+                    BinMaxX = hist.GetBinLowEdge(hist.FindLastBinAbove(ThresholdMin, 1))
                     BinMinX = hist.GetBinLowEdge(hist.FindFirstBinAbove(0, 1))
                     # Max/min = BinMax/min +- 5% +- 5 (prevents max=min for BinMax/Min=0)
                     XMax = BinMaxX + abs(BinMaxX/10) + 5
@@ -418,9 +422,9 @@ def HistLims(HistDict, Scale=1):
                     # between two vars so the bins will be less filled 
                     # hist goes on for way too long
                     # For 2D hist must first get axis before using TH1 methods
-                    BinMaxX = hist.GetXaxis().GetBinLowEdge(hist.FindLastBinAbove(2, 1))
+                    BinMaxX = hist.GetXaxis().GetBinLowEdge(hist.FindLastBinAbove(ThresholdMin, 1))
                     BinMinX = hist.GetXaxis().GetBinLowEdge(hist.FindFirstBinAbove(0, 1))
-                    BinMaxY = hist.GetYaxis().GetBinLowEdge(hist.FindLastBinAbove(2, 2))
+                    BinMaxY = hist.GetYaxis().GetBinLowEdge(hist.FindLastBinAbove(ThresholdMin, 2))
                     BinMinY = hist.GetYaxis().GetBinLowEdge(hist.FindFirstBinAbove(0, 2))                
                     # Max/min = BinMax/min +- 5% +- 5 (prevents max=min for BinMax/Min=0)
                     XMax = BinMaxX + abs(BinMaxX/10) + 5
@@ -430,8 +434,6 @@ def HistLims(HistDict, Scale=1):
 
                     hist.SetAxisRange(XMin, XMax, 'X')
                     hist.SetAxisRange(YMin, YMax, 'Y')
-                # Scales the histogram forces the graph to be drawn as 'hist'
-                hist.Scale(Scale)
 
 
 def CompareHist(HistProps, HistDict):
