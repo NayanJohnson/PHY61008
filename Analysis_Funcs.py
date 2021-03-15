@@ -323,7 +323,7 @@ def GetScale(PythiaLogPath, NEvents):
 
     return Scale
 
-def HistLims(HistDict, Scale):
+def HistLims(HistDict, Scale=1):
     '''
         Rescales hist lims depending on the data in the hists.
         Histogram dictionary should be in the following format:
