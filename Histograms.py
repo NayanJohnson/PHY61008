@@ -36,27 +36,26 @@ for EventNum in range(myTree['NEvents']):
         # Seperating out boson muons 
         # Only attempt this if all muons are present
         ZMuonInvMassList = []
-        if ParticleDict['LeadingMuon']['Check'] and ParticleDict['SubLeadingMuon']['Check'] and ParticleDict['ThirdMuon']['Check']:  
-            MuonPermutations = [
-                (ParticleDict['LeadingMuon'], ParticleDict['SubLeadingMuon'], ParticleDict['ThirdMuon']),
-                (ParticleDict['LeadingMuon'], ParticleDict['ThirdMuon'], ParticleDict['SubLeadingMuon']),
-                (ParticleDict['SubLeadingMuon'], ParticleDict['ThirdMuon'], ParticleDict['LeadingMuon'])
-            ]
+        MuonPermutations = [
+            (ParticleDict['LeadingMuon'], ParticleDict['SubLeadingMuon'], ParticleDict['ThirdMuon']),
+            (ParticleDict['LeadingMuon'], ParticleDict['ThirdMuon'], ParticleDict['SubLeadingMuon']),
+            (ParticleDict['SubLeadingMuon'], ParticleDict['ThirdMuon'], ParticleDict['LeadingMuon'])
+        ]
 
-            # Calculating InvMass of the three different muon pairs
-            for MuonPair in MuonPermutations:
-                ZMuonInvMassList.append(funcs.GetParticleVariable('InvMass', MuonPair[0:2]))
+        # Calculating InvMass of the three different muon pairs
+        for MuonPair in MuonPermutations:
+            ZMuonInvMassList.append(funcs.GetParticleVariable('InvMass', MuonPair[0:2]))
 
-            # Find the closest InvMass to the Z mass
-            ZMuonPairInvMass = min(ZMuonInvMassList, key=lambda x:abs(x-91.1876))
-            ZMuonPairIndex = ZMuonInvMassList.index(ZMuonPairInvMass)
-            if MuonPermutations[ZMuonPairIndex][0]['Pt'] < MuonPermutations[ZMuonPairIndex][1]['Pt']:
-                ParticleDict['ZLeadingMuon'] = MuonPermutations[ZMuonPairIndex][1]
-                ParticleDict['ZSubLeadingMuon'] = MuonPermutations[ZMuonPairIndex][0]
-            else:        
-                ParticleDict['ZSubLeadingMuon'] = MuonPermutations[ZMuonPairIndex][1]
-                ParticleDict['ZLeadingMuon'] = MuonPermutations[ZMuonPairIndex][0]
-            ParticleDict['WMuon'] = MuonPermutations[ZMuonPairIndex][2]
+        # Find the closest InvMass to the Z mass
+        ZMuonPairInvMass = min(ZMuonInvMassList, key=lambda x:abs(x-91.1876))
+        ZMuonPairIndex = ZMuonInvMassList.index(ZMuonPairInvMass)
+        if MuonPermutations[ZMuonPairIndex][0]['Pt'] < MuonPermutations[ZMuonPairIndex][1]['Pt']:
+            ParticleDict['ZLeadingMuon'] = MuonPermutations[ZMuonPairIndex][1]
+            ParticleDict['ZSubLeadingMuon'] = MuonPermutations[ZMuonPairIndex][0]
+        else:        
+            ParticleDict['ZSubLeadingMuon'] = MuonPermutations[ZMuonPairIndex][1]
+            ParticleDict['ZLeadingMuon'] = MuonPermutations[ZMuonPairIndex][0]
+        ParticleDict['WMuon'] = MuonPermutations[ZMuonPairIndex][2]
 
     # Filling HistDict with particles then filling the hists
     HistDict = funcs.RequestParticles(HistDict, ParticleDict)
