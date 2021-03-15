@@ -766,7 +766,6 @@ def ParticleLoop(TreeDict, EventNum):
 
 def GetParticles(myTree, HistDict, EventNum):
     '''
-
     '''
     ParticleKeywords = config.ParticleKeywords
     # Reset particle list for the new event
