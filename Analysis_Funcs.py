@@ -513,7 +513,7 @@ def CompareHist(HistProps, HistDict):
     for hist in (Hist1, Hist2):
         # SetBins actually introduces an offset into the graph
         hist.SetStats(False)
-        hist.SetTitle(Hist1FileName+'_'+Hist1Name+'_'+Hist2FileName+'_'+Hist2Name)
+        hist.SetTitle(Hist1Name+'_'+Hist2Name)
         hist.SetMaximum(Max)
 
     if Hist1.GetDimension() == 1:
