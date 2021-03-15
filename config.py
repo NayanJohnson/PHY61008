@@ -81,7 +81,7 @@ VarParams = {
     },
     
     'InvMass'   :   {
-        'Range'     :   (0, 10000)
+        'Range'     :   (-2000, 2000)
     },
 }
 
@@ -399,6 +399,8 @@ HistComparisonDict =    {
         
         'Hist2'         :   {
             'Name'          :   'ZMuons',
+<<<<<<< HEAD
+=======
             'File'          :   1
         },
 
@@ -413,9 +415,27 @@ HistComparisonDict =    {
         
         'Hist2'         :   {
             'Name'          :   'ZMuons',
+>>>>>>> WZEmJ_WZ_MuVMuMu_NoCutsScalePatch
             'File'          :   1
         },
 
         'Var'           :   ['Eta', 'Pt']
+<<<<<<< HEAD
+    },
+
+    '3'             :   {
+        'Hist1'         :   {
+            'Name'          :   'WMuon',
+            'File'          :   1
+        },
+        
+        'Hist2'         :   {
+            'Name'          :   'ZMuons',
+            'File'          :   1
+        },
+
+        'Var'           :   ['Eta', 'Pt']
+=======
+>>>>>>> WZEmJ_WZ_MuVMuMu_NoCutsScalePatch
     },    
 }
