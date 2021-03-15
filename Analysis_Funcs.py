@@ -323,7 +323,7 @@ def GetScale(PythiaLogPath, NEvents):
 
     return Scale
 
-def HistLims(HistDict, Scale):
+def HistLims(HistDict, Scale=1):
     '''
         Rescales hist lims depending on the data in the hists.
         Histogram dictionary should be in the following format:
@@ -342,10 +342,7 @@ def HistLims(HistDict, Scale):
                 }
             }
         }
-    '''
-
-    # Will return a list of the dividers of NBins
-    
+    '''    
 
     for category, properties in HistDict.items():
         for var, hist in properties['Hists'].items():

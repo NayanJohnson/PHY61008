@@ -24,13 +24,13 @@ HistDict = funcs.MakeHists(HistDict)
 # Looping through events
 for EventNum in range(myTree['NEvents']):
 
-    HistDict, ParticleDict = funcs.GetParticles(myTree, HistDict, EventNum)
-
-    # Setting FinalBeamElectron
-    ParticleDict['FinalBeamElectron'] = ParticleDict['LeadingElectron']
+    HistDict, ParticleDict, EventDict = funcs.GetParticles(myTree, HistDict, EventNum)
 
     # Event level selection for WWEmJ_WZ_MuVMuMu
     if EventDict['Count']['Electrons'] > 0 and EventDict['Count']['Muons'] >= 3:
+        ParticleDict['FinalBeamElectron'] = ParticleDict['LeadingElectron']
+
+        # Setting FinalBeamElectron
         ParticleDict['FinalBeamElectron'] = ParticleDict['LeadingElectron']
         
         # Seperating out boson muons 
@@ -61,6 +61,10 @@ for EventNum in range(myTree['NEvents']):
     # Filling HistDict with particles then filling the hists
     HistDict = funcs.RequestParticles(HistDict, ParticleDict)
     funcs.FillHists(HistDict)
+
+# Get scaling factor for histograms
+Scale = funcs.GetScale('tag_1_pythia.log', myTree['NEvents'])
+
 
 # Rescaling hist lims
 funcs.HistLims(HistDict)
