@@ -147,14 +147,42 @@ HistDict =  {
         },
     },
     
+    'ZLeadingMuon'  :   {
+        'Requests'      :   {
+            'Vars'      :   ['Eta', 'Phi', 'Rapidity', 'Pt', ('Eta', 'Pt')],
+            'Particles' :   ['ZLeadingMuon'],
+        },
+    },
+
+    'ZSubLeadingMuon'  :   {
+        'Requests'      :   {
+            'Vars'      :   ['Eta', 'Phi', 'Rapidity', 'Pt', ('Eta', 'Pt')],
+            'Particles' :   ['ZSubLeadingMuon'],
+        },
+    },   
+
+    'ZMuons'  :   {
+        'Requests'      :   {
+            'Vars'      :   ['Eta', 'Phi', 'Rapidity', 'Pt', ('Eta', 'Pt'), 'InvMass'],
+            'Particles' :   ['ZLeadingMuon', 'ZSubLeadingMuon'],
+        },
+    }, 
+
+    'WMuon'     :   {
+        'Requests'      :   {
+            'Vars'      :   ['Eta', 'Phi', 'Rapidity', 'Pt', ('Eta', 'Pt')],
+            'Particles' :   ['WMuon'],
+        },
+    },
+
     'WPlusMuon'     :   {
         'Requests'      :   {
             'Vars'      :   ['Eta', 'Phi', 'Rapidity', 'Pt', ('Eta', 'Pt')],
             'Particles' :   ['WPlusMuon'],
         },
     },
-        
-    'WMinusMuon'    :   {
+
+    'WMinusMuon'     :   {
         'Requests'      :   {
             'Vars'      :   ['Eta', 'Phi', 'Rapidity', 'Pt', ('Eta', 'Pt')],
             'Particles' :   ['WMinusMuon'],
