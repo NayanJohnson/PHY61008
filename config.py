@@ -81,7 +81,7 @@ VarParams = {
     },
     
     'InvMass'   :   {
-        'Range'     :   (-2000, 2000)
+        'Range'     :   (0, 10000)
     },
 }
 
