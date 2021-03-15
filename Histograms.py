@@ -38,18 +38,29 @@ def EventLoop(myTree, outfileprefix, EventRun, ParticleRun):
         if EventDict['Count']['Electrons'] >= EventCuts['Electrons'] and EventDict['Count']['Muons'] >= EventCuts['Muons'] and EventDict['Count']['Jets'] >= EventCuts['Jets']:
             ParticleDict['FinalBeamElectron'] = ParticleDict['LeadingElectron']
             
-            # WPlus and WMinus hists
-            # Leading and SubLeading muons will always be from the W bosons 
-            # (in this process) so I seperate them by charge to determine which
-            # boson they came from
+            # Seperating out boson muons 
+            # Only attempt this if all muons are present
+            ZMuonInvMassList = []
+            MuonPermutations = [
+                (ParticleDict['LeadingMuon'], ParticleDict['SubLeadingMuon'], ParticleDict['ThirdMuon']),
+                (ParticleDict['LeadingMuon'], ParticleDict['ThirdMuon'], ParticleDict['SubLeadingMuon']),
+                (ParticleDict['SubLeadingMuon'], ParticleDict['ThirdMuon'], ParticleDict['LeadingMuon'])
+            ]
 
-            # Will only run if that muon is present
-            for Muon in [ParticleDict['LeadingMuon'], ParticleDict['SubLeadingMuon']]:
-                if Muon['Check']:    
-                    if Muon['PID'] == 13:
-                        ParticleDict = funcs.AddParticle('WMinusMuon', ParticleDict, Muon['P4'])
-                    elif Muon['PID'] == -13:
-                        ParticleDict = funcs.AddParticle('WPlusMuon', ParticleDict, Muon['P4'])
+            # Calculating InvMass of the three different muon pairs
+            for MuonPair in MuonPermutations:
+                ZMuonInvMassList.append(funcs.GetParticleVariable('InvMass', MuonPair[0:2]))
+
+            # Find the closest InvMass to the Z mass
+            ZMuonPairInvMass = min(ZMuonInvMassList, key=lambda x:abs(x-91.1876))
+            ZMuonPairIndex = ZMuonInvMassList.index(ZMuonPairInvMass)
+            if MuonPermutations[ZMuonPairIndex][0]['Pt'] < MuonPermutations[ZMuonPairIndex][1]['Pt']:
+                ParticleDict['ZLeadingMuon'] = MuonPermutations[ZMuonPairIndex][1]
+                ParticleDict['ZSubLeadingMuon'] = MuonPermutations[ZMuonPairIndex][0]
+            else:        
+                ParticleDict['ZSubLeadingMuon'] = MuonPermutations[ZMuonPairIndex][1]
+                ParticleDict['ZLeadingMuon'] = MuonPermutations[ZMuonPairIndex][0]
+            ParticleDict['WMuon'] = MuonPermutations[ZMuonPairIndex][2]
 
 
             # Filling HistDict with particles then filling the hists

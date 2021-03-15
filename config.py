@@ -22,7 +22,7 @@ EventLoopParams = {
     'EventLevel'        :   {
         "Cuts"              :   {
             'Electrons'         :   1,
-            'Muons'             :   2,
+            'Muons'             :   3,
             'Jets'              :   1
         },
 
@@ -120,7 +120,7 @@ VarParams = {
     },
     
     'InvMass'   :   {
-        'Range'     :   (0, 10000)
+        'Range'     :   (-2000, 2000)
     },
 }
 
@@ -423,7 +423,7 @@ HistComparisonDict =    {
         },
         
         'Hist2'         :   {
-            'Name'          :   'WPlusMuon',
+            'Name'          :   'WMuon',
             'File'          :   1
         },
 
@@ -437,10 +437,10 @@ HistComparisonDict =    {
         },
         
         'Hist2'         :   {
-            'Name'          :   'WMinusMuon',
+            'Name'          :   'ZMuons',
             'File'          :   1
         },
 
         'Var'           :   ['Eta', 'Pt']
-    }
+    },
 }
