@@ -9,7 +9,7 @@ gInterpreter.Declare('#include "classes/DelphesClasses.h"')
 gInterpreter.Declare('#include "external/ExRootAnalysis/ExRootTreeReader.h"')
 
 from ROOT import ExRootTreeReader
-import config
+import config, itertools
 
 
 def LoadROOT(filename):
@@ -148,16 +148,8 @@ def RequestParticles(HistDict, ParticleDict):
         # Itterating through particle requests
         for particle in properties['Requests']['Particles']:
 
-            # Special check for AllJet request
-            # Ignore BeamJet to prevent double counting
-            if particle == 'AllJets' and particle != 'BeamJet':
-                for key, jet in ParticleDict.items():
-                    if jet['Check']:
-                        if jet['isJet']:
-                            properties['Particles'].append(jet)
-
-            # Normal particle check
-            elif ParticleDict[particle]['Check']:
+            # Particle check
+            if ParticleDict[particle]['Check']:
                 properties['Particles'].append(ParticleDict[particle])               
 
     return HistDict
@@ -483,16 +475,22 @@ def CompareHist(HistProps, HistDict):
     for key, properties in HistDict1.items():
         properties['Hists'] = {}
     
-    Hist1 = HistProps['Hist1']['Hist']
     Hist1Name = HistProps['Hist1']['HistName']
     Hist1Var = HistProps['Hist1']['HistVar']
-    Hist1FileName = HistProps['Hist1']['HistFileName']
+    Hist1 = HistProps['Hist1']['FileDict']['File'].Get(Hist1Name+'_'+Hist1Var+';1')
 
-    Hist2 = HistProps['Hist2']['Hist']
+    Hist1File_Prefix = HistProps['Hist1']['FileDict']['Prefix']
+    Hist1File_EventRun = HistProps['Hist1']['FileDict']['EventRun']
+    Hist1File_ParticleRun = HistProps['Hist1']['FileDict']['ParticleRun']
+
     Hist2Name = HistProps['Hist2']['HistName']
     Hist2Var = HistProps['Hist2']['HistVar']
-    Hist2FileName = HistProps['Hist2']['HistFileName']
-        
+    Hist2 = HistProps['Hist2']['FileDict']['File'].Get(Hist2Name+'_'+Hist2Var+';1')
+    
+    Hist2File_Prefix = HistProps['Hist2']['FileDict']['Prefix']
+    Hist2File_EventRun = HistProps['Hist2']['FileDict']['EventRun']
+    Hist2File_ParticleRun = HistProps['Hist2']['FileDict']['ParticleRun']
+
     HistDict1[Hist1Name]['Hists'][Hist1Var] = Hist1
     HistDict2[Hist2Name]['Hists'][Hist2Var] = Hist2
 
@@ -513,8 +511,61 @@ def CompareHist(HistProps, HistDict):
     for hist in (Hist1, Hist2):
         # SetBins actually introduces an offset into the graph
         hist.SetStats(False)
-        hist.SetTitle(Hist1Name+'_'+Hist2Name)
         hist.SetMaximum(Max)
+
+
+    # Legend properties
+    LegendX1 = .8
+    LegendX_interval = 0.15
+    LegendY1 = .95
+    LegendY_interval = 0.1
+
+    Legend1 = TLegend(LegendX1, LegendY1 , LegendX1+LegendX_interval, LegendY1-LegendY_interval)
+    # Stops legend overwriting canvas
+    SetOwnership(Legend1,False)
+    Legend1.SetBorderSize(1)
+    Legend1.SetShadowColor(2)
+    Legend1.SetHeader(Hist1Name)
+    # Entries
+    Legend1.AddEntry("entries","Entries: "+str(int(Hist1.GetEntries())))
+    Legend1.AddEntry(Hist1, "Line Color", "l")
+    Legend1.SetTextSize(0.025)
+    Legend1.SetTextColor(1)
+    # Seperation is small, but will be maximised to the bounds of the TLegend
+    # box
+    Legend1.SetEntrySeparation(.1)
+
+    Legend2 = TLegend(LegendX1, LegendY1-LegendY_interval , LegendX1+LegendX_interval, LegendY1-2*LegendY_interval)
+    # Stops legend overwriting canvas    
+    SetOwnership(Legend2,False)
+    Legend2.SetBorderSize(1)
+    Legend2.SetShadowColor(2)
+    # Entries
+    Legend2.AddEntry("entries","Entries: "+str(int(Hist2.GetEntries())))
+    Legend2.AddEntry(Hist2, "Line Color", "l")
+    Legend2.SetTextSize(0.025)       
+    # Seperation is small, but will be maximised to the bounds of the TLegend
+    # box
+    Legend2.SetEntrySeparation(.1)
+
+    if Hist1Name == Hist2Name:
+        Hist1.SetTitle(Hist1Name+'_'+Hist1Var)
+        if Hist1File_Prefix == Hist2File_Prefix:
+            Legend1.SetHeader('Event'+Hist1File_EventRun+'Particle'+Hist1File_ParticleRun)
+            Legend2.SetHeader('Event'+Hist2File_EventRun+'Particle'+Hist2File_ParticleRun)
+        
+        elif Hist1File_EventRun == Hist2File_EventRun :
+            Legend1.SetHeader(Hist1File_Prefix+'_'+'Particle'+Hist1File_ParticleRun)
+            Legend2.SetHeader(Hist2File_Prefix+'_'+'Particle'+Hist2File_ParticleRun)
+
+        elif Hist1File_ParticleRun == Hist2File_ParticleRun :
+            Legend1.SetHeader(Hist1File_Prefix+'_'+'Event'+Hist1File_EventRun)
+            Legend2.SetHeader(Hist2File_Prefix+'_'+'Event'+Hist2File_EventRun)
+
+    else:
+        Hist1.SetTitle(Hist1Name+'_'+Hist2Name+'_'+Hist1Var)
+        Legend1.SetHeader(Hist1Name)
+        Legend2.SetHeader(Hist2Name)
 
     if Hist1.GetDimension() == 1:
         # Force both to be drawn as hist and on the same canvas
@@ -529,52 +580,25 @@ def CompareHist(HistProps, HistDict):
         TColor.SetPalette(60, 0)
         Hist2.Draw("COLZ same")
 
-    # Legend properties
-    LegendX1 = .8
-    LegendX_interval = 0.15
-    LegendY1 = .95
-    LegendY_interval = 0.1
-
-    Legend1 = TLegend(LegendX1, LegendY1 , LegendX1+LegendX_interval, LegendY1-LegendY_interval)
-    # Stops legend overwriting canvas
-    SetOwnership(Legend1,False)
-    Legend1.SetBorderSize(1)
-    Legend1.SetShadowColor(2)
-    Legend1.SetHeader(Hist1FileName+Hist1Name)
-    # Entries
-    Legend1.AddEntry("entries","Entries: "+str(int(Hist1.GetEntries())))
-    Legend1.AddEntry(Hist1, "Line Color", "l")
-    Legend1.SetTextSize(0.025)
-    Legend1.SetTextColor(1)
-    # Seperation is small, but will be maximised to the bounds of the TLegend
-    # box
-    Legend1.SetEntrySeparation(.1)
     Legend1.Draw("same")
-
-    Legend2 = TLegend(LegendX1, LegendY1-LegendY_interval , LegendX1+LegendX_interval, LegendY1-2*LegendY_interval)
-    # Stops legend overwriting canvas    
-    SetOwnership(Legend2,False)
-    Legend2.SetBorderSize(1)
-    Legend2.SetShadowColor(2)
-    Legend2.SetHeader(Hist2FileName+Hist2Name)
-    # Entries
-    Legend2.AddEntry("entries","Entries: "+str(int(Hist2.GetEntries())))
-    Legend2.AddEntry(Hist2, "Line Color", "l")
-    Legend2.SetTextSize(0.025)       
-    # Seperation is small, but will be maximised to the bounds of the TLegend
-    # box
-    Legend2.SetEntrySeparation(.1)
     Legend2.Draw("same")
 
     HistCan.Update()
     # Write canvas to outfile, needs the name for some reason.
-    gSystem.Exec('mkdir '+Hist1FileName+'-'+Hist2FileName+'/')
-    HistCan.SaveAs(Hist1FileName+'-'+Hist2FileName+'/'+Hist1Name+'_'+Hist1Var+'_'+Hist2Name+'_'+Hist1Var+'.png')
+    gSystem.Exec('mkdir '+Hist1File_Prefix+'-'+Hist2File_Prefix)
+    gSystem.Exec('mkdir '+Hist1File_Prefix+'-'+Hist2File_Prefix+'/Event'+Hist1File_EventRun+'-'+Hist2File_EventRun)
+    gSystem.Exec('mkdir '+Hist1File_Prefix+'-'+Hist2File_Prefix+'/Event'+Hist1File_EventRun+'-'+Hist2File_EventRun+'/Particle'+Hist1File_ParticleRun+'-'+Hist2File_ParticleRun+'/')
+    
+    if Hist1Name == Hist2Name:
+        HistCan.SaveAs(Hist1File_Prefix+'-'+Hist2File_Prefix+'/Event'+Hist1File_EventRun+'-'+Hist2File_EventRun+'/Particle'+Hist1File_ParticleRun+'-'+Hist2File_ParticleRun+'/'+Hist1Name+Hist1Var+'.png')
+    else:
+        HistCan.SaveAs(Hist1File_Prefix+'-'+Hist2File_Prefix+'/Event'+Hist1File_EventRun+'-'+Hist2File_EventRun+'/Particle'+Hist1File_ParticleRun+'-'+Hist2File_ParticleRun+'/'+Hist1Name+Hist2Name+Hist1Var+'.png')
+
   
 
 
 
-def AddParticle(name, ParticleDict, P4=None, PID=None, isJet=False):
+def AddParticle(name, ParticleDict, P4=None, PID=None):
         '''
             Given a name, PID, 4-momenta of a particle,
             will add a particle dict of various properties to an existing
@@ -613,7 +637,6 @@ def AddParticle(name, ParticleDict, P4=None, PID=None, isJet=False):
                 'Theta'     :   P4.Theta(),
                 'Pt'        :   P4.Pt(),
                 'Et'        :   P4.Et(),
-                'isJet'     :   isJet,
             }
         
         return ParticleDict
@@ -651,7 +674,7 @@ def ParticleLoop(TreeDict, EventNum, Run):
         }
     }
     '''
-    Cuts = config.EventLoopParams['ParticleLevel'][Run]
+    Cuts = config.EventLoopParams['Runs']['ParticleLevel'][Run]
 
     # Reading a specific event 
     TreeDict['Tree'].ReadEntry(EventNum)
@@ -832,20 +855,19 @@ def GetParticles(myTree, Run, HistDict, EventNum):
 
             # Selecting the leading jet
             if i == numbJets - 1:
-                ParticleDict = AddParticle('LeadingJet', ParticleDict, Jet.P4(), isJet=True)
-                ParticleDict = AddParticle('BeamJet', ParticleDict, Jet.P4(), isJet=True)
+                ParticleDict = AddParticle('LeadingJet', ParticleDict, Jet.P4())
             # Selecting and checking for the subleading jet
             elif i == numbJets - 2 and numbJets - 2 >= 0:
-                ParticleDict = AddParticle('SubLeadingJet', ParticleDict, Jet.P4(), isJet=True)
+                ParticleDict = AddParticle('SubLeadingJet', ParticleDict, Jet.P4())
             # Selecting and checking for the third jet 
             elif i == numbJets - 3 and numbJets - 3 >= 0:
-                ParticleDict = AddParticle('ThirdJet', ParticleDict, Jet.P4(), isJet=True)
+                ParticleDict = AddParticle('ThirdJet', ParticleDict, Jet.P4())
             # Selecting and checking for the fourth jet
             elif i == numbJets - 4 and numbJets - 4 >= 0:
-                ParticleDict = AddParticle('FourthJet', ParticleDict, Jet.P4(), isJet=True)
+                ParticleDict = AddParticle('FourthJet', ParticleDict, Jet.P4())
             # Any extra jets
             else:
-                ParticleDict = AddParticle(str(i+1)+'Jet', ParticleDict, Jet.P4(), isJet=True)
+                ParticleDict = AddParticle(str(i+1)+'Jet', ParticleDict, Jet.P4())
 
     # MissingET
     ParticleDict = AddParticle('MissingET', ParticleDict, EventDict['MissingET_P'])
@@ -862,3 +884,53 @@ def GetParticles(myTree, Run, HistDict, EventNum):
     HistDict['Jets']['Count'] = numbJets
 
     return HistDict, ParticleDict, EventDict
+
+def InvMassCheck(particles, Boson, ParticleDict, EventDict):
+    '''
+    '''
+
+    if particles == 'Electrons' and EventDict['Count']['Electrons'] <= 2:
+        return ParticleDict, EventDict
+
+    elif particles == 'Muons' and EventDict['Count']['Muons'] <= 1:
+        return ParticleDict, EventDict
+
+    elif particles == 'Jets' and EventDict['Count']['Jets'] <= 2:
+        return ParticleDict, EventDict
+
+    BosonMass = config.EventLoopParams[Boson]['Mass']
+
+    # Setting up list of possible Boson decay products
+    # When indexing ParticleDict remove the 's' from particle
+    # Size of particlesList depends of number of expected particles
+    # of that type
+
+    # Getting the sorted particles from list
+    # List will be a list of tuples (Pt, particle)
+    particlesList = EventDict['PTSorted'][particles[0:-1]]
+    # Possible pairs of Z decay products
+    Permutations = list( itertools.combinations(particlesList, 2))
+
+    InvMassList = []
+    # Calculating InvMass of different possible pairs
+    for ParticlePair in Permutations:
+        InvMassList.append( (ParticlePair[0][1].P4()+ParticlePair[1][1].P4()).Mag() )
+
+    # Find the closest InvMass to the BosonMass
+    PairInvMass = min(InvMassList, key=lambda x:abs(x-BosonMass))
+    PairIndex = InvMassList.index(PairInvMass)
+    if Permutations[PairIndex][0][0] < Permutations[PairIndex][1][0]:
+        ParticleDict = AddParticle(Boson+'Leading'+particles[0:-1], ParticleDict, Permutations[PairIndex][1][1].P4())
+        ParticleDict = AddParticle(Boson+'SubLeading'+particles[0:-1], ParticleDict, Permutations[PairIndex][0][1].P4())
+
+    else:        
+        ParticleDict = AddParticle(Boson+'Leading'+particles[0:-1], ParticleDict, Permutations[PairIndex][0][1].P4())
+        ParticleDict = AddParticle(Boson+'SubLeading'+particles[0:-1], ParticleDict, Permutations[PairIndex][1][1].P4())
+
+    # Removing boson particles from list of particle
+    particlesList.remove(Permutations[PairIndex][0])
+    particlesList.remove(Permutations[PairIndex][1])
+    EventDict['PTSorted'][particles[0:-1]] = particlesList
+
+    return ParticleDict, EventDict
+
