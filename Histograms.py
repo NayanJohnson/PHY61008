@@ -28,29 +28,63 @@ def EventLoop(myTree, outfileprefix, EventRun, ParticleRun):
     # Initialise requested hists from HistDict
     HistDict = funcs.MakeHists(HistDict)
 
-    EventCuts = config.EventLoopParams['EventLevel'][EventRun]
+    EventCuts = config.EventLoopParams['Runs']['EventLevel'][EventRun]
+    
+    Zdecays = config.EventLoopParams['Z']['Decays']
+    WPlusdecays = config.EventLoopParams['WPlus']['Decays']
+    WMinusdecays = config.EventLoopParams['WMinus']['Decays']
+    
+    EventCutNum = 0
     # Looping through events
     for EventNum in range(myTree['NEvents']):
 
         HistDict, ParticleDict, EventDict = funcs.GetParticles(myTree, ParticleRun, HistDict, EventNum)
-
+        
+        # print(EventDict['Count']['Electrons'], EventCuts['Electrons'], EventDict['Count']['Muons'], EventCuts['Muons'],  EventDict['Count']['Jets'], EventCuts['Jets'])
+        
         # Event level selection for WWEmJ_WW_Muons
         if EventDict['Count']['Electrons'] >= EventCuts['Electrons'] and EventDict['Count']['Muons'] >= EventCuts['Muons'] and EventDict['Count']['Jets'] >= EventCuts['Jets']:
-            ParticleDict['FinalBeamElectron'] = ParticleDict['LeadingElectron']
             
-            # WPlus and WMinus hists
-            # Leading and SubLeading muons will always be from the W bosons 
-            # (in this process) so I seperate them by charge to determine which
-            # boson they came from
+            ParticleDict['FinalBeamElectron'] = ParticleDict['LeadingElectron']
+            EventCutNum += 1
+            for Zdecay in Zdecays:
+                if Zdecay == None:
+                    continue
+                elif Zdecays[0] == Zdecays[1]:
+                    continue
+                else:
+                    ParticleDict, EventDict = funcs.InvMassCheck(Zdecay, 'Z', ParticleDict, EventDict)
 
-            # Will only run if that muon is present
-            for Muon in [ParticleDict['LeadingMuon'], ParticleDict['SubLeadingMuon']]:
-                if Muon['Check']:    
-                    if Muon['PID'] == 13:
-                        ParticleDict = funcs.AddParticle('WMinusMuon', ParticleDict, Muon['P4'])
-                    elif Muon['PID'] == -13:
-                        ParticleDict = funcs.AddParticle('WPlusMuon', ParticleDict, Muon['P4'])
+            for WPlusdecay in WPlusdecays:
+                if WPlusdecay == None:
+                    continue
+                elif WPlusdecays[0] == WPlusdecays[1]:
+                    continue            
+                elif WPlusdecay == 'Jets':
+                    ParticleDict, EventDict = funcs.InvMassCheck(WPlusdecay, 'WPlus', ParticleDict, EventDict)
+                else:
+                    particlesList = [ParticleDict['Leading'+WPlusdecay[0:-1]], ParticleDict['SubLeading'+WPlusdecay[0:-1]]]
+                    for Lepton in particlesList:
+                        if Lepton['Check']:
+                            if Lepton['PID'] == -13:
+                                ParticleDict = funcs.AddParticle('WPlus'+WPlusdecay[0:-1], ParticleDict, Lepton['P4'])
 
+            for WMinusdecay in WMinusdecays:
+                if WMinusdecay == None:
+                    continue
+                elif WMinusdecays[0] == WMinusdecays[1]:
+                    continue            
+                elif WMinusdecay == 'Jets':
+                    ParticleDict, EventDict = funcs.InvMassCheck(WMinusdecay, 'WMinus', ParticleDict, EventDict)
+                else:
+                    particlesList = [ParticleDict['Leading'+WMinusdecay[0:-1]], ParticleDict['SubLeading'+WMinusdecay[0:-1]]]
+                    for Lepton in particlesList:
+                        if Lepton['Check']:
+                            if Lepton['PID'] == 13:
+                                ParticleDict = funcs.AddParticle('WMinus'+WMinusdecay[0:-1], ParticleDict, Lepton['P4'])
+
+            if len(EventDict['PTSorted']['Jet']) != 0:
+                ParticleDict = funcs.AddParticle('FinalBeamJet', ParticleDict, EventDict['PTSorted']['Jet'][-1][1].P4())
 
             # Filling HistDict with particles then filling the hists
             HistDict = funcs.RequestParticles(HistDict, ParticleDict)
@@ -65,6 +99,7 @@ def EventLoop(myTree, outfileprefix, EventRun, ParticleRun):
     # Writing and closing file
     outfile.Write()
     outfile.Close()
+
 for EventRun in EventRuns:
     for ParticleRun in ParticleRuns:
         EventLoop(myTree, outfileprefix, EventRun, ParticleRun)
