@@ -22,9 +22,9 @@ EventLoopParams = {
         
         'EventLevel'        :   {
             'Cuts'              :   {
-                'Electrons'         :   1,
-                'Muons'             :   1,
-                'Jets'              :   3
+                'Electrons'         :   0,
+                'Muons'             :   0,
+                'Jets'              :   0
             },
 
             'NoCuts'            :   {
