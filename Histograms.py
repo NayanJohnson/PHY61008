@@ -5,11 +5,24 @@ import Analysis_Funcs as funcs
 import config
 from ROOT import TFile, TH1F, TMath
 
-# sys.argv[1] returns the first argument passed to the python script
-outfileprefix = sys.argv[1]
-Runs = sys.argv[2:]
-ParticleRuns = [x.split('_')[1]for x in Runs if x.split('_')[0]=='Particle']
-EventRuns = [x.split('_')[1] for x in Runs if x.split('_')[0]=='Event']
+EventRuns = []
+ParticleRuns = []
+
+for arg in sys.argv:
+    # Should filter the python script
+    if arg.split('.')[-1] == 'py':
+        continue
+
+    # Looks for arguements passing the runs to compare
+    elif arg.split('_')[0] == 'Event':
+        EventRuns.append(arg.split('_')[1])
+
+    elif arg.split('_')[0] == 'Particle':
+        ParticleRuns.append(arg.split('_')[1])
+    
+    # Should find the prefixes of hist files to be compared
+    else:
+        outfileprefix = arg
 
 # Load event file
 myTree = funcs.LoadROOT("tag_1_delphes_events.root")

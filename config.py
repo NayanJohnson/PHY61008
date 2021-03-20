@@ -19,7 +19,7 @@ EventLoopParams = {
                 'jet_Pt'            :   0,                   
             }
         },
-        
+
         'EventLevel'        :   {
             'Cuts'              :   {
                 'Electrons'         :   0,
@@ -36,12 +36,12 @@ EventLoopParams = {
     },
 
     'Z'         :   {
-        'Decays' :   ('Jets', None),
+        'Decays' :   (None, None),
         'Mass'      :   91.1876 #GeV
     },      
 
     'WPlus'     :   {
-        'Decays' :   ('Muons', None),
+        'Decays' :   (None, None),
         'Mass'      :   80.379 #GeV
     },      
 
@@ -49,9 +49,7 @@ EventLoopParams = {
         'Decays' :   (None, None),
         'Mass'      :   80.379 #GeV
     }   
-
 }   
-
 
 # Dictionary that will contain all info needed to produce histograms.
 # 'Request' dictionary is used to tell the script what variables to
@@ -62,7 +60,7 @@ VarKeywords = [
     'dEta', 'dPhi', 'dRapidity', 'dR_Eta', 'dR_Rap', 'InvMass'
 ]
 
-# Touples of two variables will be treated as 2 dimensions in a 2D histogram
+# Tuples of two variables will be treated as 2 dimensions in a 2D histogram
 
 
 # Particle keywords:
@@ -167,7 +165,7 @@ VarParams = {
 #       }
 #   }
 # }
-    
+
 HistDict =  {
     'Electrons'     :   {
         'Requests'      :   {
