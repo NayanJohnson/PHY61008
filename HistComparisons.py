@@ -11,7 +11,7 @@ gROOT.SetBatch(True)
 
 # Arguements passed to the script 
 # (sys.argv[0] is the script itself)
-Runs = {}
+Runs = {}git 
 FileList = []
 for arg in sys.argv:
     # Should filter the python script
