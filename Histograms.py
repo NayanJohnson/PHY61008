@@ -19,7 +19,7 @@ for arg in sys.argv:
 
     elif arg.split('_')[0] == 'Particle':
         ParticleRuns.append(arg.split('_')[1])
-    
+
     # Should find the prefixes of hist files to be compared
     else:
         outfileprefix = arg
@@ -90,12 +90,7 @@ def EventLoop(myTree, outfileprefix, EventRun, ParticleRun):
                 elif WMinusdecay == 'Jets':
                     ParticleDict, EventDict = funcs.InvMassCheck(WMinusdecay, 'WMinus', ParticleDict, EventDict)
                 else:
-                    particlesList = [ParticleDict['Leading'+WMinusdecay[0:-1]], ParticleDict['SubLeading'+WMinusdecay[0:-1]]]
-                    for Lepton in particlesList:
-                        if Lepton['Check']:
-                            if Lepton['PID'] == 13:
-                                ParticleDict = funcs.AddParticle('WMinus'+WMinusdecay[0:-1], ParticleDict, Lepton['P4'])
-
+                    particlesList = [ParticleDict['Leading'+ 
             if len(EventDict['PTSorted']['Jet']) != 0:
                 ParticleDict = funcs.AddParticle('FinalBeamJet', ParticleDict, EventDict['PTSorted']['Jet'][-1][1].P4())
 
@@ -107,8 +102,9 @@ def EventLoop(myTree, outfileprefix, EventRun, ParticleRun):
     Scale = funcs.GetScale('tag_1_pythia.log', myTree['NEvents'])
 
     # Scaling and altering hist lims
-    funcs.HistLims(HistDict, Scale)
-
+    for category, properties in HistDict.items():
+        for var, hist in properties['Hists'].items():
+            hist = HistLims(hist, var, Scale=Scale)
     # Writing and closing file
     outfile.Write()
     outfile.Close()

@@ -315,7 +315,8 @@ def GetScale(PythiaLogPath, NEvents):
 
     return Scale
 
-def HistLims(HistDict, Scale=1):
+def HistLims(hist, var, Scale=1, RelativeScale='Rel' ):
+
     '''
         Rescales hist lims depending on the data in the hists.
         Histogram dictionary should be in the following format:
@@ -336,99 +337,100 @@ def HistLims(HistDict, Scale=1):
         }
     '''    
 
-    for category, properties in HistDict.items():
-        for var, hist in properties['Hists'].items():
 
-            hist.Scale(Scale)
-            # Skip if hist = False
+    if RelativeScale == 'Rel':
+        hist.Scale(Scale)
+    elif RelativeScale == 'Norm' and hist.Integral() != 0:
+        hist.Scale(1./hist.Integral())
 
-            ThresholdMin = (hist.Integral()/200)*.05
+    ThresholdMin = (hist.Integral()/200)*.05                # Skip if hist = False
 
-            if hist:
-                if hist.GetDimension() == 1:
-                    
-                    # First version of Max Min using a threshold of 0 since the 
-                    # bin width is very small
-                    BinMaxX = hist.GetBinLowEdge(hist.FindLastBinAbove(0, 1)) + 1
-                    BinMinX = hist.GetBinLowEdge(hist.FindFirstBinAbove(0, 1))
+    if hist:
+        if hist.GetDimension() == 1:
+            
+            # First version of Max Min using a threshold of 0 since the 
+            # bin width is very small
+            BinMaxX = hist.GetBinLowEdge(hist.FindLastBinAbove(0, 1)) + 1
+            BinMinX = hist.GetBinLowEdge(hist.FindFirstBinAbove(0, 1))
 
-                    # Rescales bin number so the plotted range has Nbins = 200
-                    XRange = (config.VarParams[var]['Range'][1]-config.VarParams[var]['Range'][0])
-                    NewNbinsX = 100/(BinMaxX-BinMinX) * XRange
-                    NGroupX = hist.GetNbinsX()/NewNbinsX
-                    NbinsDivisors = GetDivisors(hist.GetNbinsX())
-                    # Finds divisor closest to NGroup
-                    NGroupDivisorX = min(NbinsDivisors, key=lambda x:abs(x-NGroupX))
-                    hist.RebinX(int(NGroupDivisorX))
+            # Rescales bin number so the plotted range has Nbins = 200
+            XRange = (config.VarParams[var]['Range'][1]-config.VarParams[var]['Range'][0])
+            NewNbinsX = 100/(BinMaxX-BinMinX) * XRange
+            NGroupX = hist.GetNbinsX()/NewNbinsX
+            NbinsDivisors = GetDivisors(hist.GetNbinsX())
+            # Finds divisor closest to NGroup
+            NGroupDivisorX = min(NbinsDivisors, key=lambda x:abs(x-NGroupX))
+            hist.RebinX(int(NGroupDivisorX))
 
-                    # Recalculating Max Min with higher threshold - this is possible as 
-                    # the hists have been rebinned to a large width
-                    # Get the index of the min/max bin and the read off the value of the 
-                    # low edge
-                    # Set FindLastBinAbove threshold to 5 since otherwise the 
-                    # hist goes on for way too long
-                    BinMaxX = hist.GetBinLowEdge(hist.FindLastBinAbove(ThresholdMin, 1))
-                    BinMinX = hist.GetBinLowEdge(hist.FindFirstBinAbove(0, 1))
-                    # Max/min = BinMax/min +- 5% +- 5 (prevents max=min for BinMax/Min=0)
-                    XMax = BinMaxX + abs(BinMaxX/10) + 5
-                    XMin = BinMinX - abs(BinMinX/10) - 5
-
-
-                    hist.SetAxisRange(XMin, XMax, 'X')
-                
-                elif hist.GetDimension() == 2:
-
-                    xVar  = var.split('_')[-2]
-                    yVar  = var.split('_')[-1]
-
-                    # First version of Max Min using a threshold of 0 since the 
-                    # bin width is very small
-                    BinMaxX = hist.GetXaxis().GetBinLowEdge(hist.FindLastBinAbove(0, 1)) + 1
-                    BinMinX = hist.GetXaxis().GetBinLowEdge(hist.FindFirstBinAbove(0, 1))
-                    BinMaxY = hist.GetYaxis().GetBinLowEdge(hist.FindLastBinAbove(0, 2)) + 1
-                    BinMinY = hist.GetYaxis().GetBinLowEdge(hist.FindFirstBinAbove(0, 2))     
-
-                    # Rescales bin number so the plotted range has Nbins = 200
-                    XRange = (config.VarParams[xVar]['Range'][1]-config.VarParams[xVar]['Range'][0])
-                    NewNbinsX = 100/(BinMaxX-BinMinX) * XRange
-                    NGroupX = hist.GetNbinsX()/NewNbinsX
-                    NbinsDivisors = GetDivisors(hist.GetNbinsX())
-                    # Finds divisor closest to NGroup
-                    NGroupDivisorX = min(NbinsDivisors, key=lambda x:abs(x-NGroupX))
-                    hist.RebinX(int(NGroupDivisorX))
-
-                    # Rescales bin number so the range has Nbins 200
-                    YRange = (config.VarParams[yVar]['Range'][1]-config.VarParams[yVar]['Range'][0])
-                    NewNbinsY = 200/(BinMaxY-BinMinY) * YRange
-                    NGroupY = hist.GetNbinsY()/NewNbinsY
-                    NbinsDivisors = GetDivisors(hist.GetNbinsY())
-                    # Finds divisor closest to NGroup
-                    NGroupDivisorY = min(NbinsDivisors, key=lambda x:abs(x-NGroupY))
-                    hist.RebinY(int(NGroupDivisorY))
-
-                    # Recalculating Max Min with higher threshold - this is possible as 
-                    # the hists have been rebinned to a large width
-                    # Get the index of the min/max bin and the read off the value of the 
-                    # low edge
-                    # Set FindLastBinAbove threshold to 2 since the particles are now spread
-                    # between two vars so the bins will be less filled 
-                    # hist goes on for way too long
-                    # For 2D hist must first get axis before using TH1 methods
-                    BinMaxX = hist.GetXaxis().GetBinLowEdge(hist.FindLastBinAbove(ThresholdMin, 1))
-                    BinMinX = hist.GetXaxis().GetBinLowEdge(hist.FindFirstBinAbove(0, 1))
-                    BinMaxY = hist.GetYaxis().GetBinLowEdge(hist.FindLastBinAbove(ThresholdMin, 2))
-                    BinMinY = hist.GetYaxis().GetBinLowEdge(hist.FindFirstBinAbove(0, 2))                
-                    # Max/min = BinMax/min +- 5% +- 5 (prevents max=min for BinMax/Min=0)
-                    XMax = BinMaxX + abs(BinMaxX/10) + 5
-                    XMin = BinMinX - abs(BinMinX/10) - 5
-                    YMax = BinMaxY + abs(BinMaxY/10) + 5
-                    YMin = BinMinY - abs(BinMinY/10) - 5        
-
-                    hist.SetAxisRange(XMin, XMax, 'X')
-                    hist.SetAxisRange(YMin, YMax, 'Y')
+            # Recalculating Max Min with higher threshold - this is possible as 
+            # the hists have been rebinned to a large width
+            # Get the index of the min/max bin and the read off the value of the 
+            # low edge
+            # Set FindLastBinAbove threshold to 5 since otherwise the 
+            # hist goes on for way too long
+            BinMaxX = hist.GetBinLowEdge(hist.FindLastBinAbove(ThresholdMin, 1))
+            BinMinX = hist.GetBinLowEdge(hist.FindFirstBinAbove(0, 1))
+            # Max/min = BinMax/min +- 5% +- 5 (prevents max=min for BinMax/Min=0)
+            XMax = BinMaxX + abs(BinMaxX/10) + 5
+            XMin = BinMinX - abs(BinMinX/10) - 5
 
 
-def CompareHist(HistProps, HistDict):
+            hist.SetAxisRange(XMin, XMax, 'X')
+        
+        elif hist.GetDimension() == 2:
+
+            xVar  = var.split('_')[-2]
+            yVar  = var.split('_')[-1]
+
+            # First version of Max Min using a threshold of 0 since the 
+            # bin width is very small
+            BinMaxX = hist.GetXaxis().GetBinLowEdge(hist.FindLastBinAbove(0, 1)) + 1
+            BinMinX = hist.GetXaxis().GetBinLowEdge(hist.FindFirstBinAbove(0, 1))
+            BinMaxY = hist.GetYaxis().GetBinLowEdge(hist.FindLastBinAbove(0, 2)) + 1
+            BinMinY = hist.GetYaxis().GetBinLowEdge(hist.FindFirstBinAbove(0, 2))     
+
+            # Rescales bin number so the plotted range has Nbins = 200
+            XRange = (config.VarParams[xVar]['Range'][1]-config.VarParams[xVar]['Range'][0])
+            NewNbinsX = 100/(BinMaxX-BinMinX) * XRange
+            NGroupX = hist.GetNbinsX()/NewNbinsX
+            NbinsDivisors = GetDivisors(hist.GetNbinsX())
+            # Finds divisor closest to NGroup
+            NGroupDivisorX = min(NbinsDivisors, key=lambda x:abs(x-NGroupX))
+            hist.RebinX(int(NGroupDivisorX))
+
+            # Rescales bin number so the range has Nbins 200
+            YRange = (config.VarParams[yVar]['Range'][1]-config.VarParams[yVar]['Range'][0])
+            NewNbinsY = 200/(BinMaxY-BinMinY) * YRange
+            NGroupY = hist.GetNbinsY()/NewNbinsY
+            NbinsDivisors = GetDivisors(hist.GetNbinsY())
+            # Finds divisor closest to NGroup
+            NGroupDivisorY = min(NbinsDivisors, key=lambda x:abs(x-NGroupY))
+            hist.RebinY(int(NGroupDivisorY))
+
+            # Recalculating Max Min with higher threshold - this is possible as 
+            # the hists have been rebinned to a large width
+            # Get the index of the min/max bin and the read off the value of the 
+            # low edge
+            # Set FindLastBinAbove threshold to 2 since the particles are now spread
+            # between two vars so the bins will be less filled 
+            # hist goes on for way too long
+            # For 2D hist must first get axis before using TH1 methods
+            BinMaxX = hist.GetXaxis().GetBinLowEdge(hist.FindLastBinAbove(ThresholdMin, 1))
+            BinMinX = hist.GetXaxis().GetBinLowEdge(hist.FindFirstBinAbove(0, 1))
+            BinMaxY = hist.GetYaxis().GetBinLowEdge(hist.FindLastBinAbove(ThresholdMin, 2))
+            BinMinY = hist.GetYaxis().GetBinLowEdge(hist.FindFirstBinAbove(0, 2))                
+            # Max/min = BinMax/min +- 5% +- 5 (prevents max=min for BinMax/Min=0)
+            XMax = BinMaxX + abs(BinMaxX/10) + 5
+            XMin = BinMinX - abs(BinMinX/10) - 5
+            YMax = BinMaxY + abs(BinMaxY/10) + 5
+            YMin = BinMinY - abs(BinMinY/10) - 5        
+
+            hist.SetAxisRange(XMin, XMax, 'X')
+            hist.SetAxisRange(YMin, YMax, 'Y')
+    return hist
+
+
+def CompareHist(HistProps):
     '''
         Given a histogram dictionary and 
      
@@ -467,14 +469,8 @@ def CompareHist(HistProps, HistDict):
         }
     '''
     
-    HistDict1 = config.HistDict.copy()
-    HistDict2 = config.HistDict.copy()
+    RelativeScale = HistProps['RelScale']
 
-    for key, properties in HistDict2.items():
-        properties['Hists'] = {}
-    for key, properties in HistDict1.items():
-        properties['Hists'] = {}
-    
     Hist1Name = HistProps['Hist1']['HistName']
     Hist1Var = HistProps['Hist1']['HistVar']
     Hist1 = HistProps['Hist1']['FileDict']['File'].Get(Hist1Name+'_'+Hist1Var+';1')
@@ -491,12 +487,13 @@ def CompareHist(HistProps, HistDict):
     Hist2File_EventRun = HistProps['Hist2']['FileDict']['EventRun']
     Hist2File_ParticleRun = HistProps['Hist2']['FileDict']['ParticleRun']
 
-    HistDict1[Hist1Name]['Hists'][Hist1Var] = Hist1
-    HistDict2[Hist2Name]['Hists'][Hist2Var] = Hist2
+    print('here3',Hist1.GetEntries(), Hist2.GetEntries(), RelativeScale)
 
-    HistLims(HistDict1)
-    HistLims(HistDict2)
+    Hist1 = HistLims(Hist1, Hist1Var, RelativeScale=RelativeScale)
+    Hist2 = HistLims(Hist2, Hist2Var, RelativeScale=RelativeScale)
 
+    print(Hist1Name+'_'+Hist1Var, Hist2Name+'_'+Hist2Var)
+    print('here4',Hist1.GetEntries(), Hist2.GetEntries(), RelativeScale)
     # Clear canvas
     HistCan = TCanvas()
     HistCan.cd()
@@ -585,14 +582,14 @@ def CompareHist(HistProps, HistDict):
 
     HistCan.Update()
     # Write canvas to outfile, needs the name for some reason.
-    gSystem.Exec('mkdir '+Hist1File_Prefix+'-'+Hist2File_Prefix)
-    gSystem.Exec('mkdir '+Hist1File_Prefix+'-'+Hist2File_Prefix+'/Event'+Hist1File_EventRun+'-'+Hist2File_EventRun)
-    gSystem.Exec('mkdir '+Hist1File_Prefix+'-'+Hist2File_Prefix+'/Event'+Hist1File_EventRun+'-'+Hist2File_EventRun+'/Particle'+Hist1File_ParticleRun+'-'+Hist2File_ParticleRun+'/')
+    gSystem.Exec('mkdir '+RelativeScale+'_'+Hist1File_Prefix+'-'+Hist2File_Prefix)
+    gSystem.Exec('mkdir '+RelativeScale+'_'+Hist1File_Prefix+'-'+Hist2File_Prefix+'/Event'+Hist1File_EventRun+'-'+Hist2File_EventRun)
+    gSystem.Exec('mkdir '+RelativeScale+'_'+Hist1File_Prefix+'-'+Hist2File_Prefix+'/Event'+Hist1File_EventRun+'-'+Hist2File_EventRun+'/Particle'+Hist1File_ParticleRun+'-'+Hist2File_ParticleRun+'/')
     
     if Hist1Name == Hist2Name:
-        HistCan.SaveAs(Hist1File_Prefix+'-'+Hist2File_Prefix+'/Event'+Hist1File_EventRun+'-'+Hist2File_EventRun+'/Particle'+Hist1File_ParticleRun+'-'+Hist2File_ParticleRun+'/'+Hist1Name+Hist1Var+'.png')
+        HistCan.SaveAs(RelativeScale+'_'+Hist1File_Prefix+'-'+Hist2File_Prefix+'/Event'+Hist1File_EventRun+'-'+Hist2File_EventRun+'/Particle'+Hist1File_ParticleRun+'-'+Hist2File_ParticleRun+'/'+Hist1Name+Hist1Var+'.png')
     else:
-        HistCan.SaveAs(Hist1File_Prefix+'-'+Hist2File_Prefix+'/Event'+Hist1File_EventRun+'-'+Hist2File_EventRun+'/Particle'+Hist1File_ParticleRun+'-'+Hist2File_ParticleRun+'/'+Hist1Name+Hist2Name+Hist1Var+'.png')
+        HistCan.SaveAs(RelativeScale+'_'+Hist1File_Prefix+'-'+Hist2File_Prefix+'/Event'+Hist1File_EventRun+'-'+Hist2File_EventRun+'/Particle'+Hist1File_ParticleRun+'-'+Hist2File_ParticleRun+'/'+Hist1Name+Hist2Name+Hist1Var+'.png')
 
   
 

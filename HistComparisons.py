@@ -11,7 +11,12 @@ gROOT.SetBatch(True)
 
 # Arguements passed to the script 
 # (sys.argv[0] is the script itself)
-Runs = {}git 
+Runs = {
+    'Event'     :   {},
+    'Particle'  :   {},
+    'RelScale'  :   {}
+} 
+
 FileList = []
 for arg in sys.argv:
     # Should filter the python script
@@ -23,24 +28,34 @@ for arg in sys.argv:
         level = arg.split('_')[0]
         run = arg.split('_')[1]
         Runs[level][run] = True
-    
+
+    elif arg.split('=')[0] == 'Rel' or arg.split('=')[0] == 'Norm':
+        ScaleType = arg.split('=')[0]
+        Switch = arg.split('=')[1]
+        Runs['RelScale'][ScaleType] = Switch
+
     # Should find the prefixes of hist files to be compared
     else:
         FileList.append(arg)
 
-# If no runs were specified
-if len(Runs) == 0:
-    Runs = {
-        'Event'     :   {
-            'Cuts'      :   True,
-            'NoCuts'    :   True
-        },
+if len(Runs['Event']) == 0:
+    Runs['Event'] = {
+        'Cuts'      :   True,
+        'NoCuts'    :   True
+    }
 
-        'Particle'  :   {
-            'Cuts'      :   True,
-            'NoCuts'    :   True
-        },            
-    }        
+if len(Runs['Particle']) == 0:
+    Runs['Particle'] = {
+        'Cuts'      :   True,
+        'NoCuts'    :   True
+    }
+
+if len(Runs['RelScale']) == 0:
+    Runs['RelScale'] = {
+        'Rel'       :   True,
+        'Norm'      :   True
+    }
+     
 
 # Finds all unique combinations of files
 if len(FileList) == 1:
@@ -67,117 +82,121 @@ else:
 
 loopnum = 0
 
+for RelScale, _ in Runs['RelScale'].items():
+    for FilePair in FileCombinations:
+        for EventRunPair in EventRunCombinations:
+            for ParticleRunPair in ParticleRunCombinations:
+                
+                loopnum += 1
+                print('Loop:', loopnum)
 
-for FilePair in FileCombinations:
-    for EventRunPair in EventRunCombinations:
-        for ParticleRunPair in ParticleRunCombinations:
-            
-            loopnum += 1
-            print(loopnum)
+                HistFile1_Prefix = FilePair[0]
+                HistFile1_EventRun = EventRunPair[0]
+                HistFile1_ParticleRun = ParticleRunPair[0]
+                HistFile1_Name = HistFile1_Prefix+'_'+'Event'+HistFile1_EventRun+'Particle'+HistFile1_ParticleRun
 
-            HistFile1_Prefix = FilePair[0]
-            HistFile1_EventRun = EventRunPair[0]
-            HistFile1_ParticleRun = ParticleRunPair[0]
-            HistFile1_Name = HistFile1_Prefix+'_'+'Event'+HistFile1_EventRun+'Particle'+HistFile1_ParticleRun
+                HistFile2_Prefix = FilePair[1]
+                HistFile2_EventRun = EventRunPair[1]
+                HistFile2_ParticleRun = ParticleRunPair[1]
+                HistFile2_Name = HistFile2_Prefix+'_'+'Event'+HistFile2_EventRun+'Particle'+HistFile2_ParticleRun
 
-            HistFile2_Prefix = FilePair[1]
-            HistFile2_EventRun = EventRunPair[1]
-            HistFile2_ParticleRun = ParticleRunPair[1]
-            HistFile2_Name = HistFile2_Prefix+'_'+'Event'+HistFile2_EventRun+'Particle'+HistFile2_ParticleRun
+                # Read hist files
+                HistFiles = {
+                    1               :   {
+                        'Prefix'        :   HistFile1_Prefix,
+                        'EventRun'      :   HistFile1_EventRun,
+                        'ParticleRun'   :   HistFile1_ParticleRun,
+                        'Name'          :   HistFile1_Name,
 
-            # Read hist files
-            HistFiles = {
-                1               :   {
-                    'Prefix'        :   HistFile1_Prefix,
-                    'EventRun'      :   HistFile1_EventRun,
-                    'ParticleRun'   :   HistFile1_ParticleRun,
-                    'Name'          :   HistFile1_Name,
+                        'File'          :   TFile(HistFile1_Name+'.root')
+                    },
 
-                    'File'          :   TFile(HistFile1_Name+'.root')
-                },
+                    2   :   {
+                        'Prefix'        :   HistFile2_Prefix,
+                        'EventRun'      :   HistFile2_EventRun,
+                        'ParticleRun'   :   HistFile2_ParticleRun,
+                        'Name'          :   HistFile2_Name,
 
-                2   :   {
-                    'Prefix'        :   HistFile2_Prefix,
-                    'EventRun'      :   HistFile2_EventRun,
-                    'ParticleRun'   :   HistFile2_ParticleRun,
-                    'Name'          :   HistFile2_Name,
+                        'File'          :   TFile(HistFile2_Name+'.root')
+                    },
+                }    
 
-                    'File'          :   TFile(HistFile2_Name+'.root')
-                },
-            }    
+                HistDict = config.HistDict
+                HistCompDict = config.HistComparisonDict
 
-            HistDict = config.HistDict
-            HistCompDict = config.HistComparisonDict
+                # if False:
+                if HistFile1_Name != HistFile2_Name:
+                    for name, properties in HistDict.items():
 
-            # if False:
-            if HistFile1_Name != HistFile2_Name:
-                for name, properties in HistDict.items():
+                        for var in properties['Requests']['Vars']:
 
-                    for var in properties['Requests']['Vars']:
+                            # If the hist is 2D
+                            # 2D hists break the code for some reason
+                            if type(var) == tuple and len(var) == 2:
+                                continue
+                            else:
+                                HistVar = var
+                                HistName = name
 
+                            # Read the hist in each file
+                            Hist1 = HistFiles[1]['File'].Get(HistName+'_'+HistVar+';1')
+                            Hist2 = HistFiles[2]['File'].Get(HistName+'_'+HistVar+';1')  
+                                                        
+                            HistProps = {
+                                'Hist1'     :   {
+                                    'Hist'      :   Hist1,
+                                    'HistName'  :   HistName,
+                                    'HistVar'   :   HistVar,
+                                    'FileDict'  :   HistFiles[1]
+                                },
+
+                                'Hist2'     :   {
+                                    'Hist'      :   Hist2,
+                                    'HistName'  :   HistName,
+                                    'HistVar'   :   HistVar,
+                                    'FileDict'  :   HistFiles[2]
+
+                                },
+                                
+                                'RelScale'      :   RelScale
+                            }
+
+                            funcs.CompareHist(HistProps)
+
+                for key, properties in HistCompDict.items():
+
+                    for var in properties['Var']:
                         # If the hist is 2D
-                        # 2D hists break the code for some reason
                         if type(var) == tuple and len(var) == 2:
-                            continue
+                            HistVar = var[0]+'_'+var[1]
                         else:
                             HistVar = var
-                            HistName = name
+                        
+                        Hist1Name = properties['Hist1']['Name']
+                        Hist2Name = properties['Hist2']['Name']
+
 
                         # Read the hist in each file
-                        Hist1 = HistFiles[1]['File'].Get(HistName+'_'+HistVar+';1')
-                        Hist2 = HistFiles[2]['File'].Get(HistName+'_'+HistVar+';1')  
-                        
+                        Hist1 = HistFiles[1]['File'].Get(Hist1Name+'_'+HistVar+';1')
+                        Hist2 = HistFiles[2]['File'].Get(Hist2Name+'_'+HistVar+';1')  
+
                         HistProps = {
                             'Hist1'     :   {
                                 'Hist'      :   Hist1,
-                                'HistName'  :   HistName,
+                                'HistName'  :   Hist1Name,
                                 'HistVar'   :   HistVar,
                                 'FileDict'  :   HistFiles[1]
                             },
 
                             'Hist2'     :   {
                                 'Hist'      :   Hist2,
-                                'HistName'  :   HistName,
+                                'HistName'  :   Hist2Name,
                                 'HistVar'   :   HistVar,
                                 'FileDict'  :   HistFiles[2]
-
-                            }
+                            },
+                                
+                            'RelScale'      :   RelScale 
                         }
 
-                        funcs.CompareHist(HistProps, HistDict)
-
-            for key, properties in HistCompDict.items():
-
-                for var in properties['Var']:
-                    # If the hist is 2D
-                    if type(var) == tuple and len(var) == 2:
-                        HistVar = var[0]+'_'+var[1]
-                    else:
-                        HistVar = var
-                    
-                    Hist1Name = properties['Hist1']['Name']
-                    Hist2Name = properties['Hist2']['Name']
-
-
-                    # Read the hist in each file
-                    Hist1 = HistFiles[1]['File'].Get(Hist1Name+'_'+HistVar+';1')
-                    Hist2 = HistFiles[2]['File'].Get(Hist2Name+'_'+HistVar+';1')  
-                    
-                    HistProps = {
-                        'Hist1'     :   {
-                            'Hist'      :   Hist1,
-                            'HistName'  :   Hist1Name,
-                            'HistVar'   :   HistVar,
-                            'FileDict'  :   HistFiles[1]
-                        },
-
-                        'Hist2'     :   {
-                            'Hist'      :   Hist2,
-                            'HistName'  :   Hist2Name,
-                            'HistVar'   :   HistVar,
-                            'FileDict'  :   HistFiles[2]
-                        }
-                    }
-
-                    funcs.CompareHist(HistProps, HistDict)
+                        funcs.CompareHist(HistProps)
 
