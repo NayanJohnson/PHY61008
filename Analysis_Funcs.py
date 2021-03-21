@@ -766,8 +766,8 @@ def ParticleLoop(TreeDict, EventNum, Run):
         # Jet discared if it overlaps with any particles
         if Overlap == 0:
             # Jet cuts
-            if Cuts['jet_Eta'][0] <= particle.P4().Eta() <= Cuts['e_Eta'][1]:
-                if particle.P4().Pt() >= Cuts['jet_Pt']:
+            if Cuts['jet_Eta'][0] <= jet.P4().Eta() <= Cuts['e_Eta'][1]:
+                if jet.P4().Pt() >= Cuts['jet_Pt']:
                     jet_count += 1
                     JetPT.append( ( jet.PT, jet) )
     
