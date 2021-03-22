@@ -69,7 +69,8 @@ def MakeHists(HistDict):
 
     VarParams = config.VarParams
     NbinsDefault = VarParams['Nbins']
-    BinScale = VarParams['NbinsScale']
+    LowRangeBinScale = VarParams['LowRangeNbinsScale']
+    HighRangeBinScale = VarParams['HighRangeNbinsScale']
 
     for name, properties in HistDict.items():
         properties['Hists'] = {}
@@ -87,24 +88,24 @@ def MakeHists(HistDict):
                     histXrange = histXup-histXlow
 
                     if histXrange <= 10:
-                        histXNbins = int(NbinsDefault * histXrange*2/BinScale)
+                        histXNbins = int(NbinsDefault * 1/2 * LowRangeBinScale)
                     elif histXrange <= 100:
                         # Scales number of bins dependng on var range
-                        histXNbins = int(NbinsDefault * histXrange/BinScale)
+                        histXNbins = int(NbinsDefault * LowRangeBinScale)
                     else:
-                        histXNbins = 300
+                        histXNbins = int(NbinsDefault * HighRangeBinScale)
 
                     histYlow = VarParams[var[1]]['Range'][0]
                     histYup = VarParams[var[1]]['Range'][1]        
                     histYrange = histYup-histYlow
 
                     if histYrange <= 10:
-                        histYNbins = int(NbinsDefault * histYrange*2/BinScale)
+                        histYNbins = int(NbinsDefault * 1/2 * LowRangeBinScale)
                     elif histYrange <= 100:
                         # Scales number of bins dependng on var range
-                        histYNbins = int(NbinsDefault * histYrange/BinScale)
+                        histYNbins = int(NbinsDefault * LowRangeBinScale)
                     else:
-                        histYNbins = 300                    
+                        histYNbins = int(NbinsDefault * HighRangeBinScale)                    
 
                     hist = TH2F(histName, histTitle, histXNbins, histXlow, histXup, histYNbins, histYlow, histYup)
                     
@@ -121,12 +122,12 @@ def MakeHists(HistDict):
                 histXrange = histXup-histXlow
 
                 if histXrange <= 10:
-                    histXNbins = int(NbinsDefault * histXrange*2/BinScale)
+                    histXNbins = int(NbinsDefault * 1/2 * LowRangeBinScale)
                 elif histXrange <= 100:
                     # Scales number of bins dependng on var range
-                    histXNbins = int(NbinsDefault * histXrange/BinScale)
+                    histXNbins = int(NbinsDefault * LowRangeBinScale)
                 else:
-                    histXNbins = 300
+                    histXNbins = int(NbinsDefault * HighRangeBinScale)
 
                 hist = TH1F(histName, histTitle, histXNbins, histXlow, histXup)
 

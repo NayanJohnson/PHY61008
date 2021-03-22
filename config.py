@@ -94,7 +94,10 @@ ParticleKeywords = [
 
 VarParams = {
     'Nbins'     :   200,
-    'NbinsScale':   25,
+    'LowRangeNbinsScale'    
+                :   1,
+    'HighRangeNbinsScale'   
+                :   1.25,
     'Count'     :   {
         'Range'     :   (0, 10)
     },
