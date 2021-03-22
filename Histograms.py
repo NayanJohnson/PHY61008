@@ -90,7 +90,12 @@ def EventLoop(myTree, outfileprefix, EventRun, ParticleRun):
                 elif WMinusdecay == 'Jets':
                     ParticleDict, EventDict = funcs.InvMassCheck(WMinusdecay, 'WMinus', ParticleDict, EventDict)
                 else:
-                    particlesList = [ParticleDict['Leading'+ 
+                    particlesList = [ParticleDict['Leading'+WMinusdecay[0:-1]], ParticleDict['SubLeading'+WMinusdecay[0:-1]]]
+                    for Lepton in particlesList:
+                        if Lepton['Check']:
+                            if Lepton['PID'] == 13:
+                                ParticleDict = funcs.AddParticle('WMinus'+WMinusdecay[0:-1], ParticleDict, Lepton['P4'])
+
             if len(EventDict['PTSorted']['Jet']) != 0:
                 ParticleDict = funcs.AddParticle('FinalBeamJet', ParticleDict, EventDict['PTSorted']['Jet'][-1][1].P4())
 
@@ -104,7 +109,7 @@ def EventLoop(myTree, outfileprefix, EventRun, ParticleRun):
     # Scaling and altering hist lims
     for category, properties in HistDict.items():
         for var, hist in properties['Hists'].items():
-            hist = HistLims(hist, var, Scale=Scale)
+            hist = funcs.HistLims(hist, var, Scale=Scale)[0]
     # Writing and closing file
     outfile.Write()
     outfile.Close()

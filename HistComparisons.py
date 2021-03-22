@@ -4,7 +4,7 @@
 import sys, itertools
 import Analysis_Funcs as funcs
 import config
-from ROOT import TFile, TH1F, gROOT
+from ROOT import gSystem, TFile, TH1F, gROOT
 
 # Setting batch to True prevents TCanvas windows from opening
 gROOT.SetBatch(True)
@@ -99,6 +99,10 @@ for RelScale, _ in Runs['RelScale'].items():
                 HistFile2_EventRun = EventRunPair[1]
                 HistFile2_ParticleRun = ParticleRunPair[1]
                 HistFile2_Name = HistFile2_Prefix+'_'+'Event'+HistFile2_EventRun+'Particle'+HistFile2_ParticleRun
+                
+                gSystem.Exec('mkdir '+RelScale+'_'+HistFile1_Prefix+'-'+HistFile2_Prefix)
+                gSystem.Exec('mkdir '+RelScale+'_'+HistFile1_Prefix+'-'+HistFile2_Prefix+'/Event'+HistFile1_EventRun+'-'+HistFile2_EventRun)
+                gSystem.Exec('mkdir '+RelScale+'_'+HistFile1_Prefix+'-'+HistFile2_Prefix+'/Event'+HistFile1_EventRun+'-'+HistFile2_EventRun+'/Particle'+HistFile1_ParticleRun+'-'+HistFile2_ParticleRun+'/')
 
                 # Read hist files
                 HistFiles = {
