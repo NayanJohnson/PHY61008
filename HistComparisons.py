@@ -167,40 +167,41 @@ for RelScale, _ in Runs['RelScale'].items():
 
                             funcs.CompareHist(HistProps)
 
-                for key, properties in HistCompDict.items():
+                if HistFile1_Name == HistFile2_Name:
+                    for key, properties in HistCompDict.items():
 
-                    for var in properties['Var']:
-                        # If the hist is 2D
-                        if type(var) == tuple and len(var) == 2:
-                            HistVar = var[0]+'_'+var[1]
-                        else:
-                            HistVar = var
-                        
-                        Hist1Name = properties['Hist1']['Name']
-                        Hist2Name = properties['Hist2']['Name']
+                        for var in properties['Var']:
+                            # If the hist is 2D
+                            if type(var) == tuple and len(var) == 2:
+                                HistVar = var[0]+'_'+var[1]
+                            else:
+                                HistVar = var
+                            
+                            Hist1Name = properties['Hist1']['Name']
+                            Hist2Name = properties['Hist2']['Name']
 
 
-                        # Read the hist in each file
-                        Hist1 = HistFiles[1]['File'].Get(Hist1Name+'_'+HistVar+';1')
-                        Hist2 = HistFiles[2]['File'].Get(Hist2Name+'_'+HistVar+';1')  
+                            # Read the hist in each file
+                            Hist1 = HistFiles[1]['File'].Get(Hist1Name+'_'+HistVar+';1')
+                            Hist2 = HistFiles[2]['File'].Get(Hist2Name+'_'+HistVar+';1')  
 
-                        HistProps = {
-                            'Hist1'     :   {
-                                'Hist'      :   Hist1,
-                                'HistName'  :   Hist1Name,
-                                'HistVar'   :   HistVar,
-                                'FileDict'  :   HistFiles[1]
-                            },
+                            HistProps = {
+                                'Hist1'     :   {
+                                    'Hist'      :   Hist1,
+                                    'HistName'  :   Hist1Name,
+                                    'HistVar'   :   HistVar,
+                                    'FileDict'  :   HistFiles[1]
+                                },
 
-                            'Hist2'     :   {
-                                'Hist'      :   Hist2,
-                                'HistName'  :   Hist2Name,
-                                'HistVar'   :   HistVar,
-                                'FileDict'  :   HistFiles[2]
-                            },
-                                
-                            'RelScale'      :   RelScale 
-                        }
+                                'Hist2'     :   {
+                                    'Hist'      :   Hist2,
+                                    'HistName'  :   Hist2Name,
+                                    'HistVar'   :   HistVar,
+                                    'FileDict'  :   HistFiles[2]
+                                },
+                                    
+                                'RelScale'      :   RelScale 
+                            }
 
-                        funcs.CompareHist(HistProps)
+                            funcs.CompareHist(HistProps)``
 
