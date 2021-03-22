@@ -203,5 +203,5 @@ for RelScale, _ in Runs['RelScale'].items():
                                 'RelScale'      :   RelScale 
                             }
 
-                            funcs.CompareHist(HistProps)``
+                            funcs.CompareHist(HistProps)
 
