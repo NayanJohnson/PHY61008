@@ -68,7 +68,8 @@ def MakeHists(HistDict):
     '''
 
     VarParams = config.VarParams
-    histNbins = VarParams['Nbins']
+    NbinsDefault = VarParams['Nbins']
+    BinScale = VarParams['NbinsScale']
 
     for name, properties in HistDict.items():
         properties['Hists'] = {}
@@ -80,12 +81,32 @@ def MakeHists(HistDict):
                 if len(var) == 2:
                     histName = name+'_'+var[0]+'_'+var[1]
                     histTitle = histName+';'+var[0]+';'+var[1]+';Frequency'
+
                     histXlow = VarParams[var[0]]['Range'][0]
                     histXup = VarParams[var[0]]['Range'][1]
+                    histXrange = histXup-histXlow
+
+                    if histXrange <= 10:
+                        histXNbins = int(NbinsDefault * histXrange*2/BinScale)
+                    elif histXrange <= 100:
+                        # Scales number of bins dependng on var range
+                        histXNbins = int(NbinsDefault * histXrange/BinScale)
+                    else:
+                        histXNbins = 300
+
                     histYlow = VarParams[var[1]]['Range'][0]
                     histYup = VarParams[var[1]]['Range'][1]        
+                    histYrange = histYup-histYlow
 
-                    hist = TH2F(histName, histTitle, histNbins, histXlow, histXup, histNbins, histYlow, histYup)
+                    if histYrange <= 10:
+                        histYNbins = int(NbinsDefault * histYrange*2/BinScale)
+                    elif histYrange <= 100:
+                        # Scales number of bins dependng on var range
+                        histYNbins = int(NbinsDefault * histYrange/BinScale)
+                    else:
+                        histYNbins = 300                    
+
+                    hist = TH2F(histName, histTitle, histXNbins, histXlow, histXup, histYNbins, histYlow, histYup)
                     
                     hist.SetOption('HIST COLZ')
                     # Adds the hist to the dict
@@ -94,10 +115,20 @@ def MakeHists(HistDict):
             elif type(var) == str:
                 histName = name+'_'+var
                 histTitle = histName+';'+var+';Frequency'
+
                 histXlow = VarParams[var]['Range'][0]
                 histXup = VarParams[var]['Range'][1]
-                 
-                hist = TH1F(histName, histTitle, histNbins, histXlow, histXup)
+                histXrange = histXup-histXlow
+
+                if histXrange <= 10:
+                    histXNbins = int(NbinsDefault * histXrange*2/BinScale)
+                elif histXrange <= 100:
+                    # Scales number of bins dependng on var range
+                    histXNbins = int(NbinsDefault * histXrange/BinScale)
+                else:
+                    histXNbins = 300
+
+                hist = TH1F(histName, histTitle, histXNbins, histXlow, histXup)
 
 
                 hist.SetOption('HIST')
@@ -336,33 +367,18 @@ def HistLims(hist, var, Scale=1, RelativeScale='Rel' ):
             }
         }
     '''    
-
+    XMin, XMax, YMin, YMax = None, None, None, None
 
     if RelativeScale == 'Rel':
         hist.Scale(Scale)
     elif RelativeScale == 'Norm' and hist.Integral() != 0:
         hist.Scale(1./hist.Integral())
 
-    ThresholdMin = (hist.Integral()/200)*.05                # Skip if hist = False
+    ThresholdMin = (hist.Integral()/200) * 1/100                # Skip if hist = False
 
     if hist:
         if hist.GetDimension() == 1:
-            
-            # First version of Max Min using a threshold of 0 since the 
-            # bin width is very small
-            BinMaxX = hist.GetBinLowEdge(hist.FindLastBinAbove(0, 1)) + 1
-            BinMinX = hist.GetBinLowEdge(hist.FindFirstBinAbove(0, 1))
-
-            # Rescales bin number so the plotted range has Nbins = 200
-            XRange = (config.VarParams[var]['Range'][1]-config.VarParams[var]['Range'][0])
-            NewNbinsX = 100/(BinMaxX-BinMinX) * XRange
-            NGroupX = hist.GetNbinsX()/NewNbinsX
-            NbinsDivisors = GetDivisors(hist.GetNbinsX())
-            # Finds divisor closest to NGroup
-            NGroupDivisorX = min(NbinsDivisors, key=lambda x:abs(x-NGroupX))
-            hist.RebinX(int(NGroupDivisorX))
-
-            # Recalculating Max Min with higher threshold - this is possible as 
+                        # Recalculating Max Min with higher threshold - this is possible as 
             # the hists have been rebinned to a large width
             # Get the index of the min/max bin and the read off the value of the 
             # low edge
@@ -371,8 +387,8 @@ def HistLims(hist, var, Scale=1, RelativeScale='Rel' ):
             BinMaxX = hist.GetBinLowEdge(hist.FindLastBinAbove(ThresholdMin, 1))
             BinMinX = hist.GetBinLowEdge(hist.FindFirstBinAbove(0, 1))
             # Max/min = BinMax/min +- 5% +- 5 (prevents max=min for BinMax/Min=0)
-            XMax = BinMaxX + abs(BinMaxX/10) + 5
-            XMin = BinMinX - abs(BinMinX/10) - 5
+            XMax = BinMaxX + 5
+            XMin = BinMinX - 5
 
 
             hist.SetAxisRange(XMin, XMax, 'X')
@@ -381,31 +397,6 @@ def HistLims(hist, var, Scale=1, RelativeScale='Rel' ):
 
             xVar  = var.split('_')[-2]
             yVar  = var.split('_')[-1]
-
-            # First version of Max Min using a threshold of 0 since the 
-            # bin width is very small
-            BinMaxX = hist.GetXaxis().GetBinLowEdge(hist.FindLastBinAbove(0, 1)) + 1
-            BinMinX = hist.GetXaxis().GetBinLowEdge(hist.FindFirstBinAbove(0, 1))
-            BinMaxY = hist.GetYaxis().GetBinLowEdge(hist.FindLastBinAbove(0, 2)) + 1
-            BinMinY = hist.GetYaxis().GetBinLowEdge(hist.FindFirstBinAbove(0, 2))     
-
-            # Rescales bin number so the plotted range has Nbins = 200
-            XRange = (config.VarParams[xVar]['Range'][1]-config.VarParams[xVar]['Range'][0])
-            NewNbinsX = 100/(BinMaxX-BinMinX) * XRange
-            NGroupX = hist.GetNbinsX()/NewNbinsX
-            NbinsDivisors = GetDivisors(hist.GetNbinsX())
-            # Finds divisor closest to NGroup
-            NGroupDivisorX = min(NbinsDivisors, key=lambda x:abs(x-NGroupX))
-            hist.RebinX(int(NGroupDivisorX))
-
-            # Rescales bin number so the range has Nbins 200
-            YRange = (config.VarParams[yVar]['Range'][1]-config.VarParams[yVar]['Range'][0])
-            NewNbinsY = 200/(BinMaxY-BinMinY) * YRange
-            NGroupY = hist.GetNbinsY()/NewNbinsY
-            NbinsDivisors = GetDivisors(hist.GetNbinsY())
-            # Finds divisor closest to NGroup
-            NGroupDivisorY = min(NbinsDivisors, key=lambda x:abs(x-NGroupY))
-            hist.RebinY(int(NGroupDivisorY))
 
             # Recalculating Max Min with higher threshold - this is possible as 
             # the hists have been rebinned to a large width
@@ -419,15 +410,15 @@ def HistLims(hist, var, Scale=1, RelativeScale='Rel' ):
             BinMinX = hist.GetXaxis().GetBinLowEdge(hist.FindFirstBinAbove(0, 1))
             BinMaxY = hist.GetYaxis().GetBinLowEdge(hist.FindLastBinAbove(ThresholdMin, 2))
             BinMinY = hist.GetYaxis().GetBinLowEdge(hist.FindFirstBinAbove(0, 2))                
-            # Max/min = BinMax/min +- 5% +- 5 (prevents max=min for BinMax/Min=0)
-            XMax = BinMaxX + abs(BinMaxX/10) + 5
-            XMin = BinMinX - abs(BinMinX/10) - 5
-            YMax = BinMaxY + abs(BinMaxY/10) + 5
-            YMin = BinMinY - abs(BinMinY/10) - 5        
+            # Max/min = BinMax/min +- 5 (prevents max=min for BinMax/Min=0)
+            XMax = BinMaxX + 5
+            XMin = BinMinX - 5
+            YMax = BinMaxY + 5
+            YMin = BinMinY - 5        
 
             hist.SetAxisRange(XMin, XMax, 'X')
             hist.SetAxisRange(YMin, YMax, 'Y')
-    return hist
+    return hist, [(XMin, XMax), (YMin, YMax)]
 
 
 def CompareHist(HistProps):
@@ -487,16 +478,28 @@ def CompareHist(HistProps):
     Hist2File_EventRun = HistProps['Hist2']['FileDict']['EventRun']
     Hist2File_ParticleRun = HistProps['Hist2']['FileDict']['ParticleRun']
 
-    print('here3',Hist1.GetEntries(), Hist2.GetEntries(), RelativeScale)
 
-    Hist1 = HistLims(Hist1, Hist1Var, RelativeScale=RelativeScale)
-    Hist2 = HistLims(Hist2, Hist2Var, RelativeScale=RelativeScale)
+    Hist1, Lims1 = HistLims(Hist1, Hist1Var, RelativeScale=RelativeScale)
+    Hist2, Lims2 = HistLims(Hist2, Hist2Var, RelativeScale=RelativeScale)
 
-    print(Hist1Name+'_'+Hist1Var, Hist2Name+'_'+Hist2Var)
-    print('here4',Hist1.GetEntries(), Hist2.GetEntries(), RelativeScale)
     # Clear canvas
     HistCan = TCanvas()
     HistCan.cd()
+
+    XMin = min(Lims1[0][0], Lims2[0][0])
+    XMax = max(Lims1[0][1], Lims2[0][1])
+
+    Hist1.SetAxisRange(XMin, XMax, 'X')
+    Hist2.SetAxisRange(XMin, XMax, 'X')
+
+    #2D hists
+    if Hist1.GetDimension() == 2:
+        YMin = min(Lims1[1][0], Lims2[1][0])
+        YMax = max(Lims1[1][1], Lims2[1][1])
+        Hist1.SetAxisRange(YMin, YMax, 'Y')
+        Hist2.SetAxisRange(YMin, YMax, 'Y')
+
+
 
     # max frequency
     Max1 = Hist1.GetMaximum() + Hist1.GetMaximum()/10
@@ -513,7 +516,7 @@ def CompareHist(HistProps):
 
     # Legend properties
     LegendX1 = .8
-    LegendX_interval = 0.15
+    LegendX_interval = 0.2
     LegendY1 = .95
     LegendY_interval = 0.1
 
@@ -545,24 +548,25 @@ def CompareHist(HistProps):
     # box
     Legend2.SetEntrySeparation(.1)
 
-    if Hist1Name == Hist2Name:
+    if Hist1File_Prefix == Hist2File_Prefix:
         Hist1.SetTitle(Hist1Name+'_'+Hist1Var)
-        if Hist1File_Prefix == Hist2File_Prefix:
+        if Hist1Name == Hist2Name:
             Legend1.SetHeader('Event'+Hist1File_EventRun+'Particle'+Hist1File_ParticleRun)
             Legend2.SetHeader('Event'+Hist2File_EventRun+'Particle'+Hist2File_ParticleRun)
         
-        elif Hist1File_EventRun == Hist2File_EventRun :
-            Legend1.SetHeader(Hist1File_Prefix+'_'+'Particle'+Hist1File_ParticleRun)
-            Legend2.SetHeader(Hist2File_Prefix+'_'+'Particle'+Hist2File_ParticleRun)
-
-        elif Hist1File_ParticleRun == Hist2File_ParticleRun :
-            Legend1.SetHeader(Hist1File_Prefix+'_'+'Event'+Hist1File_EventRun)
-            Legend2.SetHeader(Hist2File_Prefix+'_'+'Event'+Hist2File_EventRun)
+        else:
+            Legend1.SetHeader(Hist1Name)
+            Legend2.SetHeader(Hist2Name)
 
     else:
-        Hist1.SetTitle(Hist1Name+'_'+Hist2Name+'_'+Hist1Var)
-        Legend1.SetHeader(Hist1Name)
-        Legend2.SetHeader(Hist2Name)
+        Hist1.SetTitle(Hist1Name+'_'+Hist2Name)
+        if Hist1Name == Hist2Name:
+            Legend1.SetHeader(Hist1File_Prefix)
+            Legend2.SetHeader(Hist2File_Prefix)
+        else:
+            Legend1.SetHeader(Hist1File_Prefix+'_'+Hist1Name)
+            Legend1.SetHeader(Hist2File_Prefix+'_'+Hist2Name)
+
 
     if Hist1.GetDimension() == 1:
         # Force both to be drawn as hist and on the same canvas
@@ -581,10 +585,6 @@ def CompareHist(HistProps):
     Legend2.Draw("same")
 
     HistCan.Update()
-    # Write canvas to outfile, needs the name for some reason.
-    gSystem.Exec('mkdir '+RelativeScale+'_'+Hist1File_Prefix+'-'+Hist2File_Prefix)
-    gSystem.Exec('mkdir '+RelativeScale+'_'+Hist1File_Prefix+'-'+Hist2File_Prefix+'/Event'+Hist1File_EventRun+'-'+Hist2File_EventRun)
-    gSystem.Exec('mkdir '+RelativeScale+'_'+Hist1File_Prefix+'-'+Hist2File_Prefix+'/Event'+Hist1File_EventRun+'-'+Hist2File_EventRun+'/Particle'+Hist1File_ParticleRun+'-'+Hist2File_ParticleRun+'/')
     
     if Hist1Name == Hist2Name:
         HistCan.SaveAs(RelativeScale+'_'+Hist1File_Prefix+'-'+Hist2File_Prefix+'/Event'+Hist1File_EventRun+'-'+Hist2File_EventRun+'/Particle'+Hist1File_ParticleRun+'-'+Hist2File_ParticleRun+'/'+Hist1Name+Hist1Var+'.png')

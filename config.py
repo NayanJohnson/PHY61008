@@ -22,9 +22,9 @@ EventLoopParams = {
 
         'EventLevel'        :   {
             'Cuts'              :   {
-                'Electrons'         :   1,
-                'Muons'             :   2,
-                'Jets'              :   1
+                'Electrons'         :   0,
+                'Muons'             :   0,
+                'Jets'              :   0
             },
 
             'NoCuts'            :   {
@@ -41,12 +41,12 @@ EventLoopParams = {
     },      
 
     'WPlus'     :   {
-        'Decays' :   ('Muons', None),
+        'Decays' :   (None, None),
         'Mass'      :   80.379 #GeV
     },      
 
     'WMinus'    :   {
-        'Decays' :   ('Muons', None),
+        'Decays' :   (None, None),
         'Mass'      :   80.379 #GeV
     }   
 }   
@@ -93,8 +93,8 @@ ParticleKeywords = [
 # }
 
 VarParams = {
-    # Initial Nbins is large so that the bins can later be rescaled
-    'Nbins'     :   5000,
+    'Nbins'     :   200,
+    'NbinsScale':   25,
     'Count'     :   {
         'Range'     :   (0, 10)
     },
@@ -112,7 +112,7 @@ VarParams = {
     },
     
     'Pt'        :   {
-        'Range'     :   (0, 1000)
+        'Range'     :   (0, 500)
     },
     
     'Et'        :   {
@@ -120,7 +120,7 @@ VarParams = {
     },
     
     'q'         :   {
-        'Range'     :   (0, 10000)
+        'Range'     :   (0, 1000)
     },
 
     'dEta'      :   {
@@ -144,7 +144,7 @@ VarParams = {
     },
     
     'InvMass'   :   {
-        'Range'     :   (-2000, 2000)
+        'Range'     :   (0, 1000)
     },
 }
 
@@ -393,7 +393,11 @@ HistDict =  {
     'MuonMuon'      :   {
         'Requests'      :   {
             'Vars'      :   ['dEta', 'dPhi', 'dRapidity', 'dR_Eta', 'dR_Rap', 'InvMass'],
-            'Particles' :   ['LeadingMuon', 'SubLeadingMuon'],
+            'Particles' :   ['LeadingMuon', 'SubLeadingMuon']
+        },
+    
+    'LeadingMuonLeadingJet'
+        'Requests'      :   {
             'Vars'      :   ['dEta', 'dPhi'],
             'Particles' :   ['LeadingMuon', 'LeadingJet'],
         },
