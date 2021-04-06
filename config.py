@@ -42,10 +42,11 @@ EventLoopParams = {
             },
 
             'NoCuts'            :   {
+                'BeamElectron'      :   {
                     'Eta'               :   (float('-inf'), float('inf')),
                 }
             },
-
+        },
     },
 
     'Z'         :   {
