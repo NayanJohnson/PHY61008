@@ -2,12 +2,12 @@ EventLoopParams = {
     'Level'              :   {
         'Loop'     :   {
             'Cuts'              :   {
-                'e_Eta'             :   (-4.3, 4.9),
-                'e_Pt'              :   5,
-                'mu_Eta'            :   (-4, 4),
-                'mu_Pt'             :   5,  
-                'jet_Eta'           :   (-4.4, 5),
-                'jet_Pt'            :   3,                   
+                'e_Eta'             :   (float('-inf'), float('inf')),
+                'e_Pt'              :   0,
+                'mu_Eta'            :   (float('-inf'), float('inf')),
+                'mu_Pt'             :   0,  
+                'jet_Eta'           :   (float('-inf'), float('inf')),
+                'jet_Pt'            :   0,                       
             },
 
             'NoCuts'            :   {
@@ -42,10 +42,11 @@ EventLoopParams = {
             },
 
             'NoCuts'            :   {
+                'BeamElectron'      :   {
                     'Eta'               :   (float('-inf'), float('inf')),
                 }
             },
-
+        },
     },
 
     'Z'         :   {
@@ -54,12 +55,12 @@ EventLoopParams = {
     },      
 
     'WPlus'     :   {
-        'Decays' :   ('Muons', None),
+        'Decays' :   (None, None),
         'Mass'      :   80.379 #GeV
     },      
 
     'WMinus'    :   {
-        'Decays' :   ('Muons', None),
+        'Decays' :   (None, None),
         'Mass'      :   80.379 #GeV
     }   
 }   
