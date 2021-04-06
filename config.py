@@ -1,6 +1,6 @@
 EventLoopParams = {
-    'Runs'              :   {
-        'ParticleLevel'     :   {
+    'Level'              :   {
+        'Loop'     :   {
             'Cuts'              :   {
                 'e_Eta'             :   (-4.3, 4.9),
                 'e_Pt'              :   5,
@@ -20,19 +20,32 @@ EventLoopParams = {
             }
         },
 
-        'EventLevel'        :   {
+        'Event'        :   {
             'Cuts'              :   {
-                'Electrons'         :   0,
-                'Muons'             :   0,
-                'Jets'              :   0
+                'Electrons'         :   1,
+                'Muons'             :   2,
+                'Jets'              :   1,
             },
 
             'NoCuts'            :   {
                 'Electrons'         :   0,
                 'Muons'             :   0,
-                'Jets'              :   0
+                'Jets'              :   0,
             },
-        }
+        },
+
+        'Background'     :   {
+            'Cuts'              :   {
+                'BeamElectron'      :   {
+                    'Eta'               :   (float('-inf'), float('inf')),
+                }
+            },
+
+            'NoCuts'            :   {
+                    'Eta'               :   (float('-inf'), float('inf')),
+                }
+            },
+
     },
 
     'Z'         :   {
@@ -41,12 +54,12 @@ EventLoopParams = {
     },      
 
     'WPlus'     :   {
-        'Decays' :   (None, None),
+        'Decays' :   ('Muons', None),
         'Mass'      :   80.379 #GeV
     },      
 
     'WMinus'    :   {
-        'Decays' :   (None, None),
+        'Decays' :   ('Muons', None),
         'Mass'      :   80.379 #GeV
     }   
 }   
@@ -93,8 +106,11 @@ ParticleKeywords = [
 # }
 
 VarParams = {
-    # Initial Nbins is large so that the bins can later be rescaled
-    'Nbins'     :   5000,
+    'Nbins'     :   200,
+    'LowRangeNbinsScale'    
+                :   1,
+    'HighRangeNbinsScale'   
+                :   1.25,
     'Count'     :   {
         'Range'     :   (0, 10)
     },
@@ -112,7 +128,7 @@ VarParams = {
     },
     
     'Pt'        :   {
-        'Range'     :   (0, 1000)
+        'Range'     :   (0, 500)
     },
     
     'Et'        :   {
@@ -120,7 +136,7 @@ VarParams = {
     },
     
     'q'         :   {
-        'Range'     :   (0, 10000)
+        'Range'     :   (0, 1000)
     },
 
     'dEta'      :   {
@@ -144,7 +160,7 @@ VarParams = {
     },
     
     'InvMass'   :   {
-        'Range'     :   (-2000, 2000)
+        'Range'     :   (0, 1000)
     },
 }
 
@@ -393,7 +409,11 @@ HistDict =  {
     'MuonMuon'      :   {
         'Requests'      :   {
             'Vars'      :   ['dEta', 'dPhi', 'dRapidity', 'dR_Eta', 'dR_Rap', 'InvMass'],
-            'Particles' :   ['LeadingMuon', 'SubLeadingMuon'],
+            'Particles' :   ['LeadingMuon', 'SubLeadingMuon']
+        },
+    
+    'LeadingMuonLeadingJet'
+        'Requests'      :   {
             'Vars'      :   ['dEta', 'dPhi'],
             'Particles' :   ['LeadingMuon', 'LeadingJet'],
         },
