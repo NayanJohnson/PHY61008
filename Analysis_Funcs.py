@@ -347,7 +347,7 @@ def GetScale(PythiaLogPath, NEvents):
 
     return Scale
 
-def HistLims(hist, var, Scale=1, RelativeScale='Rel' ):
+def HistLims(hist, var, Scale=1, Comparison='Rel' ):
 
     '''
         Rescales hist lims depending on the data in the hists.
@@ -370,9 +370,9 @@ def HistLims(hist, var, Scale=1, RelativeScale='Rel' ):
     '''    
     XMin, XMax, YMin, YMax = None, None, None, None
 
-    if RelativeScale == 'Rel':
+    if Comparison == 'Rel':
         hist.Scale(Scale)
-    elif RelativeScale == 'Norm' and hist.Integral() != 0:
+    elif Comparison == 'Norm' and hist.Integral() != 0:
         hist.Scale(1./hist.Integral())
 
     ThresholdMin = (hist.Integral()/200) * 1/100                # Skip if hist = False
@@ -444,44 +444,52 @@ def CompareHist(HistProps):
         }
          
         Histogram properties dictionary should be in the following format:
-        HistProps =     {
-            'Hist1'     :       {
-                'Hist'          :   Hist1,
-                'HistName'      :   Hist1Name,
-                'HistVar'       :   HistVar,
-                'HistFileName'  :   Hist1FileName    
+        HistFiles = {
+            1               :   {
+                'Prefix'        :   HistFile1_Prefix,
+                'LoopRun'       :   HistFile1_LoopRun,
+                'EventRun'      :   HistFile1_EventRun,
+                'BackgroundRun' :   HistFile1_BackgroundRun,
+                'Name'          :   HistFile1_Name,
+
+                'File'          :   TFile(HistFile1_Name+'.root')
             },
 
-            'Hist2'     :       {
-                'Hist'          :   Hist2,
-                'HistName'      :   Hist2Name,
-                'HistVar'       :   HistVar,
-                'HistFileName'  :   Hist2FileName    
-            }
-        }
+            2   :   {
+                'Prefix'        :   HistFile2_Prefix,
+                'LoopRun'       :   HistFile2_LoopRun,
+                'EventRun'      :   HistFile2_EventRun,
+                'BackgroundRun' :   HistFile2_BackgroundRun,
+                'Name'          :   HistFile2_Name,
+
+                'File'          :   TFile(HistFile2_Name+'.root')
+            },
+        }    
     '''
     
-    RelativeScale = HistProps['RelScale']
+    Comparison = HistProps['Comparison']
 
     Hist1Name = HistProps['Hist1']['HistName']
     Hist1Var = HistProps['Hist1']['HistVar']
     Hist1 = HistProps['Hist1']['FileDict']['File'].Get(Hist1Name+'_'+Hist1Var+';1')
 
     Hist1File_Prefix = HistProps['Hist1']['FileDict']['Prefix']
+    Hist1File_LoopRun = HistProps['Hist1']['FileDict']['LoopRun']
     Hist1File_EventRun = HistProps['Hist1']['FileDict']['EventRun']
-    Hist1File_ParticleRun = HistProps['Hist1']['FileDict']['ParticleRun']
+    Hist1File_BackgroundRun = HistProps['Hist1']['FileDict']['BackgroundRun']
 
     Hist2Name = HistProps['Hist2']['HistName']
     Hist2Var = HistProps['Hist2']['HistVar']
     Hist2 = HistProps['Hist2']['FileDict']['File'].Get(Hist2Name+'_'+Hist2Var+';1')
     
     Hist2File_Prefix = HistProps['Hist2']['FileDict']['Prefix']
+    Hist2File_LoopRun = HistProps['Hist2']['FileDict']['LoopRun']
     Hist2File_EventRun = HistProps['Hist2']['FileDict']['EventRun']
-    Hist2File_ParticleRun = HistProps['Hist2']['FileDict']['ParticleRun']
+    Hist2File_BackgroundRun = HistProps['Hist2']['FileDict']['BackgroundRun']
 
 
-    Hist1, Lims1 = HistLims(Hist1, Hist1Var, RelativeScale=RelativeScale)
-    Hist2, Lims2 = HistLims(Hist2, Hist2Var, RelativeScale=RelativeScale)
+    Hist1, Lims1 = HistLims(Hist1, Hist1Var, Comparison=Comparison)
+    Hist2, Lims2 = HistLims(Hist2, Hist2Var, Comparison=Comparison)
 
     # Clear canvas
     HistCan = TCanvas()
@@ -552,8 +560,43 @@ def CompareHist(HistProps):
     if Hist1File_Prefix == Hist2File_Prefix:
         Hist1.SetTitle(Hist1Name+'_'+Hist1Var)
         if Hist1Name == Hist2Name:
-            Legend1.SetHeader('Event'+Hist1File_EventRun+'Particle'+Hist1File_ParticleRun)
-            Legend2.SetHeader('Event'+Hist2File_EventRun+'Particle'+Hist2File_ParticleRun)
+            if Hist1File_LoopRun == Hist2File_LoopRun:
+                if Hist1File_EventRun == Hist2File_EventRun:
+                    if Hist1File_BackgroundRun == Hist2File_BackgroundRun:
+                        Legend1.SetHeader(Hist1Name)
+                        Legend2.SetHeader(Hist2Name)
+
+                    else:
+                        Legend1.SetHeader('Background'+Hist1File_BackgroundRun)
+                        Legend2.SetHeader('Background'+Hist2File_BackgroundRun)
+
+                else:
+                    if Hist1File_BackgroundRun == Hist2File_BackgroundRun:
+                        Legend1.SetHeader('Event'+Hist1File_EventRun)
+                        Legend2.SetHeader('Event'+Hist2File_EventRun)
+
+                    else:                 
+                        Legend1.SetHeader('Event'+Hist1File_EventRun+'Background'+Hist1File_BackgroundRun)
+                        Legend2.SetHeader('Event'+Hist2File_EventRun+'Background'+Hist2File_BackgroundRun)
+
+            else:
+                if Hist1File_EventRun == Hist2File_EventRun:
+                    if Hist1File_BackgroundRun == Hist2File_BackgroundRun:
+                        Legend1.SetHeader('Loop'+Hist1File_LoopRun)
+                        Legend2.SetHeader('Loop'+Hist2File_LoopRun)
+
+                    else:
+                        Legend1.SetHeader('Loop'+Hist1File_LoopRun+'Background'+Hist1File_BackgroundRun)
+                        Legend2.SetHeader('Loop'+Hist2File_LoopRun+'Background'+Hist2File_BackgroundRun)
+
+                else:
+                    if Hist1File_BackgroundRun == Hist2File_BackgroundRun:
+                        Legend1.SetHeader('Loop'+Hist1File_LoopRun+'Event'+Hist1File_EventRun)
+                        Legend2.SetHeader('Loop'+Hist2File_LoopRun+'Event'+Hist2File_EventRun)
+
+                    else:                 
+                        Legend1.SetHeader('Loop'+Hist1File_LoopRun+'Event'+Hist1File_EventRun+'Background'+Hist1File_BackgroundRun)
+                        Legend2.SetHeader('Loop'+Hist2File_LoopRun+'Event'+Hist2File_EventRun+'Background'+Hist2File_BackgroundRun)
         
         else:
             Legend1.SetHeader(Hist1Name)
@@ -588,9 +631,9 @@ def CompareHist(HistProps):
     HistCan.Update()
     
     if Hist1Name == Hist2Name:
-        HistCan.SaveAs(RelativeScale+'_'+Hist1File_Prefix+'-'+Hist2File_Prefix+'/Event'+Hist1File_EventRun+'-'+Hist2File_EventRun+'/Particle'+Hist1File_ParticleRun+'-'+Hist2File_ParticleRun+'/'+Hist1Name+Hist1Var+'.png')
+        HistCan.SaveAs(Comparison+'_'+Hist1File_Prefix+'-'+Hist2File_Prefix+'/Loop'+Hist1File_LoopRun+'-'+Hist2File_LoopRun+'/Event'+Hist1File_EventRun+'-'+Hist2File_EventRun+'/Background'+Hist1File_BackgroundRun+'-'+Hist2File_BackgroundRun+'/'+Hist1Name+Hist1Var+'.png')
     else:
-        HistCan.SaveAs(RelativeScale+'_'+Hist1File_Prefix+'-'+Hist2File_Prefix+'/Event'+Hist1File_EventRun+'-'+Hist2File_EventRun+'/Particle'+Hist1File_ParticleRun+'-'+Hist2File_ParticleRun+'/'+Hist1Name+Hist2Name+Hist1Var+'.png')
+        HistCan.SaveAs(Comparison+'_'+Hist1File_Prefix+'-'+Hist2File_Prefix+'/Loop'+Hist1File_LoopRun+'-'+Hist2File_LoopRun+'/Event'+Hist1File_EventRun+'-'+Hist2File_EventRun+'/Background'+Hist1File_BackgroundRun+'-'+Hist2File_BackgroundRun+'/'+Hist1Name+Hist2Name+Hist1Var+'.png')
 
   
 
@@ -672,7 +715,7 @@ def ParticleLoop(TreeDict, EventNum, Run):
         }
     }
     '''
-    Cuts = config.EventLoopParams['Runs']['ParticleLevel'][Run]
+    Cuts = config.EventLoopParams['Level']['Loop'][Run]
 
     # Reading a specific event 
     TreeDict['Tree'].ReadEntry(EventNum)
@@ -717,7 +760,7 @@ def ParticleLoop(TreeDict, EventNum, Run):
                         FinalLeptons.append(particle)                
                         e_count += 1
                         # Adding the electron to the sorting list 
-                        ElectronPT.append( (particle.PT, particle) )
+                        ElectronPT.append( (particle.P4().Pt(), particle) )
 
 
                 # Adding the electron to the sorting list 
@@ -732,7 +775,7 @@ def ParticleLoop(TreeDict, EventNum, Run):
                         FinalLeptons.append(particle)              
                         mu_count += 1                
                         # Adding the muon to the sorting list                 
-                        MuonPT.append( (particle.PT, particle) )   
+                        MuonPT.append( (particle.P4().Pt(), particle) )   
 
                    
                 
@@ -767,7 +810,7 @@ def ParticleLoop(TreeDict, EventNum, Run):
             if Cuts['jet_Eta'][0] <= jet.P4().Eta() <= Cuts['e_Eta'][1]:
                 if jet.P4().Pt() >= Cuts['jet_Pt']:
                     jet_count += 1
-                    JetPT.append( ( jet.PT, jet) )
+                    JetPT.append( (jet.P4().Eta(), jet) )
     
     # Sorts ElectronPT based on the 1st element in each tuple in ascending order
     ElectronPT_sorted = sorted(ElectronPT, key=lambda x: x[0])

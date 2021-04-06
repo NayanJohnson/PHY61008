@@ -5,8 +5,10 @@ import Analysis_Funcs as funcs
 import config
 from ROOT import TFile, TH1F, TMath
 
+# Initialising runs
+LoopRuns = []
+BackgroundRuns = []
 EventRuns = []
-ParticleRuns = []
 
 for arg in sys.argv:
     # Should filter the python script
@@ -14,24 +16,32 @@ for arg in sys.argv:
         continue
 
     # Looks for arguements passing the runs to compare
-    elif arg.split('_')[0] == 'Event':
-        EventRuns.append(arg.split('_')[1])
+    elif arg.split('_')[0].upper() == 'LOOP':
+        LoopRuns.append(arg.split('_')[1])
 
-    elif arg.split('_')[0] == 'Particle':
-        ParticleRuns.append(arg.split('_')[1])
+    elif arg.split('_')[0].upper() == 'ANALYSIS':
+        BackgroundRuns.append(arg.split('_')[1])
+
+    elif arg.split('_')[0].upper() == 'EVENT':
+        EventRuns.append(arg.split('_')[1])
 
     # Should find the prefixes of hist files to be compared
     else:
         outfileprefix = arg
 
+# If no run is given for a level, set the runs to default
+for Run in (LoopRuns, BackgroundRuns, EventRuns):
+    if len(LoopRuns) == 0:
+        Run = ['Cuts', 'NoCuts']
+
 # Load event file
 myTree = funcs.LoadROOT("tag_1_delphes_events.root")
 
-def EventLoop(myTree, outfileprefix, EventRun, ParticleRun):
+def EventLoop(myTree, outfileprefix, LoopRun, EventRun, BackgroundRun):
     '''
     '''
 
-    outfilename = outfileprefix+'_'+'Event'+EventRun+'Particle'+ParticleRun+'.root'
+    outfilename = outfileprefix+'_Loop'+LoopRun+'Event'+EventRun+'Background'+BackgroundRun+'.root'
 
     # Open output
     outfile = TFile(outfilename,"RECREATE")
@@ -41,7 +51,8 @@ def EventLoop(myTree, outfileprefix, EventRun, ParticleRun):
     # Initialise requested hists from HistDict
     HistDict = funcs.MakeHists(HistDict)
 
-    EventCuts = config.EventLoopParams['Runs']['EventLevel'][EventRun]
+    EventCuts = config.EventLoopParams['Level']['Event'][EventRun]
+    BackgroundCuts = config.EventLoopParams['Level']['Background'][BackgroundRun] 
     
     Zdecays = config.EventLoopParams['Z']['Decays']
     WPlusdecays = config.EventLoopParams['WPlus']['Decays']
@@ -51,14 +62,39 @@ def EventLoop(myTree, outfileprefix, EventRun, ParticleRun):
     # Looping through events
     for EventNum in range(myTree['NEvents']):
 
-        HistDict, ParticleDict, EventDict = funcs.GetParticles(myTree, ParticleRun, HistDict, EventNum)
+        HistDict, ParticleDict, EventDict = funcs.GetParticles(myTree, LoopRun, HistDict, EventNum)
+
+        FinalBeamElectron_Sorted = list(EventDict['PTSorted']['Electron'])
+
+        # print('before:', len(FinalBeamElectron_Sorted))
+        # print([(x, x[1].P4().Eta()) for x in FinalBeamElectron_Sorted])
+        # i = 0
         
-        # print(EventDict['Count']['Electrons'], EventCuts['Electrons'], EventDict['Count']['Muons'], EventCuts['Muons'],  EventDict['Count']['Jets'], EventCuts['Jets'])
-        
+
+        # Cuts out electrons in the PTSorted list and then takes the leading result as the beam electron
+        for particle in EventDict['PTSorted']['Electron']:
+            # print(particle)
+            # i+=1
+            # print(i)
+            if BackgroundCuts['BeamElectron']['Eta'][0] <= particle[1].P4().Eta() <= BackgroundCuts['BeamElectron']['Eta'][1]:
+                # print('Pass')
+                continue
+            else:
+                FinalBeamElectron_Sorted.remove(particle)
+                # print('Remove')
+
+        # print('after:', len(FinalBeamElectron_Sorted))
+        # print([(x, x[1].P4().Eta()) for x in FinalBeamElectron_Sorted])
+
+        if len(FinalBeamElectron_Sorted) != 0:
+            ParticleDict = funcs.AddParticle('FinalBeamElectron', ParticleDict, FinalBeamElectron_Sorted[-1][1].P4())
+        else:
+            continue
+
+
         # Event level selection for WWEmJ_WW_Muons
         if EventDict['Count']['Electrons'] >= EventCuts['Electrons'] and EventDict['Count']['Muons'] >= EventCuts['Muons'] and EventDict['Count']['Jets'] >= EventCuts['Jets']:
             
-            ParticleDict['FinalBeamElectron'] = ParticleDict['LeadingElectron']
             EventCutNum += 1
             for Zdecay in Zdecays:
                 if Zdecay == None:
@@ -114,6 +150,7 @@ def EventLoop(myTree, outfileprefix, EventRun, ParticleRun):
     outfile.Write()
     outfile.Close()
 
-for EventRun in EventRuns:
-    for ParticleRun in ParticleRuns:
-        EventLoop(myTree, outfileprefix, EventRun, ParticleRun)
+for LoopRun in LoopRuns:
+    for EventRun in EventRuns:
+        for BackgroundRun in BackgroundRuns:
+            EventLoop(myTree, outfileprefix, LoopRun, EventRun, BackgroundRun)

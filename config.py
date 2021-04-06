@@ -1,6 +1,6 @@
 EventLoopParams = {
-    'Runs'              :   {
-        'ParticleLevel'     :   {
+    'Level'              :   {
+        'Loop'     :   {
             'Cuts'              :   {
                 'e_Eta'             :   (-4.3, 4.9),
                 'e_Pt'              :   5,
@@ -20,19 +20,32 @@ EventLoopParams = {
             }
         },
 
-        'EventLevel'        :   {
+        'Event'        :   {
             'Cuts'              :   {
                 'Electrons'         :   1,
                 'Muons'             :   2,
-                'Jets'              :   1
+                'Jets'              :   1,
             },
 
             'NoCuts'            :   {
                 'Electrons'         :   0,
                 'Muons'             :   0,
-                'Jets'              :   0
+                'Jets'              :   0,
             },
-        }
+        },
+
+        'Background'     :   {
+            'Cuts'              :   {
+                'BeamElectron'      :   {
+                    'Eta'               :   (-1, float('inf')),
+                }
+            },
+
+            'NoCuts'            :   {
+                    'Eta'               :   (float('-inf'), float('inf')),
+                }
+            },
+
     },
 
     'Z'         :   {
