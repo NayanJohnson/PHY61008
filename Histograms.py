@@ -49,7 +49,7 @@ def EventLoop(myTree, outfileprefix, LoopRun, EventRun, BackgroundRun):
     HistDict = config.HistDict
 
     # Initialise requested hists from HistDict
-    HistDict = funcs.MakeHists(HistDict)
+    HistDict = Hist.MakeHists(HistDict)
 
     EventCuts = config.EventLoopParams['Level']['Event'][EventRun]
     BackgroundCuts = config.EventLoopParams['Level']['Background'][BackgroundRun] 
@@ -62,7 +62,7 @@ def EventLoop(myTree, outfileprefix, LoopRun, EventRun, BackgroundRun):
     # Looping through events
     for EventNum in range(myTree['NEvents']):
 
-        HistDict, ParticleDict, EventDict = funcs.GetParticles(myTree, LoopRun, HistDict, EventNum)
+        HistDict, ParticleDict, EventDict = Loop.GetParticles(myTree, LoopRun, HistDict, EventNum)
 
         FinalBeamElectron_Sorted = list(EventDict['PTSorted']['Electron'])
 
@@ -137,7 +137,7 @@ def EventLoop(myTree, outfileprefix, LoopRun, EventRun, BackgroundRun):
 
             # Filling HistDict with particles then filling the hists
             HistDict = funcs.RequestParticles(HistDict, ParticleDict)
-            funcs.FillHists(HistDict)
+            Hist.FillHists(HistDict)
 
     # Get scaling factor for histograms
     Scale = funcs.GetScale('tag_1_pythia.log', myTree['NEvents'])
@@ -145,7 +145,7 @@ def EventLoop(myTree, outfileprefix, LoopRun, EventRun, BackgroundRun):
     # Scaling and altering hist lims
     for category, properties in HistDict.items():
         for var, hist in properties['Hists'].items():
-            hist = funcs.HistLims(hist, var, Scale=Scale)[0]
+            hist = Hist.HistLims(hist, var, Scale=Scale)[0]
     # Writing and closing file
     outfile.Write()
     outfile.Close()

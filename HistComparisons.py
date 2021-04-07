@@ -185,7 +185,7 @@ for Comparison in CompRuns:
                                     'Comparison'      :   Comparison
                                 }
 
-                                funcs.CompareHist(HistProps)
+                                Hist.CompareHist(HistProps)
 
                     for key, properties in HistCompDict.items():
 
@@ -222,5 +222,5 @@ for Comparison in CompRuns:
                                 'Comparison'      :   Comparison 
                             }
 
-                            funcs.CompareHist(HistProps)
+                            Hist.CompareHist(HistProps)
 
