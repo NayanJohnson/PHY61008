@@ -61,14 +61,25 @@ def RequestParticles(HistDict, ParticleDict):
     '''
 
     # Itterating through histogram categories
-    for category, properties in HistDict.items():
+    for category, attributes in HistDict.items():
         
-        # Itterating through particle requests
-        for particle in properties['Requests']['Particles']:
+        if attributes['Dimensions'] == 1:
+            # Itterating through particle requests
+            for particle in attributes['Requests']['Particles']:
 
-            # Particle check
-            if ParticleDict[particle]['Check']:
-                properties['Particles'].append(ParticleDict[particle])               
+                # Particle check
+                if ParticleDict[particle]['Check']:
+                    attributes['Particles'].append(ParticleDict[particle])
+
+        elif attributes['Dimensions'] == 2:
+            attributes['Particles'] = [ [], [] ]
+            # Itterating through particle requests
+            for i in (0, 1):
+                ParticleSet = attributes['Requests']['Particles'][i]
+                for particle in ParticleSet:
+                    # Particle check
+                    if ParticleDict[particle]['Check']:
+                        attributes['Particles'][i].append(ParticleDict[particle])  
 
     return HistDict
 
@@ -94,7 +105,9 @@ def GetParticleVariable(var, ParticleList, category=None):
                 ParticleVars.append(ParticleList[i][var])
             return ParticleVars
 
-        elif var == 'InvMass':
+    if 2 <= len(ParticleList):
+
+        if var == 'InvMass':
             ParticleSum = TLorentzVector()
             for particle in ParticleList:
                 ParticleSum = particle['P4'] + ParticleSum
@@ -139,7 +152,7 @@ def AddParticle(name, ParticleDict, P4=False, PID=None):
         '''
 
         # Checks if a particle is present
-        if P4:
+        if not P4:
             ParticleDict[name] = {
                 'Check'     :   False
             }

@@ -77,7 +77,7 @@ def MakeHists(HistDict):
     HighRangeBinScale = VarParams['HighRangeNbinsScale']
 
     for name, attributes in HistDict.items():
-        attributes['Hists'] = []
+        attributes['Hists'] = {}
         
         # 1D Hists
         if attributes['Dimensions'] == 1:
@@ -106,7 +106,7 @@ def MakeHists(HistDict):
 
         # 2D Hists
         elif attributes['Dimensions'] == 2: 
-            for pair in properties['Requests']['Vars']:
+            for pair in attributes['Requests']['Vars']:
                 histName = name+'_'+pair[0]+'_'+pair[1]
                 histTitle = histName+';'+pair[0]+';'+pair[1]+';Frequency'
 
@@ -155,18 +155,18 @@ def FillHists(HistDict):
             for xVar, hist in attributes['Hists'].items():
                 
 
-                # Count var can be read straight from properties
+                # Count var can be read straight from attributes
                 if xVar == 'Count': 
-                    hist.Fill(properties['Count'])
+                    hist.Fill(attributes['Count'])
 
                 else:
                     xParticles = attributes['Particles']
 
                     # Get the variable of the particle in question
-                    xVal = ParticleFuncs.ParticleFuncs.GetParticleVariable(xVar, xParticles, category)
+                    xVal = ParticleFuncs.GetParticleVariable(xVar, xParticles, category)
 
                     # If a value is returned
-                    if xVar:
+                    if xVal:
                         # If the function returns a list fill the hist for each
                         # element in list
                         if type(xVal) is list:
@@ -188,10 +188,13 @@ def FillHists(HistDict):
                 yVal = ParticleFuncs.GetParticleVariable(yVar, yParticles, category)
 
                 # If values are returned
-                if xVar and yVar:
-                    hist.Fill(xVar, yVar)
+                if xVal and yVal:
+                    # each element in xVal yVal corresponds to the corresponding particles
+                    # in xParticles, yParticles
+                    for x, y in zip(xVal, yVal):
+                        hist.Fill(x, y)
 
-def HistLims(hist, Scale=1, Norm=False):
+def HistLims(hist, var, Scale=1, Norm=False):
     '''
         Rescales hist lims.
         Passed objects:
@@ -278,10 +281,33 @@ def CompareHist(HistProps):
 
                 'File'          :   TFile(HistFile2_Name+'.root')
             },
-        }    
+        }
+
+        HistProps = {
+            'Hist1'     :   {
+                'Hist'      :   Hist1,
+                'HistName'  :   HistName,
+                'HistVar'   :   HistVar,
+                'FileDict'  :   HistFiles[1]
+            },
+
+            'Hist2'     :   {
+                'Hist'      :   Hist2,
+                'HistName'  :   HistName,
+                'HistVar'   :   HistVar,
+                'FileDict'  :   HistFiles[2]
+
+            },
+            
+            'Norm'      :   Norm
+        }
     '''
     
-    Comparison = HistProps['Comparison']
+    Norm = HistProps['Norm']
+    if Norm:
+        Comparison = 'Norm'
+    else:
+        Comparison = 'Rel'
 
     Hist1Name = HistProps['Hist1']['HistName']
     Hist1Var = HistProps['Hist1']['HistVar']
@@ -302,8 +328,8 @@ def CompareHist(HistProps):
     Hist2File_BackgroundRun = HistProps['Hist2']['FileDict']['BackgroundRun']
 
 
-    Hist1, Lims1 = HistLims(Hist1, Hist1Var, Comparison=Comparison)
-    Hist2, Lims2 = HistLims(Hist2, Hist2Var, Comparison=Comparison)
+    Hist1, Lims1 = HistLims(Hist1, Hist1Var, Norm=Norm)
+    Hist2, Lims2 = HistLims(Hist2, Hist2Var, Norm=Norm)
 
     # Clear canvas
     HistCan = TCanvas()

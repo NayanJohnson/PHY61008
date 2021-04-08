@@ -2,8 +2,10 @@
 # python script.py hists1.root hists2.root output.root
 
 import sys, itertools
-import Analysis_Funcs as funcs
-import config
+import config, requests, itertools
+import Particle_Funcs as ParticleFuncs
+import Hist_Funcs as HistFuncs
+import Loop_Funcs as LoopFuncs
 from ROOT import gSystem, TFile, TH1F, gROOT
 
 # Setting batch to True prevents TCanvas windows from opening
@@ -89,13 +91,11 @@ loopnum = 0
 
 # Setting the CompRuns
 if len(Runs['NORM']) == 0:
-    CompRuns = ['Norm', 'Rel']
-elif Runs['NORM']:
-    CompRuns = ['Norm']
+    CompRuns = [True, False]
 else:
-    CompRuns = ['Rel']
+    CompRuns =  Runs['NORM']
 
-for Comparison in CompRuns:
+for Norm in CompRuns:
     for FilePair in FileCombinations:
         for LoopRunPair in LoopRunCombinations:
             for EventRunPair in EventRunCombinations:
@@ -116,6 +116,11 @@ for Comparison in CompRuns:
                     HistFile2_BackgroundRun = BackgroundRunPair[1]
                     HistFile2_Name = HistFile2_Prefix+'_'+'Loop'+HistFile2_LoopRun+'Event'+HistFile2_EventRun+'Background'+HistFile2_BackgroundRun
                     
+                    if Norm:
+                        Comparison = 'Norm'
+                    else:
+                        Comparison = 'Rel'
+
                     gSystem.Exec('mkdir '+Comparison+'_'+HistFile1_Prefix+'-'+HistFile2_Prefix)
                     gSystem.Exec('mkdir '+Comparison+'_'+HistFile1_Prefix+'-'+HistFile2_Prefix+'/Loop'+HistFile1_LoopRun+'-'+HistFile2_LoopRun)
                     gSystem.Exec('mkdir '+Comparison+'_'+HistFile1_Prefix+'-'+HistFile2_Prefix+'/Loop'+HistFile1_LoopRun+'-'+HistFile2_LoopRun+'/Event'+HistFile1_EventRun+'-'+HistFile2_EventRun+'/')
@@ -145,8 +150,8 @@ for Comparison in CompRuns:
                         },
                     }    
 
-                    HistDict = config.HistDict
-                    HistCompDict = config.HistComparisonDict
+                    HistDict = requests.HistDict
+                    HistCompDict = requests.HistComparisonDict
 
                     # if False:
                     if HistFile1_Name != HistFile2_Name:
@@ -156,12 +161,13 @@ for Comparison in CompRuns:
 
                                 # If the hist is 2D
                                 # 2D hists break the code for some reason
-                                if type(var) == tuple and len(var) == 2:
+                                if type(var) == list and len(var) == 2:
                                     continue
                                 else:
                                     HistVar = var
                                     HistName = name
 
+                                # print(HistName, HistVar)
                                 # Read the hist in each file
                                 Hist1 = HistFiles[1]['File'].Get(HistName+'_'+HistVar+';1')
                                 Hist2 = HistFiles[2]['File'].Get(HistName+'_'+HistVar+';1')  
@@ -182,10 +188,10 @@ for Comparison in CompRuns:
 
                                     },
                                     
-                                    'Comparison'      :   Comparison
+                                    'Norm'      :   Norm
                                 }
 
-                                Hist.CompareHist(HistProps)
+                                HistFuncs.CompareHist(HistProps)
 
                     for key, properties in HistCompDict.items():
 
@@ -219,8 +225,8 @@ for Comparison in CompRuns:
                                     'FileDict'  :   HistFiles[2]
                                 },
                                     
-                                'Comparison'      :   Comparison 
+                                'Norm'      :   Norm 
                             }
 
-                            Hist.CompareHist(HistProps)
+                            HistFuncs.CompareHist(HistProps)
 
