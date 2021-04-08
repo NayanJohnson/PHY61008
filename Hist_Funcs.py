@@ -1,8 +1,50 @@
-from ROOT import gSystem, gInterpreter, TChain, TH1F, TH2F, TMath, TLorentzVector, TCanvas, TLegend, SetOwnership, TColor
+from ROOT import TH1F, TH2F, TCanvas, TLegend, SetOwnership, TColor
 
-import config, itertools
-import Loop_Funcs as Loop
-import Hist_Funcs as Hist
+import config, requests, itertools
+import Particle_Funcs as ParticleFuncs
+import Loop_Funcs as LoopFuncs
+
+
+
+"""
+Definitions of used objects:
+
+HistDict =        {
+    category        :   {
+        Requests        :   {
+            Vars            :   [],
+            Particles       :   []
+        },
+        
+        Dimensions  :   int(),
+        Particles   :   [],
+        Hists       :   {
+            name        :   hist, ...
+        },
+    }
+}
+
+for 1D:
+
+    Requests        :   {
+        Vars        :   [var1, var2, ...],
+    },
+
+    Dimensions  :   1,
+    Particles   :   [particle1, particle2, ...],
+    Hists       :   {name1 : hist1, ... },
+
+for 2D:
+
+    Requests        :   {
+        Vars        :   [(xvar1, yvar1), (xvar2, yvar2) ...],
+    },
+
+    Dimensions  :   2,
+    Particles   :   [( xparticle1, xparticle2 ...), (y1particle1, yparticle2, ...)],
+    Hists       :   {name1 : hist1, ... },
+
+"""
 
 def GetScale(PythiaLogPath, NEvents):
     '''
@@ -27,73 +69,19 @@ def MakeHists(HistDict):
     '''
         Will initialise histograms using HistDict[Category][Requests][Vars] list
         and add them to HistDict[Category][Hists].
-        Will also scale the hist using the GetScale() function.
-
-        Histogram dictionary should be in the following format:
-        HistDict =        {
-            category        :   {
-                Requests        :   {
-                    Vars            :   [],
-                    Particles       :   []
-                },
-
-                Vars        :   [],
-                Particles   :   [],
-                Hists       :   {
-                    Var1        :   Hist1,
-                    Var2        :   Hist2
-                }
-            }
-        }
     '''
 
-    VarParams = config.VarParams
+    VarParams = requests.VarParams
     NbinsDefault = VarParams['Nbins']
     LowRangeBinScale = VarParams['LowRangeNbinsScale']
     HighRangeBinScale = VarParams['HighRangeNbinsScale']
 
-    for name, properties in HistDict.items():
-        properties['Hists'] = {}
-
-        for var in properties['Requests']['Vars']:
-            
-            # If var is a tuple the hist is multiple dims
-            if type(var) == tuple:
-                if len(var) == 2:
-                    histName = name+'_'+var[0]+'_'+var[1]
-                    histTitle = histName+';'+var[0]+';'+var[1]+';Frequency'
-
-                    histXlow = VarParams[var[0]]['Range'][0]
-                    histXup = VarParams[var[0]]['Range'][1]
-                    histXrange = histXup-histXlow
-
-                    if histXrange <= 10:
-                        histXNbins = int(NbinsDefault * 1/2 * LowRangeBinScale)
-                    elif histXrange <= 100:
-                        # Scales number of bins dependng on var range
-                        histXNbins = int(NbinsDefault * LowRangeBinScale)
-                    else:
-                        histXNbins = int(NbinsDefault * HighRangeBinScale)
-
-                    histYlow = VarParams[var[1]]['Range'][0]
-                    histYup = VarParams[var[1]]['Range'][1]        
-                    histYrange = histYup-histYlow
-
-                    if histYrange <= 10:
-                        histYNbins = int(NbinsDefault * 1/2 * LowRangeBinScale)
-                    elif histYrange <= 100:
-                        # Scales number of bins dependng on var range
-                        histYNbins = int(NbinsDefault * LowRangeBinScale)
-                    else:
-                        histYNbins = int(NbinsDefault * HighRangeBinScale)                    
-
-                    hist = TH2F(histName, histTitle, histXNbins, histXlow, histXup, histYNbins, histYlow, histYup)
-                    
-                    hist.SetOption('HIST COLZ')
-                    # Adds the hist to the dict
-                    HistDict[name]['Hists'][var[0]+'_'+var[1]] = hist
-
-            elif type(var) == str:
+    for name, attributes in HistDict.items():
+        attributes['Hists'] = []
+        
+        # 1D Hists
+        if attributes['Dimensions'] == 1:
+            for var in attributes['Requests']['Vars']:
                 histName = name+'_'+var
                 histTitle = histName+';'+var+';Frequency'
 
@@ -116,84 +104,108 @@ def MakeHists(HistDict):
                 # Adds the hist to the dict
                 HistDict[name]['Hists'][var] = hist
 
+        # 2D Hists
+        elif attributes['Dimensions'] == 2: 
+            for pair in properties['Requests']['Vars']:
+                histName = name+'_'+pair[0]+'_'+pair[1]
+                histTitle = histName+';'+pair[0]+';'+pair[1]+';Frequency'
+
+                histXlow = VarParams[pair[0]]['Range'][0]
+                histXup = VarParams[pair[0]]['Range'][1]
+                histXrange = histXup-histXlow
+
+                if histXrange <= 10:
+                    histXNbins = int(NbinsDefault * 1/2 * LowRangeBinScale)
+                elif histXrange <= 100:
+                    # Scales number of bins dependng on var range
+                    histXNbins = int(NbinsDefault * LowRangeBinScale)
+                else:
+                    histXNbins = int(NbinsDefault * HighRangeBinScale)
+
+                histYlow = VarParams[pair[1]]['Range'][0]
+                histYup = VarParams[pair[1]]['Range'][1]        
+                histYrange = histYup-histYlow
+
+                if histYrange <= 10:
+                    histYNbins = int(NbinsDefault * 1/2 * LowRangeBinScale)
+                elif histYrange <= 100:
+                    # Scales number of bins dependng on var range
+                    histYNbins = int(NbinsDefault * LowRangeBinScale)
+                else:
+                    histYNbins = int(NbinsDefault * HighRangeBinScale)                    
+
+                hist = TH2F(histName, histTitle, histXNbins, histXlow, histXup, histYNbins, histYlow, histYup)
+                
+                hist.SetOption('HIST COLZ')
+                # Adds the hist to the dict
+                HistDict[name]['Hists'][pair[0]+'_'+pair[1]]    =   hist
+
     return HistDict
 
 def FillHists(HistDict):
     '''
-        Given a dictionary of histograms, will fill them.
-        Histogram dictionary should be in the following format:
-        HistDict =        {
-            category        :   {
-                Requests        :   {
-                    Vars            :   [],
-                    Particles       :   []
-                },
-
-                Vars        :   [],
-                Particles   :   [],
-                Hists       :   {
-                    Var1        :   Hist1,
-                    Var2        :   Hist2
-                }
-            }
-        }
+        Given a HistDict, will fill the histograms.
     '''
     
     # List of variables that are stored in all particles.
     ParticleProperties = ['PID', 'E', 'Eta', 'Phi', 'Rapidity', 'Theta', 'Pt', 'Et']
 
-    for category, properties in HistDict.items():
-        for var, hist in properties['Hists'].items():
+    for category, attributes in HistDict.items():
+        if attributes['Dimensions'] == 1:
+            for xVar, hist in attributes['Hists'].items():
+                
 
-            # Count var can be read straight from properties
-            if var == 'Count': 
-                hist.Fill(properties['Count'])
+                # Count var can be read straight from properties
+                if xVar == 'Count': 
+                    hist.Fill(properties['Count'])
 
-            # If var contains 2 variables
-            elif len(var.split('_')) == 2:
-                xVar = GetParticleVariable(var.split('_')[0], properties['Particles'], category, 2)
-                yVar = GetParticleVariable(var.split('_')[1], properties['Particles'], category, 2)
+                else:
+                    xParticles = attributes['Particles']
+
+                    # Get the variable of the particle in question
+                    xVal = ParticleFuncs.ParticleFuncs.GetParticleVariable(xVar, xParticles, category)
+
+                    # If a value is returned
+                    if xVar:
+                        # If the function returns a list fill the hist for each
+                        # element in list
+                        if type(xVal) is list:
+                            for val in xVal:
+                                hist.Fill(val)
+                        else:
+                            hist.Fill(xVal)
+
+        elif attributes['Dimensions'] == 2:
+            for key, hist in attributes['Hists'].items():
+                
+                # 2D hist key = 'xVar_yVar'
+                xVar, yVar = key.split('_')[0], key.split('_')[1]
+
+                # attributes['Particles'] = [(xParticles), (yParticles)]
+                xParticles, yParticles = attributes['Particles'][0], attributes['Particles'][1]
+
+                xVal = ParticleFuncs.GetParticleVariable(xVar, xParticles, category)
+                yVal = ParticleFuncs.GetParticleVariable(yVar, yParticles, category)
+
+                # If values are returned
                 if xVar and yVar:
                     hist.Fill(xVar, yVar)
 
-            else:
-                xVar = GetParticleVariable(var, properties['Particles'], category)
-                if xVar != False:
-                    # If the function returns a list fill the hist for each
-                    # element in list
-                    if type(xVar) == list:
-                        for V in xVar:
-                            hist.Fill(V)
-                    else:
-                        hist.Fill(xVar)
-
-def HistLims(hist, var, Scale=1, Comparison='Rel' ):
-
+def HistLims(hist, Scale=1, Norm=False):
     '''
-        Rescales hist lims depending on the data in the hists.
-        Histogram dictionary should be in the following format:
-        HistDict =        {
-            category        :   {
-                Requests        :   {
-                    Vars            :   [],
-                    Particles       :   []
-                },
-
-                Vars        :   [],
-                Particles   :   [],
-                Hists       :   {
-                    Var1        :   Hist1,
-                    Var2        :   Hist2
-                }
-            }
-        }
+        Rescales hist lims.
+        Passed objects:
+        hist        :   histogram
+        Scale       :   float used to scale histrogram - default is 1.
+        Norm        :   Should the hist be normalised?
     '''    
     XMin, XMax, YMin, YMax = None, None, None, None
 
-    if Comparison == 'Rel':
-        hist.Scale(Scale)
-    elif Comparison == 'Norm' and hist.Integral() != 0:
+    if Norm and hist.Integral() != 0:
+        # Normalises the hist    
         hist.Scale(1./hist.Integral())
+    else:
+        hist.Scale(Scale)
 
     ThresholdMin = (hist.Integral()/200) * 1/100                # Skip if hist = False
 
@@ -244,23 +256,6 @@ def HistLims(hist, var, Scale=1, Comparison='Rel' ):
 def CompareHist(HistProps):
     '''
         Given a histogram dictionary and 
-     
-        Histogram dictionary should be in the following format:
-        HistDict =        {
-            category        :   {
-                Requests        :   {
-                    Vars            :   [],
-                    Particles       :   []
-                },
-
-                Vars        :   [],
-                Particles   :   [],
-                Hists       :   {
-                    Var1        :   Hist1,
-                    Var2        :   Hist2
-                }
-            }
-        }
          
         Histogram properties dictionary should be in the following format:
         HistFiles = {

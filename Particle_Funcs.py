@@ -1,48 +1,28 @@
 
-from ROOT import gSystem, gInterpreter, TChain, TH1F, TH2F, TMath, TLorentzVector, TCanvas, TLegend, SetOwnership, TColor
+from ROOT import TMath, TLorentzVector
 
-# Path of Delphes directory 
-gSystem.AddDynamicPath("/home/nayan/MG5_aMC_v2_8_2/Delphes/")
-gSystem.Load("libDelphes")
+import config, requests, itertools
+import Loop_Funcs as LoopFuncs
+import Hist_Funcs as HistFuncs
 
-gInterpreter.Declare('#include "classes/DelphesClasses.h"')
-gInterpreter.Declare('#include "external/ExRootAnalysis/ExRootTreeReader.h"')
+"""
+Definitions of used objects:
 
-from ROOT import ExRootTreeReader
-import config, itertools
-import Loop_Funcs as Loop
-import Hist_Funcs as Hist
+ParticleDict[name] = {
+    'Check'     :   check,
+    'Name'      :   name,
+    'PID'       :   PID,
+    'P4'        :   P4,
+    'E'         :   P4.E(),
+    'Eta'       :   P4.Eta(),
+    'Phi'       :   P4.Phi(),
+    'Rapidity'  :   P4.Rapidity(),
+    'Theta'     :   P4.Theta(),
+    'Pt'        :   P4.Pt(),
+    'Et'        :   P4.Et()
+}
 
-def LoadROOT(filename):
-    '''
-    Loads .root file with tree labeled "Delphes" and outputs dictionary containing the number 
-    of events and branches.
-    '''
-
-    # Create chain of root trees 
-    chain = TChain("Delphes")
-    chain.Add(filename)
-
-    # Create object of class ExRootTreeReader
-    myTree = ExRootTreeReader(chain)
-    NEvents = myTree.GetEntries()
-
-    # Get pointers to branches used in this analysis
-    branchParticle = myTree.UseBranch("Particle")
-    branchGenJets = myTree.UseBranch("GenJet")
-
-    TreeDict =  {
-                    'Tree'      :   myTree,
-                    'NEvents'   :   NEvents,
-                    'Branches'  :   {
-                        'Particle'          :   branchParticle,
-                        'GenJets'           :   branchGenJets,
-                    }
-                }
-
-    return TreeDict
-
-
+"""
 
 def RequestParticles(HistDict, ParticleDict):
     '''
@@ -92,25 +72,10 @@ def RequestParticles(HistDict, ParticleDict):
 
     return HistDict
 
-def GetParticleVariable(var, ParticleList, category=None, dims=1):
+def GetParticleVariable(var, ParticleList, category=None):
     '''
         Returns the value or list of variables for the given category : var
         Category is only used for q calcs.
-        var is a string.
-        properties is in the format:
-        properties = {
-            Requests        :   {
-                Vars            :   [],
-                Particles       :   []
-            },
-
-            Vars        :   [],
-            Particles   :   [],
-            Hists       :   {
-                Var1        :   Hist1,
-                Var2        :   Hist2
-            }
-        }
     '''
 
     # List of variables that are stored in all particles.
@@ -124,13 +89,10 @@ def GetParticleVariable(var, ParticleList, category=None, dims=1):
         # the hist can be filled by all particles in the list.
         if var in ParticleProperties:
             # Only alow 1D hists to return a list
-            if dims ==1:
-                ParticleVars = []
-                for i in range(0, len(ParticleList)):
-                    ParticleVars.append(ParticleList[i][var])
-                return ParticleVars
-            else:
-                return ParticleList[0][var]
+            ParticleVars = []
+            for i in range(0, len(ParticleList)):
+                ParticleVars.append(ParticleList[i][var])
+            return ParticleVars
 
         elif var == 'InvMass':
             ParticleSum = TLorentzVector()
@@ -138,10 +100,7 @@ def GetParticleVariable(var, ParticleList, category=None, dims=1):
                 ParticleSum = particle['P4'] + ParticleSum
             return ParticleSum.M()
 
-    # Seperates hists into the number of required particles
-    if len(ParticleList) == 2:
-
-        if var == 'q':
+        elif var == 'q':
             if category == 'qLepton' or category == 'qQuark':
                 q = (ParticleList[0]['P4'] - ParticleList[1]['P4']).Mag()
             elif category == 'qeMethod':
@@ -172,28 +131,15 @@ def GetParticleVariable(var, ParticleList, category=None, dims=1):
             return dR_Rap    
     return False
 
-def AddParticle(name, ParticleDict, P4=None, PID=None):
+def AddParticle(name, ParticleDict, P4=False, PID=None):
         '''
             Given a name, PID, 4-momenta of a particle,
             will add a particle dict of various properties to an existing
-            dict:
-            ParticleDict[name] = {
-                'Check'     :   check,
-                'Name'      :   name,
-                'PID'       :   PID,
-                'P4'        :   P4,
-                'E'         :   P4.E(),
-                'Eta'       :   P4.Eta(),
-                'Phi'       :   P4.Phi(),
-                'Rapidity'  :   P4.Rapidity(),
-                'Theta'     :   P4.Theta(),
-                'Pt'        :   P4.Pt(),
-                'Et'        :   P4.Et()
-            }
+            dict.
         '''
 
         # Checks if a particle is present
-        if P4 == None:
+        if P4:
             ParticleDict[name] = {
                 'Check'     :   False
             }
