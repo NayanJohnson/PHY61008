@@ -374,6 +374,13 @@ def EventLoop(myTree, outfileprefix, LoopRun, EventRun, BackgroundRun):
             if len(EventDict['PTSorted']['Jet']) != 0:
                 ParticleDict = ParticleFuncs.AddParticle('FinalBeamJet', ParticleDict, EventDict['PTSorted']['Jet'][-1][1].P4())
 
+            # Adds particle for W+ - W- muons and W+ - Electron 
+            if ParticleDict['WPlusMuon']['Check'] and ParticleDict['WMinusMuon']['Check']:
+                DiMuon = ParticleDict['WPlusMuon']['P4'] + ParticleDict['WMinusMuon']['P4']
+                WPlusMuonFinalBeamElectron = ParticleDict['WPlusMuon']['P4'] + ParticleDict['FinalBeamElectron']['P4']
+                ParticleDict = ParticleFuncs.AddParticle('DiMuon', ParticleDict, DiMuon)
+                ParticleDict = ParticleFuncs.AddParticle('WPlusMuonFinalBeamElectron', ParticleDict, WPlusMuonFinalBeamElectron)
+
             # Filling HistDict with particles then filling the hists
             HistDict = ParticleFuncs.RequestParticles(HistDict, ParticleDict)
             HistFuncs.FillHists(HistDict)
