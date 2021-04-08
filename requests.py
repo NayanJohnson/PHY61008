@@ -18,12 +18,12 @@ ParticleKeywords = [
     'LeadingJet', 'SubLeadingJet', 'ThirdJet',
     'BeamElectron', 'FinalBeamElectron', 
     'LeadingElectron', 'SubLeadingElectron', 'ThirdElectron', 'FourthElectron', 'FifthElectron',
-    'MuonSum', 'AllMuons', 
+    'MuonSum', 'AllMuons', 'DiMuon',
     'LeadingMuon', 'SubLeadingMuon', 'ThirdMuon', 'FourthMuon',
     'LeadingJet', 'SubLeadingJet', 'ThirdJet', 'FourthJet',
     'MissingET', 
-    'WPlusElectron', 'WPlusMuon', 'WMinusElectron', 'WMinusMuon', 'WMuonSum',
-    'WLeadingJet', 'WSubLeadingJet',
+    'WPlusElectron', 'WPlusMuon', 'WMinusElectron', 'WMinusMuon', 'WMuonSum', 'WPlusMuonFinalBeamElectron',
+    'WLeadingJet', 'WSubLeadingJet', 
     'ZLeadingElectron', 'ZSubLeadingElectron', 'ZThirdElectron', 'ZFourthElectron',
     'ZLeadingMuon', 'ZSubLeadingMuon', 'ZThirdMuon', 'ZFourthMuon',
     'ZLeadingJet', 'ZSubLeadingJet', 
@@ -169,8 +169,24 @@ HistDict =  {
             'Particles' :   ['ThirdMuon'],
         },
         'Dimensions':   1,
-    },                      
-        
+    },              
+
+    'DiMuon'    :   {
+        'Requests'      :   {
+            'Vars'      :   ['Eta', 'Phi', 'Pt'],
+            'Particles' :   ['DiMuon'],
+        },
+        'Dimensions':   1,
+    },
+
+    'WPlusMuonFinalBeamElectron'    :   {
+        'Requests'      :   {
+            'Vars'      :   ['Eta', 'Phi', 'Pt'],
+            'Particles' :   ['WPlusMuonFinalBeamElectron'],
+        },
+        'Dimensions':   1,
+    },
+
     'AllJets'       :   {
         'Requests'      :   {
             'Vars'      :   ['Eta', 'Phi', 'Rapidity', 'Pt'],
@@ -625,6 +641,39 @@ HistDict =  {
         },
         'Dimensions':   2,
     },
+
+    '2DWPlusMuonFinalBeamElectron'     :   {
+        'Requests'      :   {
+            'Vars'      :   [['Eta', 'Eta'], ['Pt', 'Pt']],
+            'Particles' :   [['WPlusMuon'], ['FinalBeamElectron']],
+        },
+        'Dimensions':   2,
+    },
+
+    '2DWMinusMuonFinalBeamElectron'     :   {
+        'Requests'      :   {
+            'Vars'      :   [['Eta', 'Eta'], ['Pt', 'Pt']],
+            'Particles' :   [['WMinusMuon'], ['FinalBeamElectron']],
+        },
+        'Dimensions':   2,
+    },
+
+    '2DWPlusMuonWMinusMuon'     :   {
+        'Requests'      :   {
+            'Vars'      :   [['Eta', 'Eta'], ['Pt', 'Pt']],
+            'Particles' :   [['WPlusMuon'], ['WMinusMuon']],
+        },
+        'Dimensions':   2,
+    },
+
+    '2DDiMuon-WPlusMuonFinalBeamElectron'     :   {
+        'Requests'      :   {
+            'Vars'      :   [['Eta', 'Eta'], ['Phi', 'Phi'], ['Pt', 'Pt']],
+            'Particles' :   [['DiMuon'], ['WPlusMuonFinalBeamElectron']],
+        },
+        'Dimensions':   2,
+    },
+
 }
 
 # Dictionary to request hist comparisons
@@ -704,5 +753,17 @@ HistComparisonDict =    {
         },
 
         'Var'           :   ['Eta', 'Pt']    
+    },
+
+    '6'             :   {
+        'Hist1'         :   {
+            'Name'          :   'DiMuon',
+        },
+        
+        'Hist2'         :   {
+            'Name'          :   'WPlusMuonFinalBeamElectron',
+        },
+
+        'Var'           :   ['Eta', 'Phi', 'Pt']    
     }
 }
