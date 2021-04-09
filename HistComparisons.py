@@ -28,9 +28,10 @@ for arg in sys.argv:
 
     # Looks for arguements passing the runs to compare
     elif arg.split('_')[0].upper() == 'LOOP' or arg.split('_')[0].upper() == 'EVENT' or arg.split('_')[0].upper() == 'BACKGROUND':
-        level = arg.split('_')[0].upper()
-        run = arg.split('_')[1]
-        Runs[level][run] = True
+        if len(arg.split('_')) >= 2:
+            level = arg.split('_')[0].upper()
+            run = arg.split('_')[1]
+            Runs[level][run] = True
 
     elif arg.split('=')[0].upper() == 'NORM':
         if arg.split('=')[1].upper() == 'TRUE': 
