@@ -23,96 +23,6 @@ ParticleDict[name] = {
 }
 
 '''
-
-def RequestParticles(HistDict, ParticleDict):
-    '''
-        Adds requested particles to the HistDict.
-    '''
-
-    # Itterating through histogram categories
-    for category, attributes in HistDict.items():
-        
-        if attributes['Dimensions'] == 1:
-            # Itterating through particle requests
-            for particle in attributes['Requests']['Particles']:
-
-                # Particle check
-                if ParticleDict[particle]['Check']:
-                    attributes['Particles'].append(ParticleDict[particle])
-
-        elif attributes['Dimensions'] == 2:
-            attributes['Particles'] = [ [], [] ]
-            # Itterating through particle requests
-            for i in (0, 1):
-                ParticleSet = attributes['Requests']['Particles'][i]
-                for particle in ParticleSet:
-                    # Particle check
-                    if ParticleDict[particle]['Check']:
-                        attributes['Particles'][i].append(ParticleDict[particle])  
-
-    return HistDict
-
-def GetParticleVariable(var, ParticleList, category=None):
-    '''
-        Returns the value or list of variables for the given category : var
-        Category is only used for q calcs.
-    '''
-
-    # List of variables that are stored in all particles.
-    ParticleProperties = ['Charge', 'E', 'Eta', 'Phi', 'Rapidity', 'Theta', 'Pt', 'Et']
-
-    # Variables that can be calculated from one or multiple
-    # particles.
-    if len(ParticleList) != 0:
-
-        # Variables in ParticleProperties only require one particle so
-        # the hist can be filled by all particles in the list.
-        if var in ParticleProperties:
-            # Only alow 1D hists to return a list
-            ParticleVars = []
-            for i in range(0, len(ParticleList)):
-                ParticleVars.append(ParticleList[i][var])
-            return ParticleVars
-
-    if 2 <= len(ParticleList):
-
-        if var == 'InvMass':
-            ParticleSum = TLorentzVector()
-            for particle in ParticleList:
-                ParticleSum = particle['P4'] + ParticleSum
-            return ParticleSum.M()
-
-        elif var == 'q':
-            if category == 'qLepton' or category == 'qQuark':
-                q = (ParticleList[0]['P4'] - ParticleList[1]['P4']).Mag()
-            elif category == 'qeMethod':
-                q = TMath.Sqrt(2*ParticleList[0]['E']*ParticleList[1]['E']*(1 - TMath.Cos(ParticleList[0]['Theta'])))
-            return abs(q)
-
-        elif var == 'dEta':
-            dEta = ParticleList[0]['Eta'] - ParticleList[1]['Eta']
-            return dEta
-        
-        elif var == 'dPhi':
-            dPhi = ParticleList[0]['P4'].DeltaPhi(ParticleList[1]['P4'])
-            return dPhi
-
-        elif var == 'dRapidity':
-            dRap = ParticleList[0]['Rapidity'] - ParticleList[1]['Rapidity']
-            return dRap
-
-        elif var == 'dR_Eta':
-            dR_Eta = ParticleList[0]['P4'].DrEtaPhi(ParticleList[1]['P4'])
-            return dR_Eta
-
-        elif var == 'dR_Rap':
-            dPhi = ParticleList[0]['P4'].DeltaPhi(ParticleList[1]['P4'])
-            dRap = ParticleList[0]['Rapidity'] - ParticleList[1]['Rapidity']
-            # DrRapidityPhi function doesnt seem to work
-            dR_Rap = TMath.Sqrt( dPhi**2 + dRap**2 )
-            return dR_Rap    
-    return False
-
 def AddParticle(name, ParticleDict, P4=False, Charge=None):
         '''
             Given a name, charge, 4-momenta of a particle,
@@ -139,9 +49,110 @@ def AddParticle(name, ParticleDict, P4=False, Charge=None):
                 'Theta'     :   P4.Theta(),
                 'Pt'        :   P4.Pt(),
                 'Et'        :   P4.Et(),
+                'Mt'        :   P4.Mt(),
             }
         
         return ParticleDict
+
+
+def RequestParticles(HistDict, ParticleDict):
+    '''
+        Adds requested particles to the HistDict.
+    '''
+
+    # Itterating through histogram categories
+    for category, attributes in HistDict.items():
+        
+        if attributes['Dimensions'] == 1:
+            # Itterating through particle requests
+            for ParticleList_Index in range(len(attributes['Requests']['Particles'])):
+                attributes['Particles'].append([])
+                for particle in attributes['Requests']['Particles'][ParticleList_Index]:
+                    attributes['Particles'][ParticleList_Index].append(ParticleDict[particle])
+
+        elif attributes['Dimensions'] == 2:
+
+            # Itterating through particle requests
+            for Comparison_Index in range(len(attributes['Requests']['Particles'])):
+                attributes['Particles'].append([[], []])
+                for i in (0, 1):
+                    ParticleSet = attributes['Requests']['Particles'][Comparison_Index][i]
+                    for particle in ParticleSet:
+                        attributes['Particles'][Comparison_Index][i].append(ParticleDict[particle])  
+
+    return HistDict
+
+def GetParticleVariable(ParticleDict, ParticleList, var):
+    '''
+        Returns the value or list of variables for the given category : var
+        Category is only used for q calcs.
+    '''
+
+    # List of variables that are stored in all particles.
+    ParticleProperties = ['Charge', 'E', 'Eta', 'Phi', 'Rapidity', 'Theta', 'Pt', 'Et', 'Mt']
+
+
+    # If all particles are present
+    if all(particle['Check'] for particle in ParticleList):
+
+        # Variables in ParticleProperties only require one particle so
+        # the hist can be filled by all particles in the list.
+        if var in ParticleProperties:
+            # Only alow 1D hists to return a list
+            ParticleVars = []
+            for i in range(0, len(ParticleList)):
+                ParticleVars.append(ParticleList[i][var])
+            return ParticleVars
+
+        elif var == 'qLepton':
+            BeamParticle = ParticleDict['BeamElectron']
+            if BeamParticle['Check']:
+                q = (BeamParticle['P4'] - ParticleList[0]['P4']).Mag()
+                return q
+        
+        elif var == 'qQuark':
+            BeamParticle = ParticleDict['BeamQuark']
+            if BeamParticle['Check']:
+                q = (BeamParticle['P4'] - ParticleList[0]['P4']).Mag()
+                return q
+
+        elif var == 'qeMethod':
+            BeamParticle = ParticleDict['BeamElectron']
+            if BeamParticle['Check']:
+                q = TMath.Sqrt(2*BeamParticle['E']*ParticleList[0]['E']*(1 - TMath.Cos(BeamParticle['Theta'])))
+                return q
+
+        elif var == 'M':
+            ParticleSum = TLorentzVector()
+            for particle in ParticleList:
+                ParticleSum = particle['P4'] + ParticleSum
+            return ParticleSum.M()
+
+        elif var == 'dEta':
+            dEta = ParticleList[0]['Eta'] - ParticleList[1]['Eta']
+            return dEta
+        
+        elif var == 'dPhi':
+            dPhi = ParticleList[0]['P4'].DeltaPhi(ParticleList[1]['P4'])
+            return dPhi
+
+        elif var == 'dRapidity':
+            dRap = ParticleList[0]['Rapidity'] - ParticleList[1]['Rapidity']
+            return dRap
+
+        elif var == 'dR_Eta':
+            dR_Eta = ParticleList[0]['P4'].DrEtaPhi(ParticleList[1]['P4'])
+            return dR_Eta
+
+        elif var == 'dR_Rap':
+            dPhi = ParticleList[0]['P4'].DeltaPhi(ParticleList[1]['P4'])
+            dRap = ParticleList[0]['Rapidity'] - ParticleList[1]['Rapidity']
+            # DrRapidityPhi function doesnt seem to work
+            dR_Rap = TMath.Sqrt( dPhi**2 + dRap**2 )
+            return dR_Rap    
+
+    return False
+
 
 def InvMassCheck(particles, Boson, ParticleDict, EventDict):
     '''
