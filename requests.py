@@ -151,7 +151,7 @@ HistDict =  {
     'FinalBeamElectron' 
                     :   {
         'Requests'      :   {
-            'Vars'      :   ['Eta', 'Phi', 'Rapidity', 'Pt'],
+            'Vars'      :   ['Eta', 'Phi', 'Rapidity', 'Pt', 'qLepton', 'qeMethod'],
             'Particles' :   [['FinalBeamElectron']],
         },
         'Dimensions':   1,
@@ -215,7 +215,7 @@ HistDict =  {
 
     'FinalBeamJet'    :   {
         'Requests'      :   {
-            'Vars'      :   ['Eta', 'Phi', 'Rapidity', 'Pt'],
+            'Vars'      :   ['Eta', 'Phi', 'Rapidity', 'Pt', 'qQuark'],
             'Particles' :   [['FinalBeamJet']],
         },
         'Dimensions':   1,
@@ -287,7 +287,7 @@ HistDict =  {
 
     'WMinusMuon'     :   {
         'Requests'      :   {
-            'Vars'      :   ['Eta', 'Phi', 'Rapidity', 'Pt'],
+            'Vars'      :   ['Eta', 'Phi', 'Rapidity', 'Pt', 'qLepton', 'qeMethod'],
             'Particles' :   [['WMinusMuon']],
         },
         'Dimensions':   1,
@@ -339,33 +339,6 @@ HistDict =  {
         'Requests'      :   {
             'Vars'      :   ['Eta', 'Phi', 'Rapidity', 'Pt', 'M'],
             'Particles' :   [['ZLeadingJet', 'ZSubLeadingJet']],
-        },
-        'Dimensions':   1,
-    },    
-
-    'BeamElectronFinalBeamElectron'      
-                    :   {
-        'Requests'      :   {
-            'Vars'      :   ['qLepton', 'qeMethod'],
-            'Particles' :   [['FinalBeamElectron']],
-        },
-        'Dimensions':   1,
-    },    
-
-    'BeamQuarkFinalBeamJet'       
-                    :   {
-        'Requests'      :   {
-            'Vars'      :   ['qQuark'],
-            'Particles' :   [['FinalBeamJet']],
-        },
-        'Dimensions':   1,
-    },    
-
-    'BeamElectronWMinusMuon'      
-                    :   {
-        'Requests'      :   {
-            'Vars'      :   ['qLepton', 'qeMethod'],
-            'Particles' :   [['WMinusMuon']],
         },
         'Dimensions':   1,
     },    
@@ -728,7 +701,7 @@ HistDict =  {
         'Dimensions':   2,
     },
 
-    '2DBeamElectronFinalBeamElectron-BeamElectronWMinusMuon'     
+    '2DFinalBeamElectron-WMinusMuon'     
                     :   {
         'Requests'      :   {
             'Vars'      :   [['qLepton', 'qLepton'], ['qeMethod', 'qeMethod']],
@@ -832,11 +805,11 @@ HistComparisonDict =    {
 
     '7'             :   {
         'Hist1'         :   {
-            'Name'          :   'BeamElectronFinalBeamElectron',
+            'Name'          :   'FinalBeamElectron',
         },
         
         'Hist2'         :   {
-            'Name'          :   'BeamElectronWMinusMuon',
+            'Name'          :   'WMinusMuon',
         },
 
         'Var'           :   ['qeMethod', 'qLepton']    

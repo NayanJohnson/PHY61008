@@ -108,7 +108,12 @@ def MakeHists(HistDict):
         elif attributes['Dimensions'] == 2: 
             for pair in attributes['Requests']['Vars']:
                 histName = name+'_'+pair[0]+'_'+pair[1]
-                histTitle = histName+';'+pair[0]+';'+pair[1]+';Frequency'
+
+                if attributes['Requests']['Particles'][0][0] == attributes['Requests']['Particles'][0][1]:
+                    histTitle = histName+';'+pair[0]+';'+pair[1]+';Frequency'
+                else:
+                    histTitle = histName+';'+attributes['Requests']['Particles'][0][0][0]+'_'+pair[0]+';'+attributes['Requests']['Particles'][0][1][0]+'_'+pair[1]+';Frequency'
+
 
                 histXlow = VarParams[pair[0]]['Range'][0]
                 histXup = VarParams[pair[0]]['Range'][1]
@@ -188,16 +193,15 @@ def FillHists(HistDict, ParticleDict):
 
                     xVal = ParticleFuncs.GetParticleVariable(ParticleDict, xParticles, xVar)
                     yVal = ParticleFuncs.GetParticleVariable(ParticleDict, yParticles, yVar)
-                    
+
+                    # If values are returned
                     if xVal and yVal:
                     
-                        if type(xVal) == list and type(yVal) == list:
-                            # If values are returned
-                            
-                                # each element in xVal yVal corresponds to the corresponding particles
-                                # in xParticles, yParticles
-                                for x, y in zip(xVal, yVal):
-                                    hist.Fill(x, y)
+                        if type(xVal) == list and type(yVal) == list:                            
+                            # each element in xVal yVal corresponds to the corresponding particles
+                            # in xParticles, yParticles
+                            for x, y in zip(xVal, yVal):
+                                hist.Fill(x, y)
                         else:
                             hist.Fill(xVal, yVal)
 
