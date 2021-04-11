@@ -153,11 +153,9 @@ def ParticleLoop(TreeDict, EventNum, LevelRun, LoopRun):
                 
             # MissingE is the sum of all neutrino momenta in the event
             MissingET = TLorentzVector()
-            ParticleSum = TLorentzVector()
             for particle in MissingParticle:
-                ParticleSum = particle.P4() + ParticleSum
+                MissingET = particle.P4() + MissingET
             
-            MissingET = TLorentzVector( ParticleSum.Px(), ParticleSum.Py(), 0, ParticleSum.Et() )
 
     elif LevelRun == 'Detector':
             
@@ -436,7 +434,7 @@ def EventLoop(myTree, outfileprefix, LevelRun, LoopRun, EventRun, AnalysisRun):
 
             # Filling HistDict with particles then filling the hists
             HistDict = ParticleFuncs.RequestParticles(HistDict, ParticleDict)
-            HistFuncs.FillHists(HistDict)
+            HistFuncs.FillHists(HistDict, ParticleDict)
 
     # Get scaling factor for histograms
     Scale = HistFuncs.GetScale('tag_1_pythia.log', myTree['NEvents'])
