@@ -153,10 +153,11 @@ def ParticleLoop(TreeDict, EventNum, LevelRun, LoopRun):
                 
             # MissingE is the sum of all neutrino momenta in the event
             MissingET = TLorentzVector()
+            ParticleSum = TLorentzVector()
             for particle in MissingParticle:
-                particle.P4().SetPz(0)
-                particle.P4().SetE(particle.P4().Et())
-                MissingET = MissingET + particle.P4()
+                ParticleSum = particle.P4() + ParticleSum
+            
+            MissingET = TLorentzVector( ParticleSum.Px(), ParticleSum.Py(), 0, ParticleSum.Et() )
 
     elif LevelRun == 'Detector':
             

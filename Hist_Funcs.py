@@ -401,44 +401,83 @@ def CompareHist(HistProps):
     if Hist1File_Prefix == Hist2File_Prefix:
         Hist1.SetTitle(Hist1Name+'_'+Hist1Var)
         if Hist1Name == Hist2Name:
-            if Hist1File_LoopRun == Hist2File_LoopRun:
-                if Hist1File_EventRun == Hist2File_EventRun:
-                    if Hist1File_AnalysisRun == Hist2File_AnalysisRun:
-                        Legend1.SetHeader(Hist1Name)
-                        Legend2.SetHeader(Hist2Name)
+            if Hist1File_LevelRun == Hist2File_LevelRun:
+                if Hist1File_LoopRun == Hist2File_LoopRun:
+                    if Hist1File_EventRun == Hist2File_EventRun:
+                        if Hist1File_AnalysisRun == Hist2File_AnalysisRun:
+                            Legend1.SetHeader(Hist1Name)
+                            Legend2.SetHeader(Hist2Name)
+
+                        else:
+                            Legend1.SetHeader('Background'+Hist1File_AnalysisRun)
+                            Legend2.SetHeader('Background'+Hist2File_AnalysisRun)
 
                     else:
-                        Legend1.SetHeader('Background'+Hist1File_AnalysisRun)
-                        Legend2.SetHeader('Background'+Hist2File_AnalysisRun)
+                        if Hist1File_AnalysisRun == Hist2File_AnalysisRun:
+                            Legend1.SetHeader('Event'+Hist1File_EventRun)
+                            Legend2.SetHeader('Event'+Hist2File_EventRun)
+
+                        else:                 
+                            Legend1.SetHeader('Event'+Hist1File_EventRun+'Background'+Hist1File_AnalysisRun)
+                            Legend2.SetHeader('Event'+Hist2File_EventRun+'Background'+Hist2File_AnalysisRun)
 
                 else:
-                    if Hist1File_AnalysisRun == Hist2File_AnalysisRun:
-                        Legend1.SetHeader('Event'+Hist1File_EventRun)
-                        Legend2.SetHeader('Event'+Hist2File_EventRun)
+                    if Hist1File_EventRun == Hist2File_EventRun:
+                        if Hist1File_AnalysisRun == Hist2File_AnalysisRun:
+                            Legend1.SetHeader('Loop'+Hist1File_LoopRun)
+                            Legend2.SetHeader('Loop'+Hist2File_LoopRun)
 
-                    else:                 
-                        Legend1.SetHeader('Event'+Hist1File_EventRun+'Background'+Hist1File_AnalysisRun)
-                        Legend2.SetHeader('Event'+Hist2File_EventRun+'Background'+Hist2File_AnalysisRun)
+                        else:
+                            Legend1.SetHeader('Loop'+Hist1File_LoopRun+'Background'+Hist1File_AnalysisRun)
+                            Legend2.SetHeader('Loop'+Hist2File_LoopRun+'Background'+Hist2File_AnalysisRun)
 
+                    else:
+                        if Hist1File_AnalysisRun == Hist2File_AnalysisRun:
+                            Legend1.SetHeader('Loop'+Hist1File_LoopRun+'Event'+Hist1File_EventRun)
+                            Legend2.SetHeader('Loop'+Hist2File_LoopRun+'Event'+Hist2File_EventRun)
+
+                        else:                 
+                            Legend1.SetHeader('Loop'+Hist1File_LoopRun+'Event'+Hist1File_EventRun+'Background'+Hist1File_AnalysisRun)
+                            Legend2.SetHeader('Loop'+Hist2File_LoopRun+'Event'+Hist2File_EventRun+'Background'+Hist2File_AnalysisRun)
             else:
-                if Hist1File_EventRun == Hist2File_EventRun:
-                    if Hist1File_AnalysisRun == Hist2File_AnalysisRun:
-                        Legend1.SetHeader('Loop'+Hist1File_LoopRun)
-                        Legend2.SetHeader('Loop'+Hist2File_LoopRun)
+                if Hist1File_LoopRun == Hist2File_LoopRun:
+                    if Hist1File_EventRun == Hist2File_EventRun:
+                        if Hist1File_AnalysisRun == Hist2File_AnalysisRun:
+                            Legend1.SetHeader(Hist1File_LevelRun+'Level')
+                            Legend2.SetHeader(Hist2File_LevelRun+'Level')
+
+                        else:
+                            Legend1.SetHeader(Hist1File_LevelRun+'Level_Background'+Hist1File_AnalysisRun)
+                            Legend2.SetHeader(Hist2File_LevelRun+'Level_Background'+Hist2File_AnalysisRun)
 
                     else:
-                        Legend1.SetHeader('Loop'+Hist1File_LoopRun+'Background'+Hist1File_AnalysisRun)
-                        Legend2.SetHeader('Loop'+Hist2File_LoopRun+'Background'+Hist2File_AnalysisRun)
+                        if Hist1File_AnalysisRun == Hist2File_AnalysisRun:
+                            Legend1.SetHeader(Hist1File_LevelRun+'Level_Event'+Hist1File_EventRun)
+                            Legend2.SetHeader(Hist2File_LevelRun+'Level_Event'+Hist2File_EventRun)
+
+                        else:                 
+                            Legend1.SetHeader(Hist1File_LevelRun+'Level_Event'+Hist1File_EventRun+'Background'+Hist1File_AnalysisRun)
+                            Legend2.SetHeader(Hist2File_LevelRun+'Level_Event'+Hist2File_EventRun+'Background'+Hist2File_AnalysisRun)
 
                 else:
-                    if Hist1File_AnalysisRun == Hist2File_AnalysisRun:
-                        Legend1.SetHeader('Loop'+Hist1File_LoopRun+'Event'+Hist1File_EventRun)
-                        Legend2.SetHeader('Loop'+Hist2File_LoopRun+'Event'+Hist2File_EventRun)
+                    if Hist1File_EventRun == Hist2File_EventRun:
+                        if Hist1File_AnalysisRun == Hist2File_AnalysisRun:
+                            Legend1.SetHeader(Hist1File_LevelRun+'Level_Loop'+Hist1File_LoopRun)
+                            Legend2.SetHeader(Hist2File_LevelRun+'Level_Loop'+Hist2File_LoopRun)
 
-                    else:                 
-                        Legend1.SetHeader('Loop'+Hist1File_LoopRun+'Event'+Hist1File_EventRun+'Background'+Hist1File_AnalysisRun)
-                        Legend2.SetHeader('Loop'+Hist2File_LoopRun+'Event'+Hist2File_EventRun+'Background'+Hist2File_AnalysisRun)
-        
+                        else:
+                            Legend1.SetHeader(Hist1File_LevelRun+'Level_Loop'+Hist1File_LoopRun+'Background'+Hist1File_AnalysisRun)
+                            Legend2.SetHeader(Hist2File_LevelRun+'Level_Loop'+Hist2File_LoopRun+'Background'+Hist2File_AnalysisRun)
+
+                    else:
+                        if Hist1File_AnalysisRun == Hist2File_AnalysisRun:
+                            Legend1.SetHeader(Hist1File_LevelRun+'Level_Loop'+Hist1File_LoopRun+'Event'+Hist1File_EventRun)
+                            Legend2.SetHeader(Hist2File_LevelRun+'Level_Loop'+Hist2File_LoopRun+'Event'+Hist2File_EventRun)
+
+                        else:                 
+                            Legend1.SetHeader(Hist1File_LevelRun+'Level_Loop'+Hist1File_LoopRun+'Event'+Hist1File_EventRun+'Background'+Hist1File_AnalysisRun)
+                            Legend2.SetHeader(Hist2File_LevelRun+'Level_Loop'+Hist2File_LoopRun+'Event'+Hist2File_EventRun+'Background'+Hist2File_AnalysisRun)
+
         else:
             Legend1.SetHeader(Hist1Name)
             Legend2.SetHeader(Hist2Name)
