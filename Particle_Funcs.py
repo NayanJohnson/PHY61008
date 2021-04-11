@@ -5,13 +5,13 @@ import config, requests, itertools
 import Loop_Funcs as LoopFuncs
 import Hist_Funcs as HistFuncs
 
-"""
+'''
 Definitions of used objects:
 
 ParticleDict[name] = {
     'Check'     :   check,
     'Name'      :   name,
-    'PID'       :   PID,
+    'Charge'    :   Charge,
     'P4'        :   P4,
     'E'         :   P4.E(),
     'Eta'       :   P4.Eta(),
@@ -22,42 +22,11 @@ ParticleDict[name] = {
     'Et'        :   P4.Et()
 }
 
-"""
+'''
 
 def RequestParticles(HistDict, ParticleDict):
     '''
         Adds requested particles to the HistDict.
-        Histogram dictionary should be in the following format:
-        HistDict =        {
-            category        :   {
-                Requests        :   {
-                    Vars            :   [],
-                    Particles       :   []
-                },
-
-                Vars        :   [],
-                Particles   :   [],
-                Hists       :   {
-                    Var1        :   Hist1,
-                    Var2        :   Hist2
-                }
-            }
-        }
-        
-        Particle dictionary should be in the following format:
-        ParticleDict[name] = {
-            'Check'     :   check,
-            'Name'      :   name,
-            'PID'       :   PID,
-            'P4'        :   P4,
-            'E'         :   P4.E(),
-            'Eta'       :   P4.Eta(),
-            'Phi'       :   P4.Phi(),
-            'Rapidity'  :   P4.Rapidity(),
-            'Theta'     :   P4.Theta(),
-            'Pt'        :   P4.Pt(),
-            'Et'        :   P4.Et()
-        }
     '''
 
     # Itterating through histogram categories
@@ -90,7 +59,7 @@ def GetParticleVariable(var, ParticleList, category=None):
     '''
 
     # List of variables that are stored in all particles.
-    ParticleProperties = ['PID', 'E', 'Eta', 'Phi', 'Rapidity', 'Theta', 'Pt', 'Et']
+    ParticleProperties = ['Charge', 'E', 'Eta', 'Phi', 'Rapidity', 'Theta', 'Pt', 'Et']
 
     # Variables that can be calculated from one or multiple
     # particles.
@@ -144,9 +113,9 @@ def GetParticleVariable(var, ParticleList, category=None):
             return dR_Rap    
     return False
 
-def AddParticle(name, ParticleDict, P4=False, PID=None):
+def AddParticle(name, ParticleDict, P4=False, Charge=None):
         '''
-            Given a name, PID, 4-momenta of a particle,
+            Given a name, charge, 4-momenta of a particle,
             will add a particle dict of various properties to an existing
             dict.
         '''
@@ -161,7 +130,7 @@ def AddParticle(name, ParticleDict, P4=False, PID=None):
             ParticleDict[name] = {
                 'Check'     :   True,
                 'Name'      :   name,
-                'PID'       :   PID,
+                'Charge'    :   Charge,
                 'P4'        :   P4,
                 'E'         :   P4.E(),
                 'Eta'       :   P4.Eta(),

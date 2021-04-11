@@ -6,7 +6,7 @@ import Loop_Funcs as LoopFuncs
 
 
 
-"""
+'''
 Definitions of used objects:
 
 HistDict =        {
@@ -44,7 +44,7 @@ for 2D:
     Particles   :   [( xparticle1, xparticle2 ...), (y1particle1, yparticle2, ...)],
     Hists       :   {name1 : hist1, ... },
 
-"""
+'''
 
 def GetScale(PythiaLogPath, NEvents):
     '''
@@ -53,7 +53,7 @@ def GetScale(PythiaLogPath, NEvents):
         cross section. 
     '''
 
-    with open(PythiaLogPath, "r") as file:
+    with open(PythiaLogPath, 'r') as file:
         lines = file.read().splitlines()
         # Xsec is the last element of the last line
         Xsec = float(lines[-1].split()[-1])
@@ -266,7 +266,7 @@ def CompareHist(HistProps):
                 'Prefix'        :   HistFile1_Prefix,
                 'LoopRun'       :   HistFile1_LoopRun,
                 'EventRun'      :   HistFile1_EventRun,
-                'BackgroundRun' :   HistFile1_BackgroundRun,
+                'AnalysisRun' :   HistFile1_AnalysisRun,
                 'Name'          :   HistFile1_Name,
 
                 'File'          :   TFile(HistFile1_Name+'.root')
@@ -276,7 +276,7 @@ def CompareHist(HistProps):
                 'Prefix'        :   HistFile2_Prefix,
                 'LoopRun'       :   HistFile2_LoopRun,
                 'EventRun'      :   HistFile2_EventRun,
-                'BackgroundRun' :   HistFile2_BackgroundRun,
+                'AnalysisRun'   :   HistFile2_AnalysisRun,
                 'Name'          :   HistFile2_Name,
 
                 'File'          :   TFile(HistFile2_Name+'.root')
@@ -314,19 +314,20 @@ def CompareHist(HistProps):
     Hist1 = HistProps['Hist1']['FileDict']['File'].Get(Hist1Name+'_'+Hist1Var+';1')
 
     Hist1File_Prefix = HistProps['Hist1']['FileDict']['Prefix']
+    Hist1File_LevelRun = HistProps['Hist1']['FileDict']['LevelRun']
     Hist1File_LoopRun = HistProps['Hist1']['FileDict']['LoopRun']
     Hist1File_EventRun = HistProps['Hist1']['FileDict']['EventRun']
-    Hist1File_BackgroundRun = HistProps['Hist1']['FileDict']['BackgroundRun']
+    Hist1File_AnalysisRun = HistProps['Hist1']['FileDict']['AnalysisRun']
 
     Hist2Name = HistProps['Hist2']['HistName']
     Hist2Var = HistProps['Hist2']['HistVar']
     Hist2 = HistProps['Hist2']['FileDict']['File'].Get(Hist2Name+'_'+Hist2Var+';1')
     
     Hist2File_Prefix = HistProps['Hist2']['FileDict']['Prefix']
+    Hist2File_LevelRun = HistProps['Hist2']['FileDict']['LevelRun']
     Hist2File_LoopRun = HistProps['Hist2']['FileDict']['LoopRun']
     Hist2File_EventRun = HistProps['Hist2']['FileDict']['EventRun']
-    Hist2File_BackgroundRun = HistProps['Hist2']['FileDict']['BackgroundRun']
-
+    Hist2File_AnalysisRun = HistProps['Hist2']['FileDict']['AnalysisRun']
 
     Hist1, Lims1 = HistLims(Hist1, Hist1Var, Norm=Norm)
     Hist2, Lims2 = HistLims(Hist2, Hist2Var, Norm=Norm)
@@ -376,8 +377,8 @@ def CompareHist(HistProps):
     Legend1.SetShadowColor(2)
     Legend1.SetHeader(Hist1Name)
     # Entries
-    Legend1.AddEntry("entries","Entries: "+str(int(Hist1.GetEntries())))
-    Legend1.AddEntry(Hist1, "Line Color", "l")
+    Legend1.AddEntry('entries','Entries: '+str(int(Hist1.GetEntries())))
+    Legend1.AddEntry(Hist1, 'Line Color', 'l')
     Legend1.SetTextSize(0.025)
     Legend1.SetTextColor(1)
     # Seperation is small, but will be maximised to the bounds of the TLegend
@@ -390,8 +391,8 @@ def CompareHist(HistProps):
     Legend2.SetBorderSize(1)
     Legend2.SetShadowColor(2)
     # Entries
-    Legend2.AddEntry("entries","Entries: "+str(int(Hist2.GetEntries())))
-    Legend2.AddEntry(Hist2, "Line Color", "l")
+    Legend2.AddEntry('entries','Entries: '+str(int(Hist2.GetEntries())))
+    Legend2.AddEntry(Hist2, 'Line Color', 'l')
     Legend2.SetTextSize(0.025)       
     # Seperation is small, but will be maximised to the bounds of the TLegend
     # box
@@ -402,41 +403,41 @@ def CompareHist(HistProps):
         if Hist1Name == Hist2Name:
             if Hist1File_LoopRun == Hist2File_LoopRun:
                 if Hist1File_EventRun == Hist2File_EventRun:
-                    if Hist1File_BackgroundRun == Hist2File_BackgroundRun:
+                    if Hist1File_AnalysisRun == Hist2File_AnalysisRun:
                         Legend1.SetHeader(Hist1Name)
                         Legend2.SetHeader(Hist2Name)
 
                     else:
-                        Legend1.SetHeader('Background'+Hist1File_BackgroundRun)
-                        Legend2.SetHeader('Background'+Hist2File_BackgroundRun)
+                        Legend1.SetHeader('Background'+Hist1File_AnalysisRun)
+                        Legend2.SetHeader('Background'+Hist2File_AnalysisRun)
 
                 else:
-                    if Hist1File_BackgroundRun == Hist2File_BackgroundRun:
+                    if Hist1File_AnalysisRun == Hist2File_AnalysisRun:
                         Legend1.SetHeader('Event'+Hist1File_EventRun)
                         Legend2.SetHeader('Event'+Hist2File_EventRun)
 
                     else:                 
-                        Legend1.SetHeader('Event'+Hist1File_EventRun+'Background'+Hist1File_BackgroundRun)
-                        Legend2.SetHeader('Event'+Hist2File_EventRun+'Background'+Hist2File_BackgroundRun)
+                        Legend1.SetHeader('Event'+Hist1File_EventRun+'Background'+Hist1File_AnalysisRun)
+                        Legend2.SetHeader('Event'+Hist2File_EventRun+'Background'+Hist2File_AnalysisRun)
 
             else:
                 if Hist1File_EventRun == Hist2File_EventRun:
-                    if Hist1File_BackgroundRun == Hist2File_BackgroundRun:
+                    if Hist1File_AnalysisRun == Hist2File_AnalysisRun:
                         Legend1.SetHeader('Loop'+Hist1File_LoopRun)
                         Legend2.SetHeader('Loop'+Hist2File_LoopRun)
 
                     else:
-                        Legend1.SetHeader('Loop'+Hist1File_LoopRun+'Background'+Hist1File_BackgroundRun)
-                        Legend2.SetHeader('Loop'+Hist2File_LoopRun+'Background'+Hist2File_BackgroundRun)
+                        Legend1.SetHeader('Loop'+Hist1File_LoopRun+'Background'+Hist1File_AnalysisRun)
+                        Legend2.SetHeader('Loop'+Hist2File_LoopRun+'Background'+Hist2File_AnalysisRun)
 
                 else:
-                    if Hist1File_BackgroundRun == Hist2File_BackgroundRun:
+                    if Hist1File_AnalysisRun == Hist2File_AnalysisRun:
                         Legend1.SetHeader('Loop'+Hist1File_LoopRun+'Event'+Hist1File_EventRun)
                         Legend2.SetHeader('Loop'+Hist2File_LoopRun+'Event'+Hist2File_EventRun)
 
                     else:                 
-                        Legend1.SetHeader('Loop'+Hist1File_LoopRun+'Event'+Hist1File_EventRun+'Background'+Hist1File_BackgroundRun)
-                        Legend2.SetHeader('Loop'+Hist2File_LoopRun+'Event'+Hist2File_EventRun+'Background'+Hist2File_BackgroundRun)
+                        Legend1.SetHeader('Loop'+Hist1File_LoopRun+'Event'+Hist1File_EventRun+'Background'+Hist1File_AnalysisRun)
+                        Legend2.SetHeader('Loop'+Hist2File_LoopRun+'Event'+Hist2File_EventRun+'Background'+Hist2File_AnalysisRun)
         
         else:
             Legend1.SetHeader(Hist1Name)
@@ -455,22 +456,22 @@ def CompareHist(HistProps):
     if Hist1.GetDimension() == 1:
         # Force both to be drawn as hist and on the same canvas
         Hist1.SetLineColor(4)        
-        Hist1.Draw("HIST same")
+        Hist1.Draw('HIST same')
         Hist2.SetLineColor(2)
-        Hist2.Draw("HIST same")
+        Hist2.Draw('HIST same')
     elif Hist1.GetDimension() == 2:
         TColor.SetPalette(59, 0)
-        Hist1.Draw("COLZ same")
+        Hist1.Draw('COLZ same')
         
         TColor.SetPalette(60, 0)
-        Hist2.Draw("COLZ same")
+        Hist2.Draw('COLZ same')
 
-    Legend1.Draw("same")
-    Legend2.Draw("same")
+    Legend1.Draw('same')
+    Legend2.Draw('same')
 
     HistCan.Update()
     
     if Hist1Name == Hist2Name:
-        HistCan.SaveAs(Comparison+'_'+Hist1File_Prefix+'-'+Hist2File_Prefix+'/Loop'+Hist1File_LoopRun+'-'+Hist2File_LoopRun+'/Event'+Hist1File_EventRun+'-'+Hist2File_EventRun+'/Background'+Hist1File_BackgroundRun+'-'+Hist2File_BackgroundRun+'/'+Hist1Name+Hist1Var+'.png')
+        HistCan.SaveAs(Comparison+'_'+Hist1File_Prefix+'-'+Hist2File_Prefix+'/'+Hist1File_LevelRun+'-'+Hist2File_LevelRun+'Level/Loop'+Hist1File_LoopRun+'-'+Hist2File_LoopRun+'/Event'+Hist1File_EventRun+'-'+Hist2File_EventRun+'/Background'+Hist1File_AnalysisRun+'-'+Hist2File_AnalysisRun+'/'+Hist1Name+Hist1Var+'.png')
     else:
-        HistCan.SaveAs(Comparison+'_'+Hist1File_Prefix+'-'+Hist2File_Prefix+'/Loop'+Hist1File_LoopRun+'-'+Hist2File_LoopRun+'/Event'+Hist1File_EventRun+'-'+Hist2File_EventRun+'/Background'+Hist1File_BackgroundRun+'-'+Hist2File_BackgroundRun+'/'+Hist1Name+Hist2Name+Hist1Var+'.png')
+        HistCan.SaveAs(Comparison+'_'+Hist1File_Prefix+'-'+Hist2File_Prefix+'/'+Hist1File_LevelRun+'-'+Hist2File_LevelRun+'Level/Loop'+Hist1File_LoopRun+'-'+Hist2File_LoopRun+'/Event'+Hist1File_EventRun+'-'+Hist2File_EventRun+'/Background'+Hist1File_AnalysisRun+'-'+Hist2File_AnalysisRun+'/'+Hist1Name+Hist2Name+Hist1Var+'.png')
