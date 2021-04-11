@@ -108,19 +108,19 @@ def GetParticleVariable(ParticleDict, ParticleList, var):
             BeamParticle = ParticleDict['BeamElectron']
             if BeamParticle['Check']:
                 q = (BeamParticle['P4'] - ParticleList[0]['P4']).Mag()
-                return q
+                return abs(q)
         
         elif var == 'qQuark':
             BeamParticle = ParticleDict['BeamQuark']
             if BeamParticle['Check']:
                 q = (BeamParticle['P4'] - ParticleList[0]['P4']).Mag()
-                return q
+                return abs(q)
 
         elif var == 'qeMethod':
             BeamParticle = ParticleDict['BeamElectron']
             if BeamParticle['Check']:
                 q = TMath.Sqrt(2*BeamParticle['E']*ParticleList[0]['E']*(1 - TMath.Cos(BeamParticle['Theta'])))
-                return q
+                return abs(q)
 
         elif var == 'M':
             ParticleSum = TLorentzVector()

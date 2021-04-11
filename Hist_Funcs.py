@@ -153,7 +153,6 @@ def FillHists(HistDict, ParticleDict):
     for category, attributes in HistDict.items():
         if attributes['Dimensions'] == 1:
             for xVar, hist in attributes['Hists'].items():
-                
 
                 # Count var can be read straight from attributes
                 if xVar == 'Count': 
@@ -189,13 +188,18 @@ def FillHists(HistDict, ParticleDict):
 
                     xVal = ParticleFuncs.GetParticleVariable(ParticleDict, xParticles, xVar)
                     yVal = ParticleFuncs.GetParticleVariable(ParticleDict, yParticles, yVar)
-
-                    # If values are returned
+                    
                     if xVal and yVal:
-                        # each element in xVal yVal corresponds to the corresponding particles
-                        # in xParticles, yParticles
-                        for x, y in zip(xVal, yVal):
-                            hist.Fill(x, y)
+                    
+                        if type(xVal) == list and type(yVal) == list:
+                            # If values are returned
+                            
+                                # each element in xVal yVal corresponds to the corresponding particles
+                                # in xParticles, yParticles
+                                for x, y in zip(xVal, yVal):
+                                    hist.Fill(x, y)
+                        else:
+                            hist.Fill(xVal, yVal)
 
 def HistLims(hist, var, Scale=1, Norm=False):
     '''
@@ -332,6 +336,7 @@ def CompareHist(HistProps):
     Hist2File_EventRun = HistProps['Hist2']['FileDict']['EventRun']
     Hist2File_AnalysisRun = HistProps['Hist2']['FileDict']['AnalysisRun']
 
+    # print(HistProps)
     Hist1, Lims1 = HistLims(Hist1, Hist1Var, Norm=Norm)
     Hist2, Lims2 = HistLims(Hist2, Hist2Var, Norm=Norm)
 
