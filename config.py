@@ -34,7 +34,7 @@ EventLoopParams = {
             },
         },
 
-        'Background'     :   {
+        'Analysis'     :   {
             'Cuts'              :   {
                 'BeamElectron'      :   {
                     'Eta'               :   (-1, float('inf')),
