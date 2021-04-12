@@ -695,7 +695,7 @@ HistDict =  {
     '2DDiMuon-WPlusMuonFinalBeamElectron'     
                     :   {
         'Requests'      :   {
-            'Vars'      :   [['Eta', 'Eta'], ['Phi', 'Phi'], ['Pt', 'Pt']],
+            'Vars'      :   [['Eta', 'Eta'], ['Phi', 'Phi'], ['Pt', 'Pt'], ['M', 'M']],
             'Particles' :   [[['DiMuon'], ['WPlusMuonFinalBeamElectron']]],
         },
         'Dimensions':   2,
@@ -704,7 +704,7 @@ HistDict =  {
     '2DFinalBeamElectron-WMinusMuon'     
                     :   {
         'Requests'      :   {
-            'Vars'      :   [['qLepton', 'qLepton'], ['qeMethod', 'qeMethod'], ['M', 'M']],
+            'Vars'      :   [['qLepton', 'qLepton'], ['qeMethod', 'qeMethod']],
             'Particles' :   [[['FinalBeamElectron'], ['WMinusMuon']]],
         },
         'Dimensions':   2,
