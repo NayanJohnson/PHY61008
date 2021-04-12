@@ -1,4 +1,6 @@
 from ROOT import TH1F, TH2F, TCanvas, TLegend, SetOwnership, TColor
+# Needed to allow use of kInfo, gErrorIgnoreLevel
+import ROOT
 
 import config, requests, itertools
 import Particle_Funcs as ParticleFuncs
@@ -45,6 +47,25 @@ for 2D:
     Hists       :   {name1 : hist1, ... },
 
 '''
+
+class Quiet:
+    """Context manager for silencing certain ROOT operations.  Usage:
+    with Quiet(level = ROOT.kInfo+1):
+       foo_that_makes_output
+
+    You can set a higher or lower warning level to ignore different
+    kinds of messages.  After the end of indentation, the level is set
+    back to what it was previously.
+    """
+    def __init__(self, level=ROOT.kInfo + 1):
+        self.level = level
+
+    def __enter__(self):
+        self.oldlevel = ROOT.gErrorIgnoreLevel
+        ROOT.gErrorIgnoreLevel = self.level
+
+    def __exit__(self, type, value, traceback):
+        ROOT.gErrorIgnoreLevel = self.oldlevel
 
 def GetScale(PythiaLogPath, NEvents):
     '''
@@ -476,8 +497,8 @@ def CompareHist(HistProps):
     Legend2.Draw('same')
 
     HistCan.Update()
-    
-    if Hist1Name == Hist2Name:
-        HistCan.SaveAs(Comparison+'_'+Hist1File_Prefix+'-'+Hist2File_Prefix+'/'+Hist1File_LevelRun+'-'+Hist2File_LevelRun+'Level/Loop'+Hist1File_LoopRun+'-'+Hist2File_LoopRun+'/Event'+Hist1File_EventRun+'-'+Hist2File_EventRun+'/Analysis'+Hist1File_AnalysisRun+'-'+Hist2File_AnalysisRun+'/'+Hist1Name+Hist1Var+'.png')
-    else:
-        HistCan.SaveAs(Comparison+'_'+Hist1File_Prefix+'-'+Hist2File_Prefix+'/'+Hist1File_LevelRun+'-'+Hist2File_LevelRun+'Level/Loop'+Hist1File_LoopRun+'-'+Hist2File_LoopRun+'/Event'+Hist1File_EventRun+'-'+Hist2File_EventRun+'/Analysis'+Hist1File_AnalysisRun+'-'+Hist2File_AnalysisRun+'/'+Hist1Name+Hist2Name+Hist1Var+'.png')
+    with Quiet():
+        if Hist1Name == Hist2Name:
+            HistCan.SaveAs(Comparison+'_'+Hist1File_Prefix+'-'+Hist2File_Prefix+'/'+Hist1File_LevelRun+'-'+Hist2File_LevelRun+'Level/Loop'+Hist1File_LoopRun+'-'+Hist2File_LoopRun+'/Event'+Hist1File_EventRun+'-'+Hist2File_EventRun+'/Analysis'+Hist1File_AnalysisRun+'-'+Hist2File_AnalysisRun+'/'+Hist1Name+Hist1Var+'.png')
+        else:
+            HistCan.SaveAs(Comparison+'_'+Hist1File_Prefix+'-'+Hist2File_Prefix+'/'+Hist1File_LevelRun+'-'+Hist2File_LevelRun+'Level/Loop'+Hist1File_LoopRun+'-'+Hist2File_LoopRun+'/Event'+Hist1File_EventRun+'-'+Hist2File_EventRun+'/Analysis'+Hist1File_AnalysisRun+'-'+Hist2File_AnalysisRun+'/'+Hist1Name+Hist2Name+Hist1Var+'.png')
