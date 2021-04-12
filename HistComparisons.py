@@ -108,14 +108,14 @@ for FilePair in FileCombinations:
                         HistFile1_LoopRun = LoopRunPair[0]
                         HistFile1_EventRun = EventRunPair[0]
                         HistFile1_AnalysisRun = AnalysisRunPair[0]
-                        HistFile1_Name = HistFile1_Prefix+'_'+HistFile1_LevelRun+'Level_Loop'+HistFile1_LoopRun+'Event'+HistFile1_EventRun+'Background'+HistFile1_AnalysisRun
+                        HistFile1_Name = HistFile1_Prefix+'_'+HistFile1_LevelRun+'Level_Loop'+HistFile1_LoopRun+'Event'+HistFile1_EventRun+'Analysis'+HistFile1_AnalysisRun
 
                         HistFile2_Prefix = FilePair[1]
                         HistFile2_LevelRun = LevelRunPair[1]
                         HistFile2_LoopRun = LoopRunPair[1]
                         HistFile2_EventRun = EventRunPair[1]
                         HistFile2_AnalysisRun = AnalysisRunPair[1]
-                        HistFile2_Name = HistFile2_Prefix+'_'+HistFile2_LevelRun+'Level_Loop'+HistFile2_LoopRun+'Event'+HistFile2_EventRun+'Background'+HistFile2_AnalysisRun
+                        HistFile2_Name = HistFile2_Prefix+'_'+HistFile2_LevelRun+'Level_Loop'+HistFile2_LoopRun+'Event'+HistFile2_EventRun+'Analysis'+HistFile2_AnalysisRun
                         
                         if Norm:
                             Comparison = 'Norm'
@@ -126,7 +126,7 @@ for FilePair in FileCombinations:
                         gSystem.Exec('mkdir '+Comparison+'_'+HistFile1_Prefix+'-'+HistFile2_Prefix+'/'+HistFile1_LevelRun+'-'+HistFile2_LevelRun+'Level/')
                         gSystem.Exec('mkdir '+Comparison+'_'+HistFile1_Prefix+'-'+HistFile2_Prefix+'/'+HistFile1_LevelRun+'-'+HistFile2_LevelRun+'Level/Loop'+HistFile1_LoopRun+'-'+HistFile2_LoopRun)
                         gSystem.Exec('mkdir '+Comparison+'_'+HistFile1_Prefix+'-'+HistFile2_Prefix+'/'+HistFile1_LevelRun+'-'+HistFile2_LevelRun+'Level/Loop'+HistFile1_LoopRun+'-'+HistFile2_LoopRun+'/Event'+HistFile1_EventRun+'-'+HistFile2_EventRun+'/')
-                        gSystem.Exec('mkdir '+Comparison+'_'+HistFile1_Prefix+'-'+HistFile2_Prefix+'/'+HistFile1_LevelRun+'-'+HistFile2_LevelRun+'Level/Loop'+HistFile1_LoopRun+'-'+HistFile2_LoopRun+'/Event'+HistFile1_EventRun+'-'+HistFile2_EventRun+'/Background'+HistFile1_AnalysisRun+'-'+HistFile2_AnalysisRun+'/')
+                        gSystem.Exec('mkdir '+Comparison+'_'+HistFile1_Prefix+'-'+HistFile2_Prefix+'/'+HistFile1_LevelRun+'-'+HistFile2_LevelRun+'Level/Loop'+HistFile1_LoopRun+'-'+HistFile2_LoopRun+'/Event'+HistFile1_EventRun+'-'+HistFile2_EventRun+'/Analysis'+HistFile1_AnalysisRun+'-'+HistFile2_AnalysisRun+'/')
 
 
                         # Read hist files

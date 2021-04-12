@@ -336,7 +336,7 @@ def EventLoop(myTree, outfileprefix, LevelRun, LoopRun, EventRun, AnalysisRun):
     '''
     '''
 
-    outfilename = outfileprefix+'_'+LevelRun+'Level_Loop'+LoopRun+'Event'+EventRun+'Background'+AnalysisRun+'.root'
+    outfilename = outfileprefix+'_'+LevelRun+'Level_Loop'+LoopRun+'Event'+EventRun+'Analysis'+AnalysisRun+'.root'
 
     # Open output
     outfile = TFile(outfilename,'RECREATE')
@@ -347,7 +347,7 @@ def EventLoop(myTree, outfileprefix, LevelRun, LoopRun, EventRun, AnalysisRun):
     HistDict = HistFuncs.MakeHists(HistDict)
 
     EventCuts = config.EventLoopParams['Level']['Event'][EventRun]
-    BackgroundCuts = config.EventLoopParams['Level']['Background'][AnalysisRun] 
+    AnalysisCuts = config.EventLoopParams['Level']['Analysis'][AnalysisRun] 
 
     Zdecays = config.EventLoopParams['Z']['Decays']
     WPlusdecays = config.EventLoopParams['WPlus']['Decays']
@@ -363,7 +363,7 @@ def EventLoop(myTree, outfileprefix, LevelRun, LoopRun, EventRun, AnalysisRun):
 
         # Cuts out electrons in the PTSorted list and then takes the leading result as the beam electron
         for particle in EventDict['PTSorted']['Electron']:
-            if BackgroundCuts['BeamElectron']['Eta'][0] <= particle[1].P4().Eta() <= BackgroundCuts['BeamElectron']['Eta'][1]:
+            if AnalysisCuts['BeamElectron']['Eta'][0] <= particle[1].P4().Eta() <= AnalysisCuts['BeamElectron']['Eta'][1]:
                 continue
             else:
                 FinalBeamElectron_Sorted.remove(particle)

@@ -478,6 +478,6 @@ def CompareHist(HistProps):
     HistCan.Update()
     
     if Hist1Name == Hist2Name:
-        HistCan.SaveAs(Comparison+'_'+Hist1File_Prefix+'-'+Hist2File_Prefix+'/'+Hist1File_LevelRun+'-'+Hist2File_LevelRun+'Level/Loop'+Hist1File_LoopRun+'-'+Hist2File_LoopRun+'/Event'+Hist1File_EventRun+'-'+Hist2File_EventRun+'/Background'+Hist1File_AnalysisRun+'-'+Hist2File_AnalysisRun+'/'+Hist1Name+Hist1Var+'.png')
+        HistCan.SaveAs(Comparison+'_'+Hist1File_Prefix+'-'+Hist2File_Prefix+'/'+Hist1File_LevelRun+'-'+Hist2File_LevelRun+'Level/Loop'+Hist1File_LoopRun+'-'+Hist2File_LoopRun+'/Event'+Hist1File_EventRun+'-'+Hist2File_EventRun+'/Analysis'+Hist1File_AnalysisRun+'-'+Hist2File_AnalysisRun+'/'+Hist1Name+Hist1Var+'.png')
     else:
-        HistCan.SaveAs(Comparison+'_'+Hist1File_Prefix+'-'+Hist2File_Prefix+'/'+Hist1File_LevelRun+'-'+Hist2File_LevelRun+'Level/Loop'+Hist1File_LoopRun+'-'+Hist2File_LoopRun+'/Event'+Hist1File_EventRun+'-'+Hist2File_EventRun+'/Background'+Hist1File_AnalysisRun+'-'+Hist2File_AnalysisRun+'/'+Hist1Name+Hist2Name+Hist1Var+'.png')
+        HistCan.SaveAs(Comparison+'_'+Hist1File_Prefix+'-'+Hist2File_Prefix+'/'+Hist1File_LevelRun+'-'+Hist2File_LevelRun+'Level/Loop'+Hist1File_LoopRun+'-'+Hist2File_LoopRun+'/Event'+Hist1File_EventRun+'-'+Hist2File_EventRun+'/Analysis'+Hist1File_AnalysisRun+'-'+Hist2File_AnalysisRun+'/'+Hist1Name+Hist2Name+Hist1Var+'.png')
