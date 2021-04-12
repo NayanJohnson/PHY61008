@@ -704,7 +704,7 @@ HistDict =  {
     '2DFinalBeamElectron-WMinusMuon'     
                     :   {
         'Requests'      :   {
-            'Vars'      :   [['qLepton', 'qLepton'], ['qeMethod', 'qeMethod']],
+            'Vars'      :   [['qLepton', 'qLepton'], ['qeMethod', 'qeMethod'], ['M', 'M']],
             'Particles' :   [[['FinalBeamElectron'], ['WMinusMuon']]],
         },
         'Dimensions':   2,
