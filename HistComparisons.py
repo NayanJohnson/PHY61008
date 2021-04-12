@@ -42,7 +42,7 @@ for arg in sys.argv:
     elif arg.split('=')[0].upper() == 'NORM':
         CompRuns.append(arg.split('_')[1])
 
-    elif len(arg.split('-')) >= 1:
+    elif len(arg.split('-')) > 1:
         FileList.append(arg.split('-')[0])
         FileList.append(arg.split('-')[1])
 
