@@ -42,6 +42,10 @@ for arg in sys.argv:
     elif arg.split('=')[0].upper() == 'NORM':
         CompRuns.append(arg.split('_')[1])
 
+    elif len(arg.split('-')) >= 1:
+        FileList.append(arg.split('-')[0])
+        FileList.append(arg.split('-')[1])
+
     # Should find the prefixes of hist files to be compared
     else:
         FileList.append(arg)
@@ -67,8 +71,7 @@ if len(CompRuns) == 0:
 if len(FileList) == 1:
     FileCombinations = [(FileList[0], FileList[0])]
 else:
-    FileCombinations = list(itertools.combinations_with_replacement(FileList, 2))
-
+    FileCombinations = list(itertools.combinations(FileList, 2))
 
 if len(LevelRuns) == 1:
     LevelRunCombinations = [(LevelRuns[0], LevelRuns[0])]
