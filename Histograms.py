@@ -9,10 +9,9 @@ import Loop_Funcs as LoopFuncs
 LevelRuns = []
 LoopRuns = []
 EventRuns = []
-AnalysisRuns =          {
-    'MISSINGET'         :   [],
-    'FINALBEAMELECTRON' :   [],
-}
+AnalysisRuns = []
+
+RootDir = ''
 
 for arg in sys.argv:
     # Should filter the python script
@@ -20,21 +19,29 @@ for arg in sys.argv:
         continue
 
     # Looks for arguements passing the runs to compare
-    elif arg.split('_')[0].upper() == 'LEVEL':
-        LevelRuns.append(arg.split('_')[1])
+    elif arg.split('=')[0].upper() == 'LEVEL':
+        LevelRuns.append(arg.split('=')[1])
 
-    elif arg.split('_')[0].upper() == 'LOOP':
-        LoopRuns.append(arg.split('_')[1])
+    elif arg.split('=')[0].upper() == 'LOOP':
+        LoopRuns.append(arg.split('=')[1])
 
-    elif arg.split('_')[0].upper() == 'EVENT':
-        EventRuns.append(arg.split('_')[1])
+    elif arg.split('=')[0].upper() == 'EVENT':
+        EventRuns.append(arg.split('=')[1])
 
-    elif arg.split('_')[0].upper() == 'ANALYSIS':
-        AnalysisRuns[arg.split('_')[1]].append(arg.split('_')[2])
+    elif arg.split('=')[0].upper() == 'ANALYSIS':
+        AnalysisRuns.append(arg.split('=')[1])
+
+    elif arg.split('=')[0].upper() == 'DIR':
+        RootDir = arg.split('=')[1]
 
     # Should find the prefixes of hist files to be compared
     else:
         outfileprefix = arg
+
+# Will recursively try to create each dir in RootDir path
+if RootDir:
+    for i in range(RootDir.split('/')):
+        gSystem.Exec('mkdir '+'/'.join(RootDir.split('/')[:i+1]))
 
 
 # If no run is given for a level, set the runs to default
@@ -44,14 +51,12 @@ if len(LevelRuns) == 0:
 if len(LoopRuns) == 0:
     LoopRuns = ['Cuts', 'NoCuts']
 
+if len(AnalysisRuns) == 0:
+    AnalysisRuns = ['Cuts', 'NoCuts']
+
 if len(EventRuns) == 0:
     EventRuns = ['Cuts', 'NoCuts']
 
-if len(AnalysisRuns['MISSINGET']) == 0:
-    AnalysisRuns['MISSINGET'] = ['Cuts', 'NoCuts']
-
-if len(AnalysisRuns['FINALBEAMELECTRON']) == 0:
-    AnalysisRuns['FINALBEAMELECTRON'] = ['Cuts', 'NoCuts']
 
 # Load event file
 myTree = LoopFuncs.LoadROOT('tag_1_delphes_events.root')
@@ -59,6 +64,5 @@ myTree = LoopFuncs.LoadROOT('tag_1_delphes_events.root')
 for LevelRun in LevelRuns:
     for LoopRun in LoopRuns:
         for EventRun in EventRuns:
-            for MissingETRun in AnalysisRuns['MISSINGET']:
-                for FinalBeamElectronRun in AnalysisRuns['FINALBEAMELECTRON']:
-                    LoopFuncs.EventLoop(myTree, outfileprefix, LevelRun, LoopRun, EventRun, MissingETRun, FinalBeamElectronRun)
+            for AnalysisRun in AnalysisRuns:
+                LoopFuncs.EventLoop(myTree, RootDir, outfileprefix, LevelRun, LoopRun, EventRun, AnalysisRun)
