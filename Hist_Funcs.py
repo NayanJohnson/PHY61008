@@ -288,7 +288,7 @@ def HistLims(hist, var, Scale=1, Norm=False):
             hist.SetAxisRange(YMin, YMax, 'Y')
     return hist, [(XMin, XMax), (YMin, YMax)]
 
-def CompareHist(HistProps):
+def CompareHist(HistProps, RootDir):
     '''
         Given a histogram dictionary and 
          
@@ -499,6 +499,6 @@ def CompareHist(HistProps):
     HistCan.Update()
     with Quiet():
         if Hist1Name == Hist2Name:
-            HistCan.SaveAs(Comparison+'_'+Hist1File_Prefix+'-'+Hist2File_Prefix+'/'+Hist1File_LevelRun+'-'+Hist2File_LevelRun+'Level/Loop'+Hist1File_LoopRun+'-'+Hist2File_LoopRun+'/Event'+Hist1File_EventRun+'-'+Hist2File_EventRun+'/Analysis'+Hist1File_AnalysisRun+'-'+Hist2File_AnalysisRun+'/'+Hist1Name+Hist1Var+'.png')
+            HistCan.SaveAs(RootDir+Comparison+'_'+Hist1File_Prefix+'-'+Hist2File_Prefix+'/'+Hist1File_LevelRun+'-'+Hist2File_LevelRun+'Level/Loop'+Hist1File_LoopRun+'-'+Hist2File_LoopRun+'/Event'+Hist1File_EventRun+'-'+Hist2File_EventRun+'/Analysis'+Hist1File_AnalysisRun+'-'+Hist2File_AnalysisRun+'/'+Hist1Name+Hist1Var+'.png')
         else:
-            HistCan.SaveAs(Comparison+'_'+Hist1File_Prefix+'-'+Hist2File_Prefix+'/'+Hist1File_LevelRun+'-'+Hist2File_LevelRun+'Level/Loop'+Hist1File_LoopRun+'-'+Hist2File_LoopRun+'/Event'+Hist1File_EventRun+'-'+Hist2File_EventRun+'/Analysis'+Hist1File_AnalysisRun+'-'+Hist2File_AnalysisRun+'/'+Hist1Name+Hist2Name+Hist1Var+'.png')
+            HistCan.SaveAs(RootDir+Comparison+'_'+Hist1File_Prefix+'-'+Hist2File_Prefix+'/'+Hist1File_LevelRun+'-'+Hist2File_LevelRun+'Level/Loop'+Hist1File_LoopRun+'-'+Hist2File_LoopRun+'/Event'+Hist1File_EventRun+'-'+Hist2File_EventRun+'/Analysis'+Hist1File_AnalysisRun+'-'+Hist2File_AnalysisRun+'/'+Hist1Name+Hist2Name+Hist1Var+'.png')

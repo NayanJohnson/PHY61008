@@ -11,27 +11,37 @@ LoopRuns = []
 EventRuns = []
 AnalysisRuns = []
 
+RootDir = ''
+
 for arg in sys.argv:
     # Should filter the python script
     if arg.split('.')[-1] == 'py':
         continue
 
     # Looks for arguements passing the runs to compare
-    elif arg.split('_')[0].upper() == 'LEVEL':
-        LevelRuns.append(arg.split('_')[1])
+    elif arg.split('=')[0].upper() == 'LEVEL':
+        LevelRuns.append(arg.split('=')[1])
 
-    elif arg.split('_')[0].upper() == 'LOOP':
-        LoopRuns.append(arg.split('_')[1])
+    elif arg.split('=')[0].upper() == 'LOOP':
+        LoopRuns.append(arg.split('=')[1])
 
-    elif arg.split('_')[0].upper() == 'EVENT':
-        EventRuns.append(arg.split('_')[1])
+    elif arg.split('=')[0].upper() == 'EVENT':
+        EventRuns.append(arg.split('=')[1])
 
-    elif arg.split('_')[0].upper() == 'ANALYSIS':
-        AnalysisRuns.append(arg.split('_')[1])
+    elif arg.split('=')[0].upper() == 'ANALYSIS':
+        AnalysisRuns.append(arg.split('=')[1])
+
+    elif arg.split('=')[0].upper() == 'DIR':
+        RootDir = arg.split('=')[1]
 
     # Should find the prefixes of hist files to be compared
     else:
         outfileprefix = arg
+
+# Will recursively try to create each dir in RootDir path
+if RootDir:
+    for i in range(RootDir.split('/')):
+        gSystem.Exec('mkdir '+'/'.join(RootDir.split('/')[:i+1]))
 
 
 # If no run is given for a level, set the runs to default
@@ -55,4 +65,4 @@ for LevelRun in LevelRuns:
     for LoopRun in LoopRuns:
         for EventRun in EventRuns:
             for AnalysisRun in AnalysisRuns:
-                LoopFuncs.EventLoop(myTree, outfileprefix, LevelRun, LoopRun, EventRun, AnalysisRun)
+                LoopFuncs.EventLoop(myTree, RootDir, outfileprefix, LevelRun, LoopRun, EventRun, AnalysisRun)
