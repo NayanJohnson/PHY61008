@@ -18,6 +18,14 @@ for arg in sys.argv:
     if arg.split('.')[-1] == 'py':
         continue
 
+
+    elif arg.split('=')[0].upper() == 'DIR':
+        RootDir = arg.split('=')[1]
+
+    elif arg.split('=')[0].upper() == 'PREFIX':
+        outfileprefix = arg.split('=')[1]
+
+
     # Looks for arguements passing the runs to compare
     elif arg.split('=')[0].upper() == 'LEVEL':
         LevelRuns.append(arg.split('=')[1])
@@ -31,12 +39,6 @@ for arg in sys.argv:
     elif arg.split('=')[0].upper() == 'ANALYSIS':
         AnalysisRuns.append(arg.split('=')[1])
 
-    elif arg.split('=')[0].upper() == 'DIR':
-        RootDir = arg.split('=')[1]
-
-    # Should find the prefixes of hist files to be compared
-    else:
-        outfileprefix = arg
 
 # Will recursively try to create each dir in RootDir path
 if RootDir:

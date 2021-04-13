@@ -28,7 +28,14 @@ for arg in sys.argv:
     # Should filter the python script
     if arg.split('.')[-1] == 'py':
         continue
-    
+
+    elif arg.split('=')[0].upper() == 'DIR':
+        RootDir = arg.split('=')[1]
+
+    elif arg.split('=')[0].upper() == 'FILE':
+        FileComparisons.append( (arg.split('=')[1].split('-')[0], arg.split('=')[1].split('-')[1]) )
+
+
     # Comparison args
     # "COMPARISON=COMP1-COMP2"
     elif arg.split('=')[0].upper() == 'LEVEL':
@@ -43,16 +50,11 @@ for arg in sys.argv:
     elif arg.split('=')[0].upper() == 'ANALYSIS':
         AnalysisComparisons.append( (arg.split('=')[1].split('-')[0], arg.split('=')[1].split('-')[1]) )
 
-    elif arg.split('=')[0].upper() == 'FILE':
-        FileComparisons.append( (arg.split('=')[1].split('-')[0], arg.split('=')[1].split('-')[1]) )
-
     # Single variable args
     # "VAR=ARG"
     elif arg.split('=')[0].upper() == 'NORM':
         NormRuns.append( arg.split('=')[1] )
 
-    elif arg.split('=')[0].upper() == 'DIR':
-        RootDir = arg.split('=')[1]
 
 # Will recursively try to create each dir in RootDir path
 if RootDir:
