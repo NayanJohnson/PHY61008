@@ -13,95 +13,78 @@ gROOT.SetBatch(True)
 
 # Arguements passed to the script 
 # (sys.argv[0] is the script itself)
-LevelRuns = []
-LoopRuns = []
-EventRuns = []
-AnalysisRuns = [] 
+LevelComparisons = []
+LoopComparisons = []
+EventComparisons = []
+AnalysisComparisons = [] 
 
-CompRuns = []
+NormRuns = []
 
-FileList = []
+FileComparisons = []
+
+RootDir = '' 
+
 for arg in sys.argv:
     # Should filter the python script
     if arg.split('.')[-1] == 'py':
         continue
+    
+    # Comparison args
+    # "COMPARISON=COMP1-COMP2"
+    elif arg.split('=')[0].upper() == 'LEVEL':
+        LevelComparisons.append( (arg.split('=')[1].split('-')[0], arg.split('=')[1].split('-')[1]) )
 
-    # Looks for arguements passing the runs to compare
-    elif arg.split('_')[0].upper() == 'LEVEL':
-        LevelRuns.append(arg.split('_')[1])
+    elif arg.split('=')[0].upper() == 'LOOP':
+        LoopComparisons.append( (arg.split('=')[1].split('-')[0], arg.split('=')[1].split('-')[1]) )
 
-    elif arg.split('_')[0].upper() == 'LOOP':
-        LoopRuns.append(arg.split('_')[1])
+    elif arg.split('=')[0].upper() == 'EVENT':
+        EventComparisons.append( (arg.split('=')[1].split('-')[0], arg.split('=')[1].split('-')[1]) )
 
-    elif arg.split('_')[0].upper() == 'EVENT':
-        EventRuns.append(arg.split('_')[1])
+    elif arg.split('=')[0].upper() == 'ANALYSIS':
+        AnalysisComparisons.append( (arg.split('=')[1].split('-')[0], arg.split('=')[1].split('-')[1]) )
 
-    elif arg.split('_')[0].upper() == 'ANALYSIS':
-        AnalysisRuns.append(arg.split('_')[1])
+    elif arg.split('=')[0].upper() == 'FILE':
+        FileComparisons.append( (arg.split('=')[1].split('-')[0], arg.split('=')[1].split('-')[1]) )
 
+    # Single variable args
+    # "VAR=ARG"
     elif arg.split('=')[0].upper() == 'NORM':
-        CompRuns.append(arg.split('_')[1])
+        NormRuns.append( arg.split('=')[1] )
 
-    elif len(arg.split('-')) > 1:
-        FileList.append(arg.split('-')[0])
-        FileList.append(arg.split('-')[1])
+    elif arg.split('=')[0].upper() == 'DIR':
+        RootDir = arg.split('=')[1]
 
-    # Should find the prefixes of hist files to be compared
-    else:
-        FileList.append(arg)
+# Will recursively try to create each dir in RootDir path
+if RootDir:
+    for i in range(RootDir.split('/')):
+        gSystem.Exec('mkdir '+'/'.join(RootDir.split('/')[:i+1]))
+
 
 
 # If no run is given for a level, set the runs to default
-if len(LevelRuns) == 0:
-    LevelRuns = ['Generator', 'Detector']
+if len(LevelComparisons) == 0:
+    LevelComparisons = [('Generator', 'Detector'), ('Generator', 'Generator'), ('Detector', 'Detector')]
 
-if len(LoopRuns) == 0:
-    LoopRuns = ['Cuts', 'NoCuts']
+if len(LoopComparisons) == 0:
+    LoopComparisons = [('Cuts', 'NoCuts'), ('Cuts', 'Cuts'), ('NoCuts', 'NoCuts')]
 
-if len(EventRuns) == 0:
-    EventRuns = ['Cuts', 'NoCuts']
+if len(EventComparisons) == 0:
+    EventComparisons = ['Cuts', 'NoCuts']
 
-if len(AnalysisRuns) == 0:
-    AnalysisRuns = ['Cuts', 'NoCuts']
+if len(AnalysisComparisons) == 0:
+    AnalysisComparisons = [('Cuts', 'NoCuts'), ('Cuts', 'Cuts'), ('NoCuts', 'NoCuts')]
 
-if len(CompRuns) == 0:
-    CompRuns = [True, False]    
-
-# Finds all unique combinations of files
-if len(FileList) == 1:
-    FileCombinations = [(FileList[0], FileList[0])]
-else:
-    FileCombinations = list(itertools.combinations(FileList, 2))
-
-if len(LevelRuns) == 1:
-    LevelRunCombinations = [(LevelRuns[0], LevelRuns[0])]
-else:
-    LevelRunCombinations = list(itertools.combinations_with_replacement(LevelRuns, 2))
-
-if len(LoopRuns) == 1:
-    LoopRunCombinations = [(LoopRuns[0], LoopRuns[0])]
-else:
-    LoopRunCombinations = list(itertools.combinations_with_replacement(LoopRuns, 2))
-
-if len(EventRuns) == 1:
-    EventRunCombinations = [(EventRuns[0], EventRuns[0])]
-else:
-    EventRunCombinations = list(itertools.combinations_with_replacement(EventRuns, 2))
-
-if len(AnalysisRuns) == 1:
-    AnalysisRunCombinations = [(AnalysisRuns[0], AnalysisRuns[0])]
-else:
-    AnalysisRunCombinations = list(itertools.combinations_with_replacement(AnalysisRuns, 2))
+if len(NormRuns) == 0:
+    NormRuns = [True, False]    
 
 loopnum = 0
 
-
-for FilePair in FileCombinations:
-    for LevelRunPair in LevelRunCombinations:
-        for LoopRunPair in LoopRunCombinations:
-            for EventRunPair in EventRunCombinations:
-                for AnalysisRunPair in AnalysisRunCombinations:
-                    for Norm in CompRuns:
+for FilePair in FileComparisons:
+    for LevelRunPair in LevelComparisons:
+        for LoopRunPair in LoopComparisons:
+            for EventRunPair in EventComparisons:
+                for AnalysisRunPair in AnalysisComparisons:
+                    for Norm in NormRuns:
 
                         loopnum += 1
                         print('Loop:', loopnum)
@@ -125,11 +108,11 @@ for FilePair in FileCombinations:
                         else:
                             Comparison = 'Rel'
 
-                        gSystem.Exec('mkdir '+Comparison+'_'+HistFile1_Prefix+'-'+HistFile2_Prefix)
-                        gSystem.Exec('mkdir '+Comparison+'_'+HistFile1_Prefix+'-'+HistFile2_Prefix+'/'+HistFile1_LevelRun+'-'+HistFile2_LevelRun+'Level/')
-                        gSystem.Exec('mkdir '+Comparison+'_'+HistFile1_Prefix+'-'+HistFile2_Prefix+'/'+HistFile1_LevelRun+'-'+HistFile2_LevelRun+'Level/Loop'+HistFile1_LoopRun+'-'+HistFile2_LoopRun)
-                        gSystem.Exec('mkdir '+Comparison+'_'+HistFile1_Prefix+'-'+HistFile2_Prefix+'/'+HistFile1_LevelRun+'-'+HistFile2_LevelRun+'Level/Loop'+HistFile1_LoopRun+'-'+HistFile2_LoopRun+'/Event'+HistFile1_EventRun+'-'+HistFile2_EventRun+'/')
-                        gSystem.Exec('mkdir '+Comparison+'_'+HistFile1_Prefix+'-'+HistFile2_Prefix+'/'+HistFile1_LevelRun+'-'+HistFile2_LevelRun+'Level/Loop'+HistFile1_LoopRun+'-'+HistFile2_LoopRun+'/Event'+HistFile1_EventRun+'-'+HistFile2_EventRun+'/Analysis'+HistFile1_AnalysisRun+'-'+HistFile2_AnalysisRun+'/')
+                        gSystem.Exec('mkdir '+RootDir+Comparison+'_'+HistFile1_Prefix+'-'+HistFile2_Prefix)
+                        gSystem.Exec('mkdir '+RootDir+Comparison+'_'+HistFile1_Prefix+'-'+HistFile2_Prefix+'/'+HistFile1_LevelRun+'-'+HistFile2_LevelRun+'Level/')
+                        gSystem.Exec('mkdir '+RootDir+Comparison+'_'+HistFile1_Prefix+'-'+HistFile2_Prefix+'/'+HistFile1_LevelRun+'-'+HistFile2_LevelRun+'Level/Loop'+HistFile1_LoopRun+'-'+HistFile2_LoopRun)
+                        gSystem.Exec('mkdir '+RootDir+Comparison+'_'+HistFile1_Prefix+'-'+HistFile2_Prefix+'/'+HistFile1_LevelRun+'-'+HistFile2_LevelRun+'Level/Loop'+HistFile1_LoopRun+'-'+HistFile2_LoopRun+'/Event'+HistFile1_EventRun+'-'+HistFile2_EventRun+'/')
+                        gSystem.Exec('mkdir '+RootDir+Comparison+'_'+HistFile1_Prefix+'-'+HistFile2_Prefix+'/'+HistFile1_LevelRun+'-'+HistFile2_LevelRun+'Level/Loop'+HistFile1_LoopRun+'-'+HistFile2_LoopRun+'/Event'+HistFile1_EventRun+'-'+HistFile2_EventRun+'/Analysis'+HistFile1_AnalysisRun+'-'+HistFile2_AnalysisRun+'/')
 
 
                         # Read hist files
@@ -198,7 +181,7 @@ for FilePair in FileCombinations:
                                         'Norm'      :   Norm
                                     }
 
-                                    HistFuncs.CompareHist(HistProps)
+                                    HistFuncs.CompareHist(HistProps, RootDir)
 
                         for key, properties in HistCompDict.items():
 
@@ -235,5 +218,5 @@ for FilePair in FileCombinations:
                                     'Norm'      :   Norm 
                                 }
 
-                                HistFuncs.CompareHist(HistProps)
+                                HistFuncs.CompareHist(HistProps, RootDir)
 
