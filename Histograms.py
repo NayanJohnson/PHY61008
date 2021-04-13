@@ -9,7 +9,10 @@ import Loop_Funcs as LoopFuncs
 LevelRuns = []
 LoopRuns = []
 EventRuns = []
-AnalysisRuns = []
+AnalysisRuns =          {
+    'MISSINGET'         :   [],
+    'FINALBEAMELECTRON' :   [],
+}
 
 for arg in sys.argv:
     # Should filter the python script
@@ -27,7 +30,7 @@ for arg in sys.argv:
         EventRuns.append(arg.split('_')[1])
 
     elif arg.split('_')[0].upper() == 'ANALYSIS':
-        AnalysisRuns.append(arg.split('_')[1])
+        AnalysisRuns[arg.split('_')[1]].append(arg.split('_')[2])
 
     # Should find the prefixes of hist files to be compared
     else:
@@ -41,12 +44,14 @@ if len(LevelRuns) == 0:
 if len(LoopRuns) == 0:
     LoopRuns = ['Cuts', 'NoCuts']
 
-if len(AnalysisRuns) == 0:
-    AnalysisRuns = ['Cuts', 'NoCuts']
-
 if len(EventRuns) == 0:
     EventRuns = ['Cuts', 'NoCuts']
 
+if len(AnalysisRuns['MISSINGET']) == 0:
+    AnalysisRuns['MISSINGET'] = ['Cuts', 'NoCuts']
+
+if len(AnalysisRuns['FINALBEAMELECTRON']) == 0:
+    AnalysisRuns['FINALBEAMELECTRON'] = ['Cuts', 'NoCuts']
 
 # Load event file
 myTree = LoopFuncs.LoadROOT('tag_1_delphes_events.root')
@@ -54,5 +59,6 @@ myTree = LoopFuncs.LoadROOT('tag_1_delphes_events.root')
 for LevelRun in LevelRuns:
     for LoopRun in LoopRuns:
         for EventRun in EventRuns:
-            for AnalysisRun in AnalysisRuns:
-                LoopFuncs.EventLoop(myTree, outfileprefix, LevelRun, LoopRun, EventRun, AnalysisRun)
+            for MissingETRun in AnalysisRuns['MISSINGET']:
+                for FinalBeamElectronRun in AnalysisRuns['FINALBEAMELECTRON']:
+                    LoopFuncs.EventLoop(myTree, outfileprefix, LevelRun, LoopRun, EventRun, MissingETRun, FinalBeamElectronRun)

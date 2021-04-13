@@ -36,13 +36,21 @@ EventLoopParams = {
 
         'Analysis'     :   {
             'Cuts'              :   {
-                'BeamElectron'      :   {
+                'MissingET'         :   {
+                    'Et'            :   (15, float('inf')),
+                },
+
+                'FinalBeamElectron' :   {
                     'Eta'               :   (-1, float('inf')),
                 }
             },
 
             'NoCuts'            :   {
-                'BeamElectron'      :   {
+                'MissingET'         :   {
+                    'Et'            :   (0, float('inf')),
+                },
+                #
+                'FinalBeamElectron' :   {
                     'Eta'               :   (float('-inf'), float('inf')),
                 }
             },
