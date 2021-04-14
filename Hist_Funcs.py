@@ -67,17 +67,12 @@ class Quiet:
     def __exit__(self, type, value, traceback):
         ROOT.gErrorIgnoreLevel = self.oldlevel
 
-def GetScale(PythiaLogPath, NEvents):
+def GetScale(Xsec, NEvents):
     '''
         Given the path to the pythia log file and the number of events,
         will return the scaling factor calculated from the process 
         cross section. 
     '''
-
-    with open(PythiaLogPath, 'r') as file:
-        lines = file.read().splitlines()
-        # Xsec is the last element of the last line
-        Xsec = float(lines[-1].split()[-1])
     
     # L_int(Data) = 1 [ab-1] = 1000000 [pb-1]
     # L_int(MC) = N/Xsec [pb-1]
@@ -288,7 +283,7 @@ def HistLims(hist, var, Scale=1, Norm=False):
             hist.SetAxisRange(YMin, YMax, 'Y')
     return hist, [(XMin, XMax), (YMin, YMax)]
 
-def CompareHist(HistProps, RootDir):
+def CompareHist(HistProps, MediaDir):
     '''
         Given a histogram dictionary and 
          
@@ -499,6 +494,6 @@ def CompareHist(HistProps, RootDir):
     HistCan.Update()
     with Quiet():
         if Hist1Name == Hist2Name:
-            HistCan.SaveAs(RootDir+Comparison+'_'+Hist1File_Prefix+'-'+Hist2File_Prefix+'/'+Hist1File_LevelRun+'-'+Hist2File_LevelRun+'Level/Loop'+Hist1File_LoopRun+'-'+Hist2File_LoopRun+'/Event'+Hist1File_EventRun+'-'+Hist2File_EventRun+'/Analysis'+Hist1File_AnalysisRun+'-'+Hist2File_AnalysisRun+'/'+Hist1Name+Hist1Var+'.png')
+            HistCan.SaveAs(MediaDir+Comparison+'_'+Hist1File_Prefix+'-'+Hist2File_Prefix+'/'+Hist1File_LevelRun+'-'+Hist2File_LevelRun+'Level/Loop'+Hist1File_LoopRun+'-'+Hist2File_LoopRun+'/Event'+Hist1File_EventRun+'-'+Hist2File_EventRun+'/Analysis'+Hist1File_AnalysisRun+'-'+Hist2File_AnalysisRun+'/'+Hist1Name+Hist1Var+'.png')
         else:
-            HistCan.SaveAs(RootDir+Comparison+'_'+Hist1File_Prefix+'-'+Hist2File_Prefix+'/'+Hist1File_LevelRun+'-'+Hist2File_LevelRun+'Level/Loop'+Hist1File_LoopRun+'-'+Hist2File_LoopRun+'/Event'+Hist1File_EventRun+'-'+Hist2File_EventRun+'/Analysis'+Hist1File_AnalysisRun+'-'+Hist2File_AnalysisRun+'/'+Hist1Name+Hist2Name+Hist1Var+'.png')
+            HistCan.SaveAs(MediaDir+Comparison+'_'+Hist1File_Prefix+'-'+Hist2File_Prefix+'/'+Hist1File_LevelRun+'-'+Hist2File_LevelRun+'Level/Loop'+Hist1File_LoopRun+'-'+Hist2File_LoopRun+'/Event'+Hist1File_EventRun+'-'+Hist2File_EventRun+'/Analysis'+Hist1File_AnalysisRun+'-'+Hist2File_AnalysisRun+'/'+Hist1Name+Hist2Name+Hist1Var+'.png')
