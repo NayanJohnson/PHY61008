@@ -43,7 +43,7 @@ EventDict   =   {
 
 '''
 
-def LoadROOT(filename):
+def LoadROOT(RunList):
     '''
     Loads .root file with tree labeled 'Delphes' and outputs dictionary containing the number 
     of events and branches.
@@ -51,7 +51,8 @@ def LoadROOT(filename):
 
     # Create chain of root trees 
     chain = TChain('Delphes')
-    chain.Add(filename)
+    for run in RunList:
+        chain.Add(run+'tag_1_delphes_events.root')
 
     # Create object of class ExRootTreeReader
     myTree = ExRootTreeReader(chain)
@@ -333,14 +334,14 @@ def GetParticles(myTree, LevelRun, LoopRun, HistDict, EventNum):
 
     return HistDict, ParticleDict, EventDict
 
-def EventLoop(myTree, RootDir, outfileprefix, LevelRun, LoopRun, EventRun, AnalysisRun):
+def EventLoop(myTree, Xsec, MediaDir, outfileprefix, LevelRun, LoopRun, EventRun, AnalysisRun):
     '''
     '''
 
     outfilename = outfileprefix+'_'+LevelRun+'Level_Loop'+LoopRun+'Event'+EventRun+'Analysis'+AnalysisRun+'.root'
 
     # Open output
-    outfile = TFile(RootDir+outfilename,'RECREATE')
+    outfile = TFile(MediaDir+outfilename,'RECREATE')
 
     HistDict = requests.HistDict
 
@@ -440,7 +441,7 @@ def EventLoop(myTree, RootDir, outfileprefix, LevelRun, LoopRun, EventRun, Analy
         HistFuncs.FillHists(HistDict, ParticleDict)
 
     # Get scaling factor for histograms
-    Scale = HistFuncs.GetScale('tag_1_pythia.log', myTree['NEvents'])
+    Scale = HistFuncs.GetScale(Xsec, myTree['NEvents'])
 
     # Scaling and altering hist lims
     for category, attributes in HistDict.items():
