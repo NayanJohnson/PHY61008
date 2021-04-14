@@ -58,7 +58,7 @@ for arg in sys.argv:
 
 # Will recursively try to create each dir in RootDir path
 if RootDir:
-    for i in range(RootDir.split('/')):
+    for i in range(len(RootDir.split('/'))):
         gSystem.Exec('mkdir '+'/'.join(RootDir.split('/')[:i+1]))
 
 
