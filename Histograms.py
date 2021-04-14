@@ -11,7 +11,7 @@ LoopRuns = []
 EventRuns = []
 AnalysisRuns = []
 
-RunDir = ''
+Runs = ['01']
 MediaDir = ''
 
 for arg in sys.argv:
@@ -19,12 +19,14 @@ for arg in sys.argv:
     if arg.split('.')[-1] == 'py':
         continue
 
+    # Dir arguements in the form "DIR=RUNDIR-MEDIADIR"
+    elif arg.split('=')[0].upper() == 'RUNS':
+        Runs = arg.split('=')[1].split('-')
 
-    elif arg.split('=')[0].upper() == 'RUNDIR':
-        RootDir = arg.split('=')[1]
+    # Dir arguements in the form "DIR=RUNDIR-MEDIADIR"
+    elif arg.split('=')[0].upper() == 'MEDIA':
+        MediaDir = arg.split('=')[1]
 
-    elif arg.split('=')[0].upper() == 'MEDIADIR':
-        RootDir = arg.split('=')[1]
 
     elif arg.split('=')[0].upper() == 'PREFIX':
         outfileprefix = arg.split('=')[1]
@@ -44,12 +46,6 @@ for arg in sys.argv:
         AnalysisRuns.append(arg.split('=')[1])
 
 
-# Will recursively try to create each dir in RootDir path
-if RootDir:
-    for i in range(len(RootDir.split('/'))):
-        gSystem.Exec('mkdir '+'/'.join(RootDir.split('/')[:i+1]))
-
-
 # If no run is given for a level, set the runs to default
 if len(LevelRuns) == 0:
     LevelRuns = ['Generator', 'Detector']
@@ -63,12 +59,31 @@ if len(AnalysisRuns) == 0:
 if len(EventRuns) == 0:
     EventRuns = ['Cuts', 'NoCuts']
 
+# run folders => "run_x/"
+Runs = ['run_'+run+'/' for run in Runs]
 
-# Load event file
-myTree = LoopFuncs.LoadROOT('tag_1_delphes_events.root')
+# Looping through the cross section of all runs and taking an average
+XsecList = []
+for run in Runs:
+    with open(run+'tag_1_pythia.log', 'r') as file:
+        lines = file.read().splitlines()
+        # Xsec is the last element of the last line
+        XsecList.append( float(lines[-1].split()[-1]) )
+
+Xsec = sum(XsecList)/len(XsecList)
+
+# Loading all runs at once
+myTree = LoopFuncs.LoadROOT(Runs)
+
+# Will recursively try to create each dir in RootDir path
+if MediaDir:
+    for i in range(len(MediaDir.split('/'))):
+        gSystem.Exec('mkdir '+'/'.join(MediaDir.split('/')[:i+1]))
+
+    # Load event file
 
 for LevelRun in LevelRuns:
     for LoopRun in LoopRuns:
         for EventRun in EventRuns:
             for AnalysisRun in AnalysisRuns:
-                LoopFuncs.EventLoop(myTree, RootDir, outfileprefix, LevelRun, LoopRun, EventRun, AnalysisRun)
+                LoopFuncs.EventLoop(myTree, Xsec, MediaDir, outfileprefix, LevelRun, LoopRun, EventRun, AnalysisRun)
