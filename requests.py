@@ -56,7 +56,7 @@ VarParams = {
     },
     
     'Et'        :   {
-        'Range'     :   [0, 1500]
+        'Range'     :   [0, 500]
     },
 
     'Mt'   :   {
