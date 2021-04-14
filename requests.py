@@ -713,7 +713,7 @@ HistDict =  {
     '2DMissingET-FinalBeamElectron'     
                     :   {
         'Requests'      :   {
-            'Vars'      :   [['Et', 'Eta'], ['Et', 'Phi'], ['Et', 'Pt'], ['Et', 'Et'], ['Et', 'qLepton']],
+            'Vars'      :   [['Et', 'Eta'], ['Et', 'Phi'], ['Et', 'Pt'], ['Et', 'Et']],
             'Particles' :   [[['MissingET'], ['FinalBeamElectron']]],
         },
         'Dimensions':   2,
