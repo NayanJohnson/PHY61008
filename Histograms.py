@@ -11,7 +11,8 @@ LoopRuns = []
 EventRuns = []
 AnalysisRuns = []
 
-RootDir = ''
+RunDir = ''
+MediaDir = ''
 
 for arg in sys.argv:
     # Should filter the python script
@@ -19,7 +20,10 @@ for arg in sys.argv:
         continue
 
 
-    elif arg.split('=')[0].upper() == 'DIR':
+    elif arg.split('=')[0].upper() == 'RUNDIR':
+        RootDir = arg.split('=')[1]
+
+    elif arg.split('=')[0].upper() == 'MEDIADIR':
         RootDir = arg.split('=')[1]
 
     elif arg.split('=')[0].upper() == 'PREFIX':
