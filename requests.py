@@ -710,6 +710,15 @@ HistDict =  {
         'Dimensions':   2,
     },
 
+    '2DMissingET-FinalBeamElectron'     
+                    :   {
+        'Requests'      :   {
+            'Vars'      :   [['Et', 'Eta'], ['Et', 'Phi'], ['Et', 'Pt'], ['Et', 'Et'], ['Et', 'qLepton']],
+            'Particles' :   [[['MissingET'], ['FinalBeamElectron']]],
+        },
+        'Dimensions':   2,
+    },
+
 }
 
 # Dictionary to request hist comparisons
