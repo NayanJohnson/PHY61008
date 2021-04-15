@@ -469,7 +469,7 @@ def CompareHist(HistProps, MediaDir):
     Legend2.Draw('same')
 
     HistCan.Update()
-    with Loop_Funcs.Quiet():
+    with LoopFuncs.Quiet():
         if Hist1Name == Hist2Name:
             HistCan.SaveAs(MediaDir+Comparison+'_'+Hist1File_Prefix+'-'+Hist2File_Prefix+'/'+Hist1File_LevelRun+'-'+Hist2File_LevelRun+'Level/Loop'+Hist1File_LoopRun+'-'+Hist2File_LoopRun+'/Event'+Hist1File_EventRun+'-'+Hist2File_EventRun+'/Analysis'+Hist1File_AnalysisRun+'-'+Hist2File_AnalysisRun+'/'+Hist1Name+Hist1Var+'.png')
         else:
