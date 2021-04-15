@@ -22,15 +22,15 @@ NormRuns = []
 
 FileComparisons = []
 
-RootDir = '' 
+MediaDir = ''
 
 for arg in sys.argv:
     # Should filter the python script
     if arg.split('.')[-1] == 'py':
         continue
 
-    elif arg.split('=')[0].upper() == 'DIR':
-        RootDir = arg.split('=')[1]
+    elif arg.split('=')[0].upper() == 'MEDIA':
+        MediaDir = arg.split('=')[1]
 
     elif arg.split('=')[0].upper() == 'FILE':
         FileComparisons.append( (arg.split('=')[1].split('-')[0], arg.split('=')[1].split('-')[1]) )
@@ -57,9 +57,8 @@ for arg in sys.argv:
 
 
 # Will recursively try to create each dir in RootDir path
-if RootDir:
-    for i in range(len(RootDir.split('/'))):
-        gSystem.Exec('mkdir '+'/'.join(RootDir.split('/')[:i+1]))
+for i in range(len(MediaDir.split('/'))):
+    gSystem.Exec('mkdir '+'/'.join(MediaDir.split('/')[:i+1]))
 
 
 
@@ -71,7 +70,7 @@ if len(LoopComparisons) == 0:
     LoopComparisons = [('Cuts', 'NoCuts'), ('Cuts', 'Cuts'), ('NoCuts', 'NoCuts')]
 
 if len(EventComparisons) == 0:
-    EventComparisons = ['Cuts', 'NoCuts']
+    EventComparisons =  [('Cuts', 'NoCuts'), ('Cuts', 'Cuts'), ('NoCuts', 'NoCuts')]
 
 if len(AnalysisComparisons) == 0:
     AnalysisComparisons = [('Cuts', 'NoCuts'), ('Cuts', 'Cuts'), ('NoCuts', 'NoCuts')]
@@ -183,7 +182,7 @@ for FilePair in FileComparisons:
                                         'Norm'      :   Norm
                                     }
 
-                                    HistFuncs.CompareHist(HistProps, RootDir)
+                                    HistFuncs.CompareHist(HistProps, MediaDir)
 
                         for key, properties in HistCompDict.items():
 
@@ -220,5 +219,5 @@ for FilePair in FileComparisons:
                                     'Norm'      :   Norm 
                                 }
 
-                                HistFuncs.CompareHist(HistProps, RootDir)
+                                HistFuncs.CompareHist(HistProps, MediaDir)
 
