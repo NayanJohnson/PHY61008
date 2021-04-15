@@ -1,3 +1,26 @@
+# Needed to allow use of kInfo, gErrorIgnoreLevel
+import ROOT
+class Quiet:
+    """Context manager for silencing certain ROOT operations.  Usage:
+    with Quiet(level = ROOT.kInfo+1):
+       foo_that_makes_output
+
+    You can set a higher or lower warning level to ignore different
+    kinds of messages.  After the end of indentation, the level is set
+    back to what it was previously.
+
+    gErrorIgnoreLevel = kPrint, kInfo, kWarning, kError, kBreak, kSysError, kFatal
+    """
+    def __init__(self, level=ROOT.kInfo + 1):
+        self.level = level
+
+    def __enter__(self):
+        self.oldlevel = ROOT.gErrorIgnoreLevel
+        ROOT.gErrorIgnoreLevel = self.level
+
+    def __exit__(self, type, value, traceback):
+        ROOT.gErrorIgnoreLevel = self.oldlevel
+
 from ROOT import gSystem, gInterpreter, TChain, TFile, TLorentzVector
 
 # Path of Delphes directory 
@@ -42,6 +65,7 @@ EventDict   =   {
 }
 
 '''
+
 
 def LoadROOT(RunList):
     '''
