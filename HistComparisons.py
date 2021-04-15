@@ -70,7 +70,7 @@ if len(LoopComparisons) == 0:
     LoopComparisons = [('Cuts', 'NoCuts'), ('Cuts', 'Cuts'), ('NoCuts', 'NoCuts')]
 
 if len(EventComparisons) == 0:
-    EventComparisons = ['Cuts', 'NoCuts']
+    EventComparisons =  [('Cuts', 'NoCuts'), ('Cuts', 'Cuts'), ('NoCuts', 'NoCuts')]
 
 if len(AnalysisComparisons) == 0:
     AnalysisComparisons = [('Cuts', 'NoCuts'), ('Cuts', 'Cuts'), ('NoCuts', 'NoCuts')]
