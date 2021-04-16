@@ -665,7 +665,7 @@ HistDict =  {
         'Dimensions':   2,
     },
 
-    '2DWPlusMuonFinalBeamElectron'     
+    '2DWPlusMuon-FinalBeamElectron'     
                     :   {
         'Requests'      :   {
             'Vars'      :   [['Eta', 'Eta'], ['Pt', 'Pt']],
@@ -688,6 +688,24 @@ HistDict =  {
         'Requests'      :   {
             'Vars'      :   [['Eta', 'Eta'], ['Pt', 'Pt']],
             'Particles' :   [[['WPlusMuon'], ['WMinusMuon']]],
+        },
+        'Dimensions':   2,
+    },
+
+    '2DWPlusMuonFinalBeamElectron'     
+                    :   {
+        'Requests'      :   {
+            'Vars'      :   [['Eta', 'Pt']],
+            'Particles' :   [[['WPlusMuonFinalBeamElectron'], ['WPlusMuonFinalBeamElectron']]],
+        },
+        'Dimensions':   2,
+    },
+
+    '2DDiMuon'     
+                    :   {
+        'Requests'      :   {
+            'Vars'      :   [['Eta', 'Pt']],
+            'Particles' :   [[['DiMuon'], ['DiMuon']]],
         },
         'Dimensions':   2,
     },
