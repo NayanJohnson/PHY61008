@@ -563,7 +563,7 @@ HistDict =  {
     '2DMissingET'     
                     :   {
         'Requests'      :   {
-            'Vars'      :   [['Eta', 'Pt']],
+            'Vars'      :   [['Eta', 'Pt'], ['Phi', 'Et']],
             'Particles' :   [[['MissingET'], ['MissingET']]],
         },
         'Dimensions':   2,
