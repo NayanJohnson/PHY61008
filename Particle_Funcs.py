@@ -154,17 +154,17 @@ def GetParticleVariable(ParticleDict, ParticleList, var):
     return False
 
 
-def InvMassCheck(particles, Boson, ParticleDict, EventDict):
+def InvMassCheck(Type, Boson, ParticleDict, EventDict, EventCuts):
     '''
     '''
 
-    if particles == 'Electrons' and EventDict['Count']['Electrons'] <= 2:
+    if Type == 'Electrons' and EventDict['Count']['Electrons'] <= 2:
         return ParticleDict, EventDict
 
-    elif particles == 'Muons' and EventDict['Count']['Muons'] <= 1:
+    elif Type == 'Muons' and EventDict['Count']['Muons'] <= 1:
         return ParticleDict, EventDict
 
-    elif particles == 'Jets' and EventDict['Count']['Jets'] <= 2:
+    elif Type == 'Jets' and EventDict['Count']['Jets'] <= 2:
         return ParticleDict, EventDict
 
     BosonMass = config.EventLoopParams[Boson]['Mass']
@@ -176,7 +176,11 @@ def InvMassCheck(particles, Boson, ParticleDict, EventDict):
 
     # Getting the sorted particles from list
     # List will be a list of tuples (Pt, particle)
-    particlesList = EventDict['PTSorted'][particles[0:-1]]
+    # particleList will now be in order of ascending Pt
+    particlesList = []
+    for i in range(EventCuts[Type]):
+        particlesList.append(EventDict['PTSorted'][Type][-1-i])
+
     # Possible pairs of Z decay products
     Permutations = list( itertools.combinations(particlesList, 2))
 
@@ -199,7 +203,7 @@ def InvMassCheck(particles, Boson, ParticleDict, EventDict):
     # Removing boson particles from list of particle
     particlesList.remove(Permutations[PairIndex][0])
     particlesList.remove(Permutations[PairIndex][1])
-    EventDict['PTSorted'][particles[0:-1]] = particlesList
+    EventDict['PTSorted'][particles] = particlesList
 
     return ParticleDict, EventDict
 
