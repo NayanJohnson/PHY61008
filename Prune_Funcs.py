@@ -1,52 +1,18 @@
-def LoadRuns(Runs):
-    '''
-    Loads .root file with tree labeled 'Delphes' and outputs dictionary containing the number 
-    of events and branches.
-    '''
+from ROOT import TFile, TLorentzVector
 
-    # Create chain of root trees 
-    chain = TChain('Delphes')
-    for run in range(Runs):
-        run += 1
-        if run < 100:
-            runstr = format(run, '{02d}')
-        chain.Add(runstr+'/tag_1_delphes_events.root')
+import config, requests
+import Particle_Funcs as ParticleFuncs
+import Loop_Funcs as LoopFuncs
 
-    # Create object of class ExRootTreeReader
-    myTree = ExRootTreeReader(chain)
-    NEvents = myTree.GetEntries()
 
-    # Get pointers to branches used in this analysis
-    branchParticle = myTree.UseBranch('Particle')
-    branchGenJet = myTree.UseBranch('GenJet')
-    branchElectron = myTree.UseBranch('Electron')
-    branchMuon = myTree.UseBranch('Muon')
-    branchJet = myTree.UseBranch('Jet')
-    branchMissingET = myTree.UseBranch('MissingET')
-
-    TreeDict =  {
-                    'Tree'      :   myTree,
-                    'NEvents'   :   NEvents,
-                    'Branches'  :   {
-                        'Particle'          :   branchParticle,
-                        'GenJet'            :   branchGenJet,
-                        'Electron'          :   branchElectron,
-                        'Muon'              :   branchMuon,
-                        'Jet'               :   branchJet,
-                        'MissingET'         :   branchMissingET,
-                    }
-                }
-
-    return TreeDict
-
-def EventPruneLoop(myTree, Xsec, MediaDir, outfileprefix, LevelRun, LoopRun, EventRun, AnalysisRun):
+def EventLoop(TreeDict, Xsec, RootDir, outfileprefix, LevelRun, LoopRun, EventRun, AnalysisRun):
     '''
     '''
 
-    outfilename = outfileprefix+'_'+LevelRun+'Level_Loop'+LoopRun+'Event'+EventRun+'Analysis'+AnalysisRun+'.root'
+    outfilename = RootDir+'Loop'+LoopRun+'/Event'+EventRun+'/Analysis'+AnalysisRun+'/'+outfileprefix+LevelRun+'Level_Pruned.root'
 
     # Open output
-    outfile = TFile(MediaDir+outfilename,'RECREATE')
+    outfile = TFile(outfilename,'RECREATE')
     PrunedTree = TreeDict['Tree'].CloneTree(0)
 
     EventCuts = config.EventLoopParams['Level']['Event'][EventRun]
@@ -55,12 +21,14 @@ def EventPruneLoop(myTree, Xsec, MediaDir, outfileprefix, LevelRun, LoopRun, Eve
     Zdecays = config.EventLoopParams['Z']['Decays']
     WPlusdecays = config.EventLoopParams['WPlus']['Decays']
     WMinusdecays = config.EventLoopParams['WMinus']['Decays']
-    
+
+    HistDict = requests.HistDict
+
     EventCutNum = 0
     # Looping through events
-    for EventNum in range(myTree['NEvents']):
+    for EventNum in range(TreeDict['NEvents']):
 
-        HistDict, ParticleDict, EventDict = GetParticles(myTree, LevelRun, LoopRun, HistDict, EventNum)
+        HistDict, ParticleDict, EventDict = LoopFuncs.GetParticles(TreeDict, LevelRun, LoopRun, HistDict, EventNum)
         
         # MissingET cuts
         if EventDict['MissingET'].Et() < AnalysisCuts['MissingET']['Et'][0] or AnalysisCuts['MissingET']['Et'][1] < EventDict['MissingET'].Et():
@@ -137,9 +105,11 @@ def EventPruneLoop(myTree, Xsec, MediaDir, outfileprefix, LevelRun, LoopRun, Eve
             ParticleDict = ParticleFuncs.AddParticle('DiMuon', ParticleDict, DiMuon)
             ParticleDict = ParticleFuncs.AddParticle('WPlusMuonFinalBeamElectron', ParticleDict, WPlusMuonFinalBeamElectron)
 
-        myTree['Tree'].ReadEntry(EventNum)
+        TreeDict['Tree'].GetEntry(EventNum)
         PrunedTree.Fill()
-
+    
     # Writing and closing file
     outfile.Write()
     outfile.Close()
+    print('here')
+    # PrunedTree.Delete()

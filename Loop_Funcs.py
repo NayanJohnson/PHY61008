@@ -67,7 +67,7 @@ EventDict   =   {
 '''
 
 
-def LoadTree(filename):
+def LoadTrees(TreeList):
     '''
     Loads .root file with tree labeled 'Delphes' and outputs dictionary containing the number 
     of events and branches.
@@ -75,9 +75,11 @@ def LoadTree(filename):
 
     # Create chain of root trees 
     chain = TChain('Delphes')
+    for tree in TreeList:
+        chain.Add(tree)
 
     # Create object of class ExRootTreeReader
-    TreeDict = ExRootTreeReader(filename)
+    TreeDict = ExRootTreeReader(chain)
     NEvents = TreeDict.GetEntries()
 
     # Get pointers to branches used in this analysis
@@ -89,9 +91,10 @@ def LoadTree(filename):
     branchMissingET = TreeDict.UseBranch('MissingET')
 
     TreeDict =  {
-                    'Tree'      :   TreeDict,
-                    'NEvents'   :   NEvents,
-                    'Branches'  :   {
+                    'Tree'          :       chain,
+                    'TreeReader'    :       TreeDict,
+                    'NEvents'       :       NEvents,
+                    'Branches'      :       {
                         'Particle'          :   branchParticle,
                         'GenJet'            :   branchGenJet,
                         'Electron'          :   branchElectron,
@@ -112,7 +115,7 @@ def ParticleLoop(TreeDict, EventNum, LevelRun, LoopRun):
     Cuts = config.EventLoopParams['Level']['Loop'][LoopRun]
 
     # Reading a specific event 
-    TreeDict['Tree'].ReadEntry(EventNum)
+    TreeDict['TreeReader'].ReadEntry(EventNum)
 
     # Number ot particular particles in eventNbins
     e_count = 0
@@ -267,9 +270,9 @@ def ParticleLoop(TreeDict, EventNum, LevelRun, LoopRun):
         'BeamQuark'     :   BeamQuark,
         'MissingET'     :   MissingET,
         'PTSorted'  :   {
-            'Electron'  :   ElectronPT_sorted,
-            'Muon'      :   MuonPT_sorted,
-            'Jet'       :   JetPT_sorted
+            'Electrons'  :   ElectronPT_sorted,
+            'Muons'      :   MuonPT_sorted,
+            'Jets'       :   JetPT_sorted
         }
     }
 
@@ -469,7 +472,7 @@ def EventLoop(TreeDict, Xsec, MediaDir, outfileprefix, LevelRun, LoopRun, EventR
     for category, attributes in HistDict.items():
         for var, hist in attributes['Hists'].items():
             hist = HistFuncs.HistLims(hist, var, Scale=Scale)[0]
-            
+
     # Writing and closing file
     outfile.Write()
     outfile.Close()

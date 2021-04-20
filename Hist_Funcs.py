@@ -218,7 +218,7 @@ def HistLims(hist, var, Scale=1, Norm=False):
 
     if hist:
         if hist.GetDimension() == 1:
-                        # Recalculating Max Min with higher threshold - this is possible as 
+            # Recalculating Max Min with higher threshold - this is possible as 
             # the hists have been rebinned to a large width
             # Get the index of the min/max bin and the read off the value of the 
             # low edge
