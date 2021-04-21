@@ -61,6 +61,11 @@ if len(AnalysisRuns) == 0:
 if len(EventRuns) == 0:
     EventRuns = ['Cuts', 'NoCuts']
 
+# Will recursively try to create each dir in RootDir path
+if RootDir:
+    for i in range(len(RootDir.split('/'))):
+        gSystem.Exec('mkdir '+'/'.join(RootDir.split('/')[:i+1]))
+
 # Load event file
 for LevelRun in LevelRuns:
     for LoopRun in LoopRuns:
