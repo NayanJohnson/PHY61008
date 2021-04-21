@@ -1,8 +1,8 @@
-from ROOT import gSystem, TFile, TChain
+from ROOT import gSystem, TFile, TChain, TObject
 import sys
 
 # Initialising runs
-NRuns = 5
+NRuns = 1
 RootDir = ''
 outfileprefix = ''
 Selection = ''
@@ -47,16 +47,32 @@ if RootDir:
     for i in range(len(RootDir.split('/'))):
         gSystem.Exec('mkdir '+'/'.join(RootDir.split('/')[:i+1]))
 
-chain = TChain('Delphes')
-for tree in RunTrees:
-    chain.Add(tree)
 
-outfilename = RootDir+outfileprefix+'Pruned.root'
-outfile = TFile(outfilename,'RECREATE')
-PrunedTree = chain.CopyTree(Selection)
+# Groups Tree into 5 runs to manage memory use 
+n = 5
+GroupedTrees = [RunTrees[x:x+n] for x in range(0,len(RunTrees),n)]
 
-outfile.Write()
-outfile.Close()
+for i in range(len(GroupedTrees)):
+    chain = TChain('Delphes')
+    for tree in GroupedTrees[i]:
+        chain.Add(tree)
+
+    outfilename = RootDir+outfileprefix+'Pruned.root'
+
+    # For the first loop overwrite existing files
+    # For subsequent loops update the file
+    if i == 0:
+        outfile = TFile(outfilename,'RECREATE')
+    else:
+        outfile = TFile(outfilename,'UPDATE')
+
+    PrunedTree = chain.CopyTree(Selection)
+
+
+    outfile.Write("", TObject.kOverwrite)
+    outfile.Close()
+    chain.Reset()
+    print('Group ', i)
 
 
 print('Mean xsec =', Xsec)

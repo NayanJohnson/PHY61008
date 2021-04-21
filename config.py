@@ -1,6 +1,8 @@
 EventLoopParams = {
-    'Level'              :   {
-        'Loop'     :   {
+    'Xsec'              :   2.8985389400000052,
+    'NEvents'           :   1000000,
+    'Level'             :   {
+        'Loop'              :   {
             'Cuts'              :   {
                 'e_Eta'             :   (-4.3, 4.9),
                 'e_Pt'              :   5,

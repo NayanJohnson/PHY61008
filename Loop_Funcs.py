@@ -40,8 +40,8 @@ import Hist_Funcs as HistFuncs
 Definitions of used objects:
 
 TreeDict =  {
-    'Tree'      :   TreeDict,
-    'NEvents'   :   NEvents,
+    'Tree'          :       chain,
+    'TreeReader'    :       TreeDict,
     'Branches'  :   {
         'Particle'          :   branchParticle,
         'GenJets'           :   branchGenJets,
@@ -67,7 +67,7 @@ EventDict   =   {
 '''
 
 
-def LoadTrees(TreeList):
+def LoadTrees(TreeList, GetNEvents=False):
     '''
     Loads .root file with tree labeled 'Delphes' and outputs dictionary containing the number 
     of events and branches.
@@ -79,20 +79,23 @@ def LoadTrees(TreeList):
         chain.Add(tree)
 
     # Create object of class ExRootTreeReader
-    TreeDict = ExRootTreeReader(chain)
-    NEvents = TreeDict.GetEntries()
+    TreeReader = ExRootTreeReader(chain)
 
+    if GetNEvents:
+        NEvents = TreeReader.GetEntries()
+    else:
+        NEvents = config.EventLoopParams['NEvents']
     # Get pointers to branches used in this analysis
-    branchParticle = TreeDict.UseBranch('Particle')
-    branchGenJet = TreeDict.UseBranch('GenJet')
-    branchElectron = TreeDict.UseBranch('Electron')
-    branchMuon = TreeDict.UseBranch('Muon')
-    branchJet = TreeDict.UseBranch('Jet')
-    branchMissingET = TreeDict.UseBranch('MissingET')
+    branchParticle = TreeReader.UseBranch('Particle')
+    branchGenJet = TreeReader.UseBranch('GenJet')
+    branchElectron = TreeReader.UseBranch('Electron')
+    branchMuon = TreeReader.UseBranch('Muon')
+    branchJet = TreeReader.UseBranch('Jet')
+    branchMissingET = TreeReader.UseBranch('MissingET')
 
     TreeDict =  {
                     'Tree'          :       chain,
-                    'TreeReader'    :       TreeDict,
+                    'TreeReader'    :       TreeReader,
                     'NEvents'       :       NEvents,
                     'Branches'      :       {
                         'Particle'          :   branchParticle,
@@ -382,7 +385,7 @@ def EventLoop(TreeDict, Xsec, MediaDir, outfileprefix, LevelRun, LoopRun, EventR
     
     EventCutNum = 0
     # Looping through events
-    for EventNum in range(TreeDict['NEvents']):
+    for EventNum in range(TreeDict['TreeReader'].GetEntries()):
 
         HistDict, ParticleDict, EventDict = GetParticles(TreeDict, LevelRun, LoopRun, HistDict, EventNum)
         

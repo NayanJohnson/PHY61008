@@ -5,6 +5,8 @@ from ROOT import gSystem, TFile, TH1F, TMath
 import config, requests, sys
 import Loop_Funcs as LoopFuncs
 
+Trees = []
+
 # Initialising runs
 LevelRuns = []
 LoopRuns = []
@@ -13,11 +15,15 @@ AnalysisRuns = []
 
 Runs = 1
 RootDir = ''
+outfileprefix = ''
 
 for arg in sys.argv:
     # Should filter the python script
     if arg.split('.')[-1] == 'py':
         continue
+
+    elif arg.split('=')[0].upper() == 'TREE':
+        Trees.append(arg.split('=')[1])
 
     # Dir arguements in the form
     elif arg.split('=')[0].upper() == 'ROOTDIR':
@@ -25,7 +31,6 @@ for arg in sys.argv:
 
     elif arg.split('=')[0].upper() == 'PREFIX':
         outfileprefix = arg.split('=')[1]
-
 
     # Looks for arguements passing the runs to compare
     elif arg.split('=')[0].upper() == 'LEVEL':
@@ -40,6 +45,8 @@ for arg in sys.argv:
     elif arg.split('=')[0].upper() == 'ANALYSIS':
         AnalysisRuns.append(arg.split('=')[1])
 
+myTree = LoopFuncs.LoadTrees(Trees)
+Xsec = config.EventLoopParams['Xsec']
 
 # If no run is given for a level, set the runs to default
 if len(LevelRuns) == 0:
@@ -59,5 +66,4 @@ for LevelRun in LevelRuns:
     for LoopRun in LoopRuns:
         for EventRun in EventRuns:
             for AnalysisRun in AnalysisRuns:
-                myTree = LoopFuncs.LoadTree(Runs)
-                LoopFuncs.EventLoop(myTree, Xsec, MediaDir, outfileprefix, LevelRun, LoopRun, EventRun, AnalysisRun)
+                LoopFuncs.EventLoop(myTree, Xsec, RootDir, outfileprefix, LevelRun, LoopRun, EventRun, AnalysisRun)
