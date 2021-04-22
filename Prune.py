@@ -4,7 +4,7 @@ import sys
 # Initialising runs
 NRuns = 1
 RootDir = ''
-outfileprefix = ''
+outfilename = ''
 Selection = ''
 
 for arg in sys.argv:
@@ -20,8 +20,8 @@ for arg in sys.argv:
     elif arg.split('=')[0].upper() == 'ROOTDIR':
         RootDir = arg.split('=')[1]
 
-    elif arg.split('=')[0].upper() == 'PREFIX':
-        outfileprefix = arg.split('=')[1]
+    elif arg.split('=')[0].upper() == 'OUTFILE':
+        outfilename = arg.split('=')[1]
 
     # Looks for arguements passing the runs to compare
     elif arg.split('=')[0].upper() == 'SELECTION':
@@ -57,7 +57,7 @@ for i in range(len(GroupedTrees)):
     for tree in GroupedTrees[i]:
         chain.Add(tree)
 
-    outfilename = RootDir+outfileprefix+'Pruned.root'
+    outfilename = RootDir+outfilename+'.root'
 
     # For the first loop overwrite existing files
     # For subsequent loops update the file
