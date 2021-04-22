@@ -51,12 +51,13 @@ if RootDir:
 # Groups Tree into 5 runs to manage memory use 
 n = 5
 GroupedTrees = [RunTrees[x:x+n] for x in range(0,len(RunTrees),n)]
-
+GroupNEvents = []
 for i in range(len(GroupedTrees)):
     chain = TChain('Delphes')
+
     for tree in GroupedTrees[i]:
         chain.Add(tree)
-
+    GroupNEvents.append(chain.GetEntries())
     outfilename = RootDir+outfilename+'.root'
 
     # For the first loop overwrite existing files
@@ -74,6 +75,6 @@ for i in range(len(GroupedTrees)):
     chain.Reset()
     print('Group ', i)
 
-
+NEvents = sum(GroupNEvents)
 print('Mean xsec =', Xsec)
-print('NEvents =', chain.GetEntries())
+print('NEvents =', NEvents)
