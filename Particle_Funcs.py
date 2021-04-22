@@ -193,17 +193,17 @@ def InvMassCheck(Type, Boson, ParticleDict, EventDict, EventCuts):
     PairInvMass = min(InvMassList, key=lambda x:abs(x-BosonMass))
     PairIndex = InvMassList.index(PairInvMass)
     if Permutations[PairIndex][0][0] < Permutations[PairIndex][1][0]:
-        ParticleDict = AddParticle(Boson+'Leading'+particles[0:-1], ParticleDict, Permutations[PairIndex][1][1].P4())
-        ParticleDict = AddParticle(Boson+'SubLeading'+particles[0:-1], ParticleDict, Permutations[PairIndex][0][1].P4())
+        ParticleDict = AddParticle(Boson+'Leading'+Type[0:-1], ParticleDict, Permutations[PairIndex][1][1].P4())
+        ParticleDict = AddParticle(Boson+'SubLeading'+Type[0:-1], ParticleDict, Permutations[PairIndex][0][1].P4())
 
     else:        
-        ParticleDict = AddParticle(Boson+'Leading'+particles[0:-1], ParticleDict, Permutations[PairIndex][0][1].P4())
-        ParticleDict = AddParticle(Boson+'SubLeading'+particles[0:-1], ParticleDict, Permutations[PairIndex][1][1].P4())
+        ParticleDict = AddParticle(Boson+'Leading'+Type[0:-1], ParticleDict, Permutations[PairIndex][0][1].P4())
+        ParticleDict = AddParticle(Boson+'SubLeading'+Type[0:-1], ParticleDict, Permutations[PairIndex][1][1].P4())
 
     # Removing boson particles from list of particle
     particlesList.remove(Permutations[PairIndex][0])
     particlesList.remove(Permutations[PairIndex][1])
-    EventDict['PTSorted'][particles] = particlesList
+    EventDict['PTSorted'][Type] = particlesList
 
     return ParticleDict, EventDict
 

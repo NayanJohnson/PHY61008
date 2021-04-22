@@ -386,6 +386,9 @@ def EventLoop(TreeDict, Xsec, MediaDir, outfileprefix, LevelRun, LoopRun, EventR
     EventCutNum = 0
     # Looping through events
     for EventNum in range(TreeDict['TreeReader'].GetEntries()):
+        
+        if EventNum % 10000 == 0:
+            print(EventNum, ' events completed.')
 
         HistDict, ParticleDict, EventDict = GetParticles(TreeDict, LevelRun, LoopRun, HistDict, EventNum)
         
