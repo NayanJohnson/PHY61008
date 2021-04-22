@@ -361,11 +361,11 @@ HistDict =  {
         'Dimensions':   1,
     },    
 
-    'FinalBeamElectronLeadingJet'   
+    'FinalBeamElectronFinalBeamJet'   
                     :   {
         'Requests'      :   {
             'Vars'      :   ['dEta', 'dPhi', 'M'],
-            'Particles' :   [['FinalBeamElectron', 'LeadingJet']],
+            'Particles' :   [['FinalBeamElectron', 'FinalBeamJet']],
         },
         'Dimensions':   1,
     },    
@@ -378,20 +378,20 @@ HistDict =  {
         'Dimensions':   1,
     },    
 
-    'LeadingMuonLeadingJet'
+    'LeadingMuonFinalBeamJet'
                     :   {
         'Requests'      :   {
             'Vars'      :   ['dEta', 'dPhi'],
-            'Particles' :   [['LeadingMuon', 'LeadingJet']],
+            'Particles' :   [['LeadingMuon', 'FinalBeamJet']],
         },
         'Dimensions':   1,
     },    
 
-    'SubLeadingMuonLeadingJet'  
+    'SubLeadingMuonFinalBeamJet'  
                     :   {
         'Requests'      :   {
             'Vars'      :   ['dEta', 'dPhi'],
-            'Particles' :   [['SubLeadingMuon', 'LeadingJet']],
+            'Particles' :   [['SubLeadingMuon', 'FinalBeamJet']],
         },
         'Dimensions':   1,
     },    
@@ -405,11 +405,11 @@ HistDict =  {
         'Dimensions':   1,
     },    
 
-    'MissingETLeadingJet'  
+    'MissingETFinalBeamJet'  
                     :   {
         'Requests'      :   {
             'Vars'      :   ['dEta', 'dPhi'],
-            'Particles' :   [['MissingET', 'LeadingJet']],
+            'Particles' :   [['MissingET', 'FinalBeamJet']],
         },
         'Dimensions':   1,
     },    
@@ -737,6 +737,14 @@ HistDict =  {
         'Dimensions':   2,
     },
 
+    '2DFinalBeamJet-ZLeadingJet'     
+                    :   {
+        'Requests'      :   {
+            'Vars'      :   [['Et', 'Eta'], ['Et', 'Phi'], ['Et', 'Pt'], ['Et', 'Et']],
+            'Particles' :   [[['FinalBeamJet'], ['ZLeadingJet']]],
+        },
+        'Dimensions':   2,
+    },
 }
 
 # Dictionary to request hist comparisons

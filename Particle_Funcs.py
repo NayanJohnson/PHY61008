@@ -158,14 +158,8 @@ def InvMassCheck(Type, Boson, ParticleDict, EventDict, EventCuts):
     '''
     '''
 
-    if Type == 'Electrons' and EventDict['Count']['Electrons'] <= 2:
-        return ParticleDict, EventDict
-
-    elif Type == 'Muons' and EventDict['Count']['Muons'] <= 1:
-        return ParticleDict, EventDict
-
-    elif Type == 'Jets' and EventDict['Count']['Jets'] <= 2:
-        return ParticleDict, EventDict
+    if EventDict['Count'][Type] <= EventCuts['Level']['Event']['Cuts'][Type]:
+        return ParticleDict, EventDict, True
 
     BosonMass = config.EventLoopParams[Boson]['Mass']
 
@@ -189,6 +183,7 @@ def InvMassCheck(Type, Boson, ParticleDict, EventDict, EventCuts):
     for ParticlePair in Permutations:
         InvMassList.append( (ParticlePair[0][1].P4()+ParticlePair[1][1].P4()).Mag() )
 
+    
     # Find the closest InvMass to the BosonMass
     PairInvMass = min(InvMassList, key=lambda x:abs(x-BosonMass))
     PairIndex = InvMassList.index(PairInvMass)
@@ -205,5 +200,5 @@ def InvMassCheck(Type, Boson, ParticleDict, EventDict, EventCuts):
     particlesList.remove(Permutations[PairIndex][1])
     EventDict['PTSorted'][Type] = particlesList
 
-    return ParticleDict, EventDict
+    return ParticleDict, EventDict, False
 
