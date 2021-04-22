@@ -1,6 +1,6 @@
 EventLoopParams = {
-    'Xsec'              :   2.8985389400000052,
-    'NEvents'           :   1000000,
+    'Xsec'              :   0.0001576,
+    'NEvents'           :   10000*5,
     'Level'             :   {
         'Loop'              :   {
             'Cuts'              :   {
@@ -25,8 +25,8 @@ EventLoopParams = {
         'Event'        :   {
             'Cuts'              :   {
                 'Electrons'         :   1,
-                'Muons'             :   2,
-                'Jets'              :   1
+                'Muons'             :   1,
+                'Jets'              :   3
             },
 
             'NoCuts'            :   {
@@ -39,7 +39,7 @@ EventLoopParams = {
         'Analysis'     :   {
             'Cuts'              :   {
                 'MissingET'         :   {
-                    'Et'                :   (30, float('inf')),
+                    'Et'                :   (0, float('inf')),
                 },
 
                 'FinalBeamElectron' :   {
@@ -60,7 +60,7 @@ EventLoopParams = {
     },
 
     'Z'         :   {
-        'Decays' :   (None, None),
+        'Decays' :   ('Jets', None),
         'Mass'      :   91.1876 #GeV
     },      
 
@@ -70,7 +70,7 @@ EventLoopParams = {
     },      
 
     'WMinus'    :   {
-        'Decays' :   ('Muons', None),
+        'Decays' :   (None, None),
         'Mass'      :   80.379 #GeV
     }   
 }   
