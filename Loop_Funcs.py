@@ -414,7 +414,9 @@ def EventLoop(TreeDict, Xsec, MediaDir, outfileprefix, LevelRun, LoopRun, EventR
             elif Zdecays[0] == Zdecays[1]:
                 continue
             else:
-                ParticleDict, EventDict = ParticleFuncs.InvMassCheck(Zdecay, 'Z', ParticleDict, EventDict, EventCuts)
+                ParticleDict, EventDict, Continue = ParticleFuncs.InvMassCheck(Zdecay, 'Z', ParticleDict, EventDict, EventCuts)
+                if Continue:
+                    continue                
 
         for WPlusdecay in WPlusdecays:
             if WPlusdecay == None:
@@ -422,7 +424,9 @@ def EventLoop(TreeDict, Xsec, MediaDir, outfileprefix, LevelRun, LoopRun, EventR
             elif WPlusdecays[0] == WPlusdecays[1]:
                 continue            
             elif WPlusdecay == 'Jets':
-                ParticleDict, EventDict = ParticleFuncs.InvMassCheck(WPlusdecay, 'WPlus', ParticleDict, EventDict, EventCuts)
+                ParticleDict, EventDict, Continue = ParticleFuncs.InvMassCheck(WPlusdecay, 'WPlus', ParticleDict, EventDict, EventCuts)
+                if Continue:
+                    continue                
             else:
                 particlesList = [ParticleDict['Leading'+WPlusdecay[0:-1]], ParticleDict['SubLeading'+WPlusdecay[0:-1]]]
                 for Lepton in particlesList:
@@ -436,7 +440,9 @@ def EventLoop(TreeDict, Xsec, MediaDir, outfileprefix, LevelRun, LoopRun, EventR
             elif WMinusdecays[0] == WMinusdecays[1]:
                 continue            
             elif WMinusdecay == 'Jets':
-                ParticleDict, EventDict = ParticleFuncs.InvMassCheck(WMinusdecay, 'WMinus', ParticleDict, EventDict, EventCuts)
+                ParticleDict, EventDict, Continue = ParticleFuncs.InvMassCheck(WMinusdecay, 'WMinus', ParticleDict, EventDict, EventCuts)
+                if Continue:
+                    continue
             else:
                 particlesList = [ParticleDict['Leading'+WMinusdecay[0:-1]], ParticleDict['SubLeading'+WMinusdecay[0:-1]]]
                 for Lepton in particlesList:

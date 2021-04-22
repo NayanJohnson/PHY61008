@@ -51,7 +51,7 @@ EventLoopParams = {
                 'MissingET'         :   {
                     'Et'                :   (0, float('inf')),
                 },
-                #
+
                 'FinalBeamElectron' :   {
                     'Eta'               :   (float('-inf'), float('inf')),
                 }
@@ -61,17 +61,17 @@ EventLoopParams = {
 
     'Z'         :   {
         'Decays' :   (None, None),
-        'Mass'      :   91.1876 #GeV
+        'Mass'      :   91.19 #GeV
     },      
 
     'WPlus'     :   {
         'Decays' :   ('Muons', None),
-        'Mass'      :   80.379 #GeV
+        'Mass'      :   80.38 #GeV
     },      
 
     'WMinus'    :   {
         'Decays' :   ('Muons', None),
-        'Mass'      :   80.379 #GeV
+        'Mass'      :   80.38 #GeV
     }   
 }   
 
