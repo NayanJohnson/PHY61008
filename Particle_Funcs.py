@@ -89,7 +89,7 @@ def GetParticleVariable(ParticleDict, ParticleList, var):
     '''
 
     # List of variables that are stored in all particles.
-    ParticleProperties = ['Charge', 'E', 'Eta', 'Phi', 'Rapidity', 'Theta', 'Pt', 'Et', 'Mt']
+    ParticleProperties = ['Charge', 'E', 'Eta', 'Phi', 'Rapidity', 'Theta', 'E', 'Pt', 'Et', 'Mt']
 
 
     # If all particles are present
@@ -183,10 +183,10 @@ def InvMassCheck(Type, Boson, ParticleDict, EventDict, EventCuts):
     for ParticlePair in Permutations:
         InvMassList.append( (ParticlePair[0][1].P4()+ParticlePair[1][1].P4()).Mag() )
 
-    
     # Find the closest InvMass to the BosonMass
     PairInvMass = min(InvMassList, key=lambda x:abs(x-BosonMass))
     PairIndex = InvMassList.index(PairInvMass)
+
     if Permutations[PairIndex][0][0] < Permutations[PairIndex][1][0]:
         ParticleDict = AddParticle(Boson+'Leading'+Type[0:-1], ParticleDict, Permutations[PairIndex][1][1].P4())
         ParticleDict = AddParticle(Boson+'SubLeading'+Type[0:-1], ParticleDict, Permutations[PairIndex][0][1].P4())

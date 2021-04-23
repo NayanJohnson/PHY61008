@@ -3,7 +3,7 @@
 # plot and what particles the histogram requires
 
 VarKeywords = [
-    'Count', 'Eta', 'Phi', 'Rapidity', 'Pt', 'Et', 'M' 'Mt', 'q', 
+    'Count', 'Eta', 'Phi', 'Rapidity', 'Pt', 'Et', 'E' 'M' 'Mt', 'q', 
     'dEta', 'dPhi', 'dRapidity', 'dR_Eta', 'dR_Rap',
 ]
 
@@ -50,7 +50,11 @@ VarParams = {
     'Rapidity'  :   {
         'Range'     :   [-10, 10]
     },
-    
+
+    'E'        :   {
+        'Range'     :   [0, 1000]
+    },
+
     'Pt'        :   {
         'Range'     :   [0, 500]
     },
@@ -207,7 +211,7 @@ HistDict =  {
 
     'AllJets'       :   {
         'Requests'      :   {
-            'Vars'      :   ['Eta', 'Phi', 'Rapidity', 'Pt'],
+            'Vars'      :   ['Eta', 'Phi', 'Rapidity', 'Pt', 'E'],
             'Particles' :   [['LeadingJet'], ['SubLeadingJet'], ['ThirdJet'], ['FourthJet']],
         },
         'Dimensions':   1,
@@ -221,9 +225,17 @@ HistDict =  {
         'Dimensions':   1,
     },    
 
+    'LeadingJets'    :   {
+        'Requests'      :   {
+            'Vars'      :   ['M'],
+            'Particles' :   [['LeadingJet', 'SubLeadingJet']],
+        },
+        'Dimensions':   1,
+    },    
+
     'LeadingJet'    :   {
         'Requests'      :   {
-            'Vars'      :   ['Eta', 'Phi', 'Rapidity', 'Pt'],
+            'Vars'      :   ['Eta', 'Phi', 'Rapidity', 'Pt', 'M'],
             'Particles' :   [['LeadingJet']],
         },
         'Dimensions':   1,
@@ -231,7 +243,7 @@ HistDict =  {
 
     'SubLeadingJet' :   {
         'Requests'      :   {
-            'Vars'      :   ['Eta', 'Phi', 'Rapidity', 'Pt'],
+            'Vars'      :   ['Eta', 'Phi', 'Rapidity', 'Pt', 'M'],
             'Particles' :   [['SubLeadingJet']],
         },
         'Dimensions':   1,
