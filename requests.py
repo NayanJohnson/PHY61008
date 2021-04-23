@@ -382,6 +382,17 @@ HistDict =  {
         'Dimensions':   1,
     },    
 
+
+    'FinalBeamElectronLeadingJet'   
+                    :   {
+        'Requests'      :   {
+            'Vars'      :   ['dEta', 'dPhi', 'M'],
+            'Particles' :   [['FinalBeamElectron', 'LeadingJet']],
+        },
+        'Dimensions':   1,
+    },    
+
+
     'MuonMuon'      :   {
         'Requests'      :   {
             'Vars'      :   ['dEta', 'dPhi', 'dRapidity', 'dR_Eta', 'dR_Rap', 'M'],
@@ -860,5 +871,29 @@ HistComparisonDict =    {
         },
 
         'Var'           :   ['qeMethod', 'qLepton']    
+    },
+
+    '8'             :   {
+        'Hist1'         :   {
+            'Name'          :   'FinalBeamJet',
+        },
+        
+        'Hist2'         :   {
+            'Name'          :   'ZLeadingJet',
+        },
+
+        'Var'           :   ['Eta', 'Phi', 'Pt']    
+    },
+
+    '9'             :   {
+        'Hist1'         :   {
+            'Name'          :   'FinalBeamJet',
+        },
+        
+        'Hist2'         :   {
+            'Name'          :   'ZSubLeadingJet',
+        },
+
+        'Var'           :   ['Eta', 'Phi', 'Pt']    
     },
 }
