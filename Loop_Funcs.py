@@ -256,7 +256,7 @@ def ParticleLoop(TreeDict, EventNum, LevelRun, LoopRun):
             if Cuts['jet_Eta'][0] <= jet.P4().Eta() <= Cuts['e_Eta'][1]:
                 if jet.P4().Pt() >= Cuts['jet_Pt']:
                     jet_count += 1
-                    JetPT.append( (jet.P4().Eta(), jet) )
+                    JetPT.append( (jet.P4().Pt(), jet) )
     
     # Sorts particle based on the 1st element in each tuple (the Pt) in ascending order
     ElectronPT_sorted = sorted(ElectronPT, key=lambda x: x[0])
