@@ -158,7 +158,7 @@ def InvMassCheck(Type, Boson, ParticleDict, EventDict, EventCuts):
     '''
     '''
 
-    if EventDict['Count'][Type] <= EventCuts['Level']['Event']['Cuts'][Type]:
+    if EventDict['Count'][Type] <= EventCuts[Type]:
         return ParticleDict, EventDict, True
 
     BosonMass = config.EventLoopParams[Boson]['Mass']
