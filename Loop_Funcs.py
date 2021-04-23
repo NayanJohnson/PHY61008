@@ -362,14 +362,12 @@ def GetParticles(TreeDict, LevelRun, LoopRun, HistDict, EventNum):
 
     return HistDict, ParticleDict, EventDict
 
-def EventLoop(TreeDict, Xsec, MediaDir, outfileprefix, LevelRun, LoopRun, EventRun, AnalysisRun):
+def EventLoop(TreeDict, Xsec, outfilename, LevelRun, LoopRun, EventRun, AnalysisRun):
     '''
     '''
-
-    outfilename = outfileprefix+'_'+LevelRun+'Level_Loop'+LoopRun+'Event'+EventRun+'Analysis'+AnalysisRun+'.root'
 
     # Open output
-    outfile = TFile(MediaDir+outfilename,'RECREATE')
+    outfile = TFile(outfilename+'.root','RECREATE')
 
     HistDict = requests.HistDict
 
@@ -488,3 +486,4 @@ def EventLoop(TreeDict, Xsec, MediaDir, outfileprefix, LevelRun, LoopRun, EventR
     # Writing and closing file
     outfile.Write()
     outfile.Close()
+    gSystem.Exec('rootprint -f png -d '+outfilename+'/ '+outfilename+'.root')
