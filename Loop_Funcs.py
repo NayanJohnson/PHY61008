@@ -367,7 +367,7 @@ def EventLoop(TreeDict, Xsec, outfilename, LevelRun, LoopRun, EventRun, Analysis
     '''
 
     # Open output
-    outfile = TFile(outfilename,'RECREATE')
+    outfile = TFile(outfilename+'.root','RECREATE')
 
     HistDict = requests.HistDict
 
@@ -486,3 +486,4 @@ def EventLoop(TreeDict, Xsec, outfilename, LevelRun, LoopRun, EventRun, Analysis
     # Writing and closing file
     outfile.Write()
     outfile.Close()
+    gSystem.Exec('rootprint -f png -d '+outfilename+'/ '+outfilename+'.root')

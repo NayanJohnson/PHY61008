@@ -80,5 +80,5 @@ for LoopRun in LoopRuns:
             gSystem.Exec('mkdir '+RootDir+'/Loop'+LoopRun+'/Event'+EventRun+'/Analysis'+AnalysisRun)
             for LevelRun in LevelRuns:
                 print('Started run:', RootDir+'/Loop'+LoopRun+'/Event'+EventRun+'/Analysis'+AnalysisRun)
-                outfilename = RootDir+'/Loop'+LoopRun+'/Event'+EventRun+'/Analysis'+AnalysisRun+'/'+outfileprefix+LevelRun+'.root'
+                outfilename = RootDir+'/Loop'+LoopRun+'/Event'+EventRun+'/Analysis'+AnalysisRun+'/'+outfileprefix+LevelRun
                 LoopFuncs.EventLoop(myTree, Xsec, outfilename, LevelRun, LoopRun, EventRun, AnalysisRun)
