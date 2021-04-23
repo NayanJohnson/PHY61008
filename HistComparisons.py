@@ -23,7 +23,7 @@ NormRuns = []
 MediaDir = ''
 
 RootDir = ('', '')
-FileComparisons = [('', '')]
+FileComparisons = []
 
 for arg in sys.argv:
     # Should filter the python script
@@ -70,6 +70,9 @@ if len(MediaDir) > 0:
 
 
 # If no run is given for a level, set the runs to default
+if len(FileComparisons) == 0:
+    FileComparisons = [('','')]
+
 if len(LevelComparisons) == 0:
     LevelComparisons = [('Generator', 'Detector'), ('Generator', 'Generator'), ('Detector', 'Detector')]
 
@@ -86,8 +89,6 @@ if len(NormRuns) == 0:
     NormRuns = [True, False]    
 
 loopnum = 0
-
-print(FileComparisons, LevelComparisons, LoopComparisons, EventComparisons, AnalysisComparisons, NormRuns)
 
 for FilePair in FileComparisons:
     for LevelRunPair in LevelComparisons:
