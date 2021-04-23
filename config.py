@@ -1,5 +1,5 @@
 EventLoopParams = {
-    'Xsec'              :   0.0001576,
+    'Xsec'              :   0.28,
     'NEvents'           :   10000*5,
     'Level'             :   {
         'Loop'              :   {
@@ -25,7 +25,7 @@ EventLoopParams = {
         'Event'        :   {
             'Cuts'              :   {
                 'Electrons'         :   1,
-                'Muons'             :   1,
+                'Muons'             :   0,
                 'Jets'              :   3
             },
 
@@ -70,7 +70,7 @@ EventLoopParams = {
     },      
 
     'WMinus'    :   {
-        'Decays' :   ('Muons', None),
+        'Decays' :   (None, None),
         'Mass'      :   80.38 #GeV
     }   
 }   
