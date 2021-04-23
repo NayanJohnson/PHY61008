@@ -20,19 +20,25 @@ AnalysisComparisons = []
 
 NormRuns = []
 
-FileComparisons = []
-
 MediaDir = ''
+
+RootDir = ('', '')
+FileComparisons = [('', '')]
 
 for arg in sys.argv:
     # Should filter the python script
     if arg.split('.')[-1] == 'py':
         continue
 
-    elif arg.split('=')[0].upper() == 'MEDIA':
-        MediaDir = arg.split('=')[1]
+    elif arg.split('=')[0].upper() == 'MEDIADIRS':
+        RootDir = arg.split('=')[1]
 
-    elif arg.split('=')[0].upper() == 'FILE':
+    # File args
+    # "ARG=FILE1ARG-FILE2ARG"
+    elif arg.split('=')[0].upper() == 'ROOTDIRS':
+        RootDir = (arg.split('=')[1].split('-')[0], arg.split('=')[1].split('-')[1])
+     
+    elif arg.split('=')[0].upper() == 'PREFIX':
         FileComparisons.append( (arg.split('=')[1].split('-')[0], arg.split('=')[1].split('-')[1]) )
 
 
@@ -57,8 +63,9 @@ for arg in sys.argv:
 
 
 # Will recursively try to create each dir in MediaDir path
-for i in range(len(MediaDir.split('/'))):
-    gSystem.Exec('mkdir '+'/'.join(MediaDir.split('/')[:i+1]))
+if len(MediaDir) > 0:
+    for i in range(len(MediaDir.split('/'))):
+        gSystem.Exec('mkdir '+'/'.join(MediaDir.split('/')[:i+1]))
 
 
 
@@ -80,6 +87,8 @@ if len(NormRuns) == 0:
 
 loopnum = 0
 
+print(FileComparisons, LevelComparisons, LoopComparisons, EventComparisons, AnalysisComparisons, NormRuns)
+
 for FilePair in FileComparisons:
     for LevelRunPair in LevelComparisons:
         for LoopRunPair in LoopComparisons:
@@ -90,30 +99,32 @@ for FilePair in FileComparisons:
                         loopnum += 1
                         print('Loop:', loopnum)
 
+                        HistFile1_RootDir = RootDir[0]
                         HistFile1_Prefix = FilePair[0]
                         HistFile1_LevelRun = LevelRunPair[0]
                         HistFile1_LoopRun = LoopRunPair[0]
                         HistFile1_EventRun = EventRunPair[0]
                         HistFile1_AnalysisRun = AnalysisRunPair[0]
-                        HistFile1_Name = MediaDir+HistFile1_Prefix+'_'+HistFile1_LevelRun+'Level_Loop'+HistFile1_LoopRun+'Event'+HistFile1_EventRun+'Analysis'+HistFile1_AnalysisRun
+                        HistFile1_Name = HistFile1_RootDir+'/Loop'+HistFile1_LoopRun+'/Event'+HistFile1_EventRun+'/Analysis'+HistFile1_AnalysisRun+'/'+HistFile1_Prefix+HistFile1_LevelRun+'.root'
 
+                        HistFile2_RootDir = RootDir[1]
                         HistFile2_Prefix = FilePair[1]
                         HistFile2_LevelRun = LevelRunPair[1]
                         HistFile2_LoopRun = LoopRunPair[1]
                         HistFile2_EventRun = EventRunPair[1]
                         HistFile2_AnalysisRun = AnalysisRunPair[1]
-                        HistFile2_Name = MediaDir+HistFile2_Prefix+'_'+HistFile2_LevelRun+'Level_Loop'+HistFile2_LoopRun+'Event'+HistFile2_EventRun+'Analysis'+HistFile2_AnalysisRun
+                        HistFile2_Name = HistFile2_RootDir+'/Loop'+HistFile2_LoopRun+'/Event'+HistFile2_EventRun+'/Analysis'+HistFile2_AnalysisRun+'/'+HistFile2_Prefix+HistFile2_LevelRun+'.root'
                         
                         if Norm:
                             Comparison = 'Norm'
                         else:
                             Comparison = 'Rel'
 
-                        gSystem.Exec('mkdir '+MediaDir+Comparison+'_'+HistFile1_Prefix+'-'+HistFile2_Prefix)
-                        gSystem.Exec('mkdir '+MediaDir+Comparison+'_'+HistFile1_Prefix+'-'+HistFile2_Prefix+'/'+HistFile1_LevelRun+'-'+HistFile2_LevelRun+'Level/')
-                        gSystem.Exec('mkdir '+MediaDir+Comparison+'_'+HistFile1_Prefix+'-'+HistFile2_Prefix+'/'+HistFile1_LevelRun+'-'+HistFile2_LevelRun+'Level/Loop'+HistFile1_LoopRun+'-'+HistFile2_LoopRun)
-                        gSystem.Exec('mkdir '+MediaDir+Comparison+'_'+HistFile1_Prefix+'-'+HistFile2_Prefix+'/'+HistFile1_LevelRun+'-'+HistFile2_LevelRun+'Level/Loop'+HistFile1_LoopRun+'-'+HistFile2_LoopRun+'/Event'+HistFile1_EventRun+'-'+HistFile2_EventRun+'/')
-                        gSystem.Exec('mkdir '+MediaDir+Comparison+'_'+HistFile1_Prefix+'-'+HistFile2_Prefix+'/'+HistFile1_LevelRun+'-'+HistFile2_LevelRun+'Level/Loop'+HistFile1_LoopRun+'-'+HistFile2_LoopRun+'/Event'+HistFile1_EventRun+'-'+HistFile2_EventRun+'/Analysis'+HistFile1_AnalysisRun+'-'+HistFile2_AnalysisRun+'/')
+                        gSystem.Exec('mkdir '+MediaDir+Comparison+HistFile1_Prefix+HistFile2_Prefix)
+                        gSystem.Exec('mkdir '+MediaDir+Comparison+HistFile1_Prefix+HistFile2_Prefix+'/Loop'+HistFile1_LoopRun+'-'+HistFile2_LoopRun)
+                        gSystem.Exec('mkdir '+MediaDir+Comparison+HistFile1_Prefix+HistFile2_Prefix+'/Loop'+HistFile1_LoopRun+'-'+HistFile2_LoopRun+'/Event'+HistFile1_EventRun+'-'+HistFile2_EventRun)
+                        gSystem.Exec('mkdir '+MediaDir+Comparison+HistFile1_Prefix+HistFile2_Prefix+'/Loop'+HistFile1_LoopRun+'-'+HistFile2_LoopRun+'/Event'+HistFile1_EventRun+'-'+HistFile2_EventRun+'/Analysis'+HistFile1_AnalysisRun+'-'+HistFile2_AnalysisRun+'/')
+                        gSystem.Exec('mkdir '+MediaDir+Comparison+HistFile1_Prefix+HistFile2_Prefix+'/Loop'+HistFile1_LoopRun+'-'+HistFile2_LoopRun+'/Event'+HistFile1_EventRun+'-'+HistFile2_EventRun+'/Analysis'+HistFile1_AnalysisRun+'-'+HistFile2_AnalysisRun+'/'+HistFile1_LevelRun+'-'+HistFile2_LevelRun+'Level/')
 
 
                         # Read hist files
@@ -126,7 +137,7 @@ for FilePair in FileComparisons:
                                 'AnalysisRun'   :   HistFile1_AnalysisRun,
                                 'Name'          :   HistFile1_Name,
 
-                                'File'          :   TFile(HistFile1_Name+'.root')
+                                'File'          :   TFile(HistFile1_Name)
                             },
 
                             2   :   {
@@ -134,10 +145,10 @@ for FilePair in FileComparisons:
                                 'LevelRun'      :   HistFile2_LevelRun,
                                 'LoopRun'       :   HistFile2_LoopRun,
                                 'EventRun'      :   HistFile2_EventRun,
-                                'AnalysisRun' :   HistFile2_AnalysisRun,
+                                'AnalysisRun'   :   HistFile2_AnalysisRun,
                                 'Name'          :   HistFile2_Name,
 
-                                'File'          :   TFile(HistFile2_Name+'.root')
+                                'File'          :   TFile(HistFile2_Name)
                             },
                         }    
 
