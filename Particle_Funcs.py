@@ -89,7 +89,7 @@ def GetParticleVariable(ParticleDict, ParticleList, var):
     '''
 
     # List of variables that are stored in all particles.
-    ParticleProperties = ['Charge', 'E', 'Eta', 'Phi', 'Rapidity', 'Theta', 'Pt', 'Et', 'Mt']
+    ParticleProperties = ['Charge', 'E', 'Eta', 'Phi', 'Rapidity', 'Theta', 'E', 'Pt', 'Et', 'Mt']
 
 
     # If all particles are present
