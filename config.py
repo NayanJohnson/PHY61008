@@ -1,5 +1,5 @@
 EventLoopParams = {
-    'Xsec'              :   0.0001576,
+    'Xsec'              :  	9.96e-05,
     'NEvents'           :   10000*5,
     'Level'             :   {
         'Loop'              :   {
