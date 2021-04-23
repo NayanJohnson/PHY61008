@@ -45,9 +45,6 @@ for arg in sys.argv:
     elif arg.split('=')[0].upper() == 'ANALYSIS':
         AnalysisRuns.append(arg.split('=')[1])
 
-myTree = LoopFuncs.LoadTrees(Trees)
-Xsec = config.EventLoopParams['Xsec']
-
 # If no run is given for a level, set the runs to default
 if len(LevelRuns) == 0:
     LevelRuns = ['Generator', 'Detector']
@@ -61,14 +58,27 @@ if len(AnalysisRuns) == 0:
 if len(EventRuns) == 0:
     EventRuns = ['Cuts', 'NoCuts']
 
+# Loading Trees
+myTree = LoopFuncs.LoadTrees(Trees)
+
+# Getting Xsec from config file 
+Xsec = config.EventLoopParams['Xsec']
+
 # Will recursively try to create each dir in RootDir path
-if RootDir:
+if len(RootDir) > 0:
     for i in range(len(RootDir.split('/'))):
         gSystem.Exec('mkdir '+'/'.join(RootDir.split('/')[:i+1]))
 
-# Load event file
-for LevelRun in LevelRuns:
-    for LoopRun in LoopRuns:
-        for EventRun in EventRuns:
-            for AnalysisRun in AnalysisRuns:
-                LoopFuncs.EventLoop(myTree, Xsec, RootDir, outfileprefix, LevelRun, LoopRun, EventRun, AnalysisRun)
+
+
+
+for LoopRun in LoopRuns:
+    gSystem.Exec('mkdir '+RootDir+'/Loop'+LoopRun)
+    for EventRun in EventRuns:
+        gSystem.Exec('mkdir '+RootDir+'/Loop'+LoopRun+'/Event'+EventRun)
+        for AnalysisRun in AnalysisRuns:
+            gSystem.Exec('mkdir '+RootDir+'/Loop'+LoopRun+'/Event'+EventRun+'/Analysis'+AnalysisRun)
+            for LevelRun in LevelRuns:
+                print('Started run:', RootDir+'/Loop'+LoopRun+'/Event'+EventRun+'/Analysis'+AnalysisRun)
+                outfilename = RootDir+'/Loop'+LoopRun+'/Event'+EventRun+'/Analysis'+AnalysisRun+'/'+outfileprefix+LevelRun
+                LoopFuncs.EventLoop(myTree, Xsec, outfilename, LevelRun, LoopRun, EventRun, AnalysisRun)
