@@ -65,7 +65,7 @@ myTree = LoopFuncs.LoadTrees(Trees)
 Xsec = config.EventLoopParams['Xsec']
 
 # Will recursively try to create each dir in RootDir path
-if RootDir:
+if len(RootDir) > 0:
     for i in range(len(RootDir.split('/'))):
         gSystem.Exec('mkdir '+'/'.join(RootDir.split('/')[:i+1]))
 
