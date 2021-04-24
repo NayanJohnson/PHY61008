@@ -25,8 +25,8 @@ EventLoopParams = {
         'Event'        :   {
             'Cuts'              :   {
                 'Electrons'         :   1,
-                'Muons'             :   2,
-                'Jets'              :   1
+                'Muons'             :   1,
+                'Jets'              :   3
             },
 
             'NoCuts'            :   {
@@ -60,7 +60,7 @@ EventLoopParams = {
     },
 
     'Z'         :   {
-        'Decays' :   (None, None),
+        'Decays' :   ('Jets', None),
         'Mass'      :   91.19 #GeV
     },      
 
@@ -70,7 +70,7 @@ EventLoopParams = {
     },      
 
     'WMinus'    :   {
-        'Decays' :   ('Muons', None),
+        'Decays' :   (None, None),
         'Mass'      :   80.38 #GeV
     }   
 }   

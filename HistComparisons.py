@@ -96,6 +96,7 @@ for FilePair in FileComparisons:
             for EventRunPair in EventComparisons:
                 for AnalysisRunPair in AnalysisComparisons:
                     for Norm in NormRuns:
+                        
 
                         loopnum += 1
                         print('Loop:', loopnum)
@@ -116,6 +117,7 @@ for FilePair in FileComparisons:
                         HistFile2_AnalysisRun = AnalysisRunPair[1]
                         HistFile2_Name = HistFile2_RootDir+'/Loop'+HistFile2_LoopRun+'/Event'+HistFile2_EventRun+'/Analysis'+HistFile2_AnalysisRun+'/'+HistFile2_Prefix+HistFile2_LevelRun+'.root'
                         
+                        
                         if Norm:
                             Comparison = 'Norm'
                         else:
@@ -127,6 +129,7 @@ for FilePair in FileComparisons:
                         gSystem.Exec('mkdir '+MediaDir+Comparison+HistFile1_Prefix+HistFile2_Prefix+'/Loop'+HistFile1_LoopRun+'-'+HistFile2_LoopRun+'/Event'+HistFile1_EventRun+'-'+HistFile2_EventRun+'/Analysis'+HistFile1_AnalysisRun+'-'+HistFile2_AnalysisRun+'/')
                         gSystem.Exec('mkdir '+MediaDir+Comparison+HistFile1_Prefix+HistFile2_Prefix+'/Loop'+HistFile1_LoopRun+'-'+HistFile2_LoopRun+'/Event'+HistFile1_EventRun+'-'+HistFile2_EventRun+'/Analysis'+HistFile1_AnalysisRun+'-'+HistFile2_AnalysisRun+'/'+HistFile1_LevelRun+'-'+HistFile2_LevelRun+'Level/')
 
+                        print('Current run:', MediaDir+Comparison+HistFile1_Prefix+HistFile2_Prefix+'/Loop'+HistFile1_LoopRun+'-'+HistFile2_LoopRun+'/Event'+HistFile1_EventRun+'-'+HistFile2_EventRun+'/Analysis'+HistFile1_AnalysisRun+'-'+HistFile2_AnalysisRun+'/'+HistFile1_LevelRun+'-'+HistFile2_LevelRun+'Level/')
 
                         # Read hist files
                         HistFiles = {
