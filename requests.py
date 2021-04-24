@@ -382,7 +382,6 @@ HistDict =  {
         'Dimensions':   1,
     },    
 
-
     'FinalBeamElectronLeadingJet'   
                     :   {
         'Requests'      :   {
@@ -683,7 +682,7 @@ HistDict =  {
     '2DZJets'       :   {
         'Requests'      :   {
             'Vars'      :   [['Eta', 'Pt']],
-            'Particles' :   [[['ZSubLeadingJet', 'ZSubLeadingJet'], ['ZSubLeadingJet', 'ZSubLeadingJet']]],
+            'Particles' :   [[['ZLeadingJet', 'ZLeadingJet'], ['ZSubLeadingJet', 'ZSubLeadingJet']]],
         },
         'Dimensions':   2,
     },
@@ -896,4 +895,16 @@ HistComparisonDict =    {
 
         'Var'           :   ['Eta', 'Phi', 'Pt']    
     },
+
+    '10'             :   {
+        'Hist1'         :   {
+            'Name'          :   'AllJets',
+        },
+        
+        'Hist2'         :   {
+            'Name'          :   'ZJets',
+        },
+
+        'Var'           :   ['Eta', 'Phi', 'Pt']    
+    },    
 }
