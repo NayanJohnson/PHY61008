@@ -89,7 +89,7 @@ def GetParticleVariable(ParticleDict, ParticleList, var):
     '''
 
     # List of variables that are stored in all particles.
-    ParticleProperties = ['Charge', 'E', 'Eta', 'Phi', 'Rapidity', 'Theta', 'E', 'Pt', 'Et', 'Mt']
+    ParticleProperties = ['Charge', 'E', 'Eta', 'Phi', 'Rapidity', 'Theta', 'E', 'Pt', 'Et']
 
 
     # If all particles are present
@@ -127,6 +127,12 @@ def GetParticleVariable(ParticleDict, ParticleList, var):
             for particle in ParticleList:
                 ParticleSum = particle['P4'] + ParticleSum
             return ParticleSum.M()
+
+        elif var == 'Mt':
+            ParticleSum = TLorentzVector()
+            for particle in ParticleList:
+                ParticleSum = particle['P4'] + ParticleSum
+            return ParticleSum.Mt()
 
         elif var == 'dEta':
             dEta = ParticleList[0]['Eta'] - ParticleList[1]['Eta']
@@ -196,9 +202,8 @@ def InvMassCheck(Type, Boson, ParticleDict, EventDict, EventCuts):
         ParticleDict = AddParticle(Boson+'SubLeading'+Type[0:-1], ParticleDict, Permutations[PairIndex][1][1].P4())
 
     # Removing boson particles from list of particle
-    particlesList.remove(Permutations[PairIndex][0])
-    particlesList.remove(Permutations[PairIndex][1])
-    EventDict['PTSorted'][Type] = particlesList
+    EventDict['PTSorted'][Type].remove(Permutations[PairIndex][0])
+    EventDict['PTSorted'][Type].remove(Permutations[PairIndex][1])
 
     return ParticleDict, EventDict, False
 
