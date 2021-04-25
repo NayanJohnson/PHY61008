@@ -36,15 +36,20 @@ EventLoopParams = {
             },
         },
 
+
         'Analysis'     :   {
             'Cuts'              :   {
                 
                 'LeadingJet'        :   {
-                    'Pt'                :   (15, float('inf')),
+                    'Pt'                :   (20, float('inf')),
                 },
 
                 'SubLeadingJet'     :   {
                     'Pt'                :   (15, float('inf')),
+                },
+
+                'ZJets'             :   {
+                    'M'                 :   (50, float('inf')),
                 },
 
                 'MissingET'         :   {
@@ -64,6 +69,10 @@ EventLoopParams = {
 
                 'SubLeadingJet'        :   {
                     'Pt'                :   (0, float('inf')),
+                },
+
+                'ZJets'        :   {
+                    'M'                :   (0, float('inf')),
                 },
 
                 'MissingET'         :   {
