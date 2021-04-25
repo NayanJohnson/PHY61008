@@ -336,7 +336,7 @@ HistDict =  {
             'Particles' :   [['ZLeadingJet']],
         },
         'Dimensions':   1,
-    },    
+    },
 
     'ZSubLeadingJet'  
                     :   {
@@ -349,8 +349,24 @@ HistDict =  {
 
     'ZJets'         :   {
         'Requests'      :   {
-            'Vars'      :   ['Eta', 'Phi', 'Rapidity', 'Pt', 'M'],
+            'Vars'      :   ['Eta', 'Phi', 'Rapidity', 'Pt', 'M', 'Mt'],
             'Particles' :   [['ZLeadingJet', 'ZSubLeadingJet']],
+        },
+        'Dimensions':   1,
+    },    
+
+    'ZLeadingJetFinalBeamJet'         :   {
+        'Requests'      :   {
+            'Vars'      :   ['M', 'Mt'],
+            'Particles' :   [['ZLeadingJet', 'FinalBeamJet']],
+        },
+        'Dimensions':   1,
+    },    
+
+    'ZSubLeadingJetFinalBeamJet'         :   {
+        'Requests'      :   {
+            'Vars'      :   ['M', 'Mt'],
+            'Particles' :   [['ZSubLeadingJet', 'FinalBeamJet']],
         },
         'Dimensions':   1,
     },    
@@ -381,7 +397,6 @@ HistDict =  {
         },
         'Dimensions':   1,
     },    
-
 
     'FinalBeamElectronLeadingJet'   
                     :   {
@@ -683,7 +698,7 @@ HistDict =  {
     '2DZJets'       :   {
         'Requests'      :   {
             'Vars'      :   [['Eta', 'Pt']],
-            'Particles' :   [[['ZSubLeadingJet', 'ZSubLeadingJet'], ['ZSubLeadingJet', 'ZSubLeadingJet']]],
+            'Particles' :   [[['ZLeadingJet', 'ZLeadingJet'], ['ZSubLeadingJet', 'ZSubLeadingJet']]],
         },
         'Dimensions':   2,
     },
@@ -882,7 +897,7 @@ HistComparisonDict =    {
             'Name'          :   'ZLeadingJet',
         },
 
-        'Var'           :   ['Eta', 'Phi', 'Pt']    
+        'Var'           :   ['Eta', 'Pt']    
     },
 
     '9'             :   {
@@ -894,6 +909,54 @@ HistComparisonDict =    {
             'Name'          :   'ZSubLeadingJet',
         },
 
-        'Var'           :   ['Eta', 'Phi', 'Pt']    
+        'Var'           :   ['Eta', 'Pt']    
     },
+
+    '10'             :   {
+        'Hist1'         :   {
+            'Name'          :   'FinalBeamJet',
+        },
+        
+        'Hist2'         :   {
+            'Name'          :   'ZJets',
+        },
+
+        'Var'           :   ['Eta', 'Pt']    
+    },
+
+    '11'             :   {
+        'Hist1'         :   {
+            'Name'          :   'AllJets',
+        },
+        
+        'Hist2'         :   {
+            'Name'          :   'ZJets',
+        },
+
+        'Var'           :   ['Eta', 'Pt']    
+    },    
+
+    '12'             :   {
+        'Hist1'         :   {
+            'Name'          :   'ZLeadingJetFinalBeamJet',
+        },
+        
+        'Hist2'         :   {
+            'Name'          :   'ZJets',
+        },
+
+        'Var'           :   ['M', 'Mt']    
+    },
+
+    '13'             :   {
+        'Hist1'         :   {
+            'Name'          :   'ZSubLeadingJetFinalBeamJet',
+        },
+        
+        'Hist2'         :   {
+            'Name'          :   'ZJets',
+        },
+
+        'Var'           :   ['M', 'Mt']    
+    },    
 }

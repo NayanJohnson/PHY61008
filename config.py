@@ -1,6 +1,11 @@
 EventLoopParams = {
+<<<<<<< HEAD
     'Xsec'              :  	9.96e-05,
     'NEvents'           :   10000*5,
+=======
+    'Xsec'              :   0,
+    'NEvents'           :   0,
+>>>>>>> Patch
     'Level'             :   {
         'Loop'              :   {
             'Cuts'              :   {
@@ -24,9 +29,15 @@ EventLoopParams = {
 
         'Event'        :   {
             'Cuts'              :   {
+<<<<<<< HEAD
                 'Electrons'         :   1,
                 'Muons'             :   1,
                 'Jets'              :   3
+=======
+                'Electrons'         :   0,
+                'Muons'             :   0,
+                'Jets'              :   0
+>>>>>>> Patch
             },
 
             'NoCuts'            :   {
@@ -38,6 +49,15 @@ EventLoopParams = {
 
         'Analysis'     :   {
             'Cuts'              :   {
+                
+                'LeadingJet'        :   {
+                    'Pt'                :   (0, float('inf')),
+                },
+
+                'SubLeadingJet'     :   {
+                    'Pt'                :   (0, float('inf')),
+                },
+
                 'MissingET'         :   {
                     'Et'                :   (0, float('inf')),
                 },
@@ -48,6 +68,15 @@ EventLoopParams = {
             },
 
             'NoCuts'            :   {
+                
+                'LeadingJet'        :   {
+                    'Pt'                :   (0, float('inf')),
+                },
+
+                'SubLeadingJet'        :   {
+                    'Pt'                :   (0, float('inf')),
+                },
+
                 'MissingET'         :   {
                     'Et'                :   (0, float('inf')),
                 },
@@ -70,7 +99,7 @@ EventLoopParams = {
     },      
 
     'WMinus'    :   {
-        'Decays' :   ('Muons', None),
+        'Decays' :   (None, None),
         'Mass'      :   80.38 #GeV
     }   
 }   
