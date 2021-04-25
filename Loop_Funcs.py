@@ -455,6 +455,10 @@ def EventLoop(TreeDict, Xsec, outfilename, LevelRun, LoopRun, EventRun, Analysis
                     if Lepton['Check']:
                         if Lepton['Charge'] == -1:
                             ParticleDict = ParticleFuncs.AddParticle('WMinus'+WMinusdecay[0:-1], ParticleDict, Lepton['P4'])      
+        
+        ZJets_M = ( ParticleDict['ZLeadingJet']['P4'] + ParticleDict['ZSubLeadingJet']['P4'] ).M()
+        if ZJets_M < AnalysisCuts['ZJets']['M'][0] or AnalysisCuts['ZJets']['M'][1] < ZJets_M:
+            continue
 
         # FinalBeamElectron selection
         if len(EventDict['PTSorted']['Electrons']) != 0:
