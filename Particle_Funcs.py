@@ -202,9 +202,8 @@ def InvMassCheck(Type, Boson, ParticleDict, EventDict, EventCuts):
         ParticleDict = AddParticle(Boson+'SubLeading'+Type[0:-1], ParticleDict, Permutations[PairIndex][1][1].P4())
 
     # Removing boson particles from list of particle
-    particlesList.remove(Permutations[PairIndex][0])
-    particlesList.remove(Permutations[PairIndex][1])
-    EventDict['PTSorted'][Type] = particlesList
+    EventDict['PTSorted'][Type].remove(Permutations[PairIndex][0])
+    EventDict['PTSorted'][Type].remove(Permutations[PairIndex][1])
 
     return ParticleDict, EventDict, False
 

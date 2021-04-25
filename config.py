@@ -1,6 +1,6 @@
 EventLoopParams = {
-    'Xsec'              :   2.8985389400000052,
-    'NEvents'           :   1000000,
+    'Xsec'              :   0,
+    'NEvents'           :   0,
     'Level'             :   {
         'Loop'              :   {
             'Cuts'              :   {
@@ -24,9 +24,9 @@ EventLoopParams = {
 
         'Event'        :   {
             'Cuts'              :   {
-                'Electrons'         :   1,
-                'Muons'             :   1,
-                'Jets'              :   3
+                'Electrons'         :   0,
+                'Muons'             :   0,
+                'Jets'              :   0
             },
 
             'NoCuts'            :   {
@@ -38,8 +38,17 @@ EventLoopParams = {
 
         'Analysis'     :   {
             'Cuts'              :   {
+                
+                'LeadingJet'        :   {
+                    'Pt'                :   (0, float('inf')),
+                },
+
+                'SubLeadingJet'     :   {
+                    'Pt'                :   (0, float('inf')),
+                },
+
                 'MissingET'         :   {
-                    'Et'                :   (25, float('inf')),
+                    'Et'                :   (0, float('inf')),
                 },
 
                 'FinalBeamElectron' :   {
@@ -48,6 +57,15 @@ EventLoopParams = {
             },
 
             'NoCuts'            :   {
+                
+                'LeadingJet'        :   {
+                    'Pt'                :   (0, float('inf')),
+                },
+
+                'SubLeadingJet'        :   {
+                    'Pt'                :   (0, float('inf')),
+                },
+
                 'MissingET'         :   {
                     'Et'                :   (0, float('inf')),
                 },
@@ -60,12 +78,12 @@ EventLoopParams = {
     },
 
     'Z'         :   {
-        'Decays' :   ('Jets', None),
+        'Decays' :   (None, None),
         'Mass'      :   91.19 #GeV
     },      
 
     'WPlus'     :   {
-        'Decays' :   ('Muons', None),
+        'Decays' :   (None, None),
         'Mass'      :   80.38 #GeV
     },      
 

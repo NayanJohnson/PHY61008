@@ -394,6 +394,14 @@ def EventLoop(TreeDict, Xsec, outfilename, LevelRun, LoopRun, EventRun, Analysis
         if EventDict['MissingET'].Et() < AnalysisCuts['MissingET']['Et'][0] or AnalysisCuts['MissingET']['Et'][1] < EventDict['MissingET'].Et():
             continue
 
+        # LeadingJet SubLeadingJet Cut
+        if ParticleDict['LeadingJet']['Check']:
+            if ParticleDict['LeadingJet']['Pt'] < AnalysisCuts['LeadingJet']['Pt'][0] or AnalysisCuts['LeadingJet']['Pt'][1] < ParticleDict['LeadingJet']['Pt']:
+                continue
+        if ParticleDict['SubLeadingJet']['Check']:
+            if ParticleDict['SubLeadingJet']['Pt'] < AnalysisCuts['SubLeadingJet']['Pt'][0] or AnalysisCuts['SubLeadingJet']['Pt'][1] < ParticleDict['SubLeadingJet']['Pt']:
+                continue        
+
         # Event cuts
         if EventDict['Count']['Electrons'] < EventCuts['Electrons'] or EventDict['Count']['Muons'] < EventCuts['Muons'] or EventDict['Count']['Jets'] < EventCuts['Jets']:
             continue
@@ -446,23 +454,21 @@ def EventLoop(TreeDict, Xsec, outfilename, LevelRun, LoopRun, EventRun, Analysis
                 for Lepton in particlesList:
                     if Lepton['Check']:
                         if Lepton['Charge'] == -1:
-                            ParticleDict = ParticleFuncs.AddParticle('WMinus'+WMinusdecay[0:-1], ParticleDict, Lepton['P4'])
-        
-        # FinalBeamElectron selection and cuts completed after boson particles removed from PTSorted List
-        FinalBeamElectron_Sorted = list(EventDict['PTSorted']['Electrons'])
-        # FinalBeamElectron cuts 
-        for particle in EventDict['PTSorted']['Electrons']:
-            if particle[1].P4().Eta() < AnalysisCuts['FinalBeamElectron']['Eta'][0] or AnalysisCuts['FinalBeamElectron']['Eta'][1] < particle[1].P4().Eta():
-                FinalBeamElectron_Sorted.remove(particle)                
+                            ParticleDict = ParticleFuncs.AddParticle('WMinus'+WMinusdecay[0:-1], ParticleDict, Lepton['P4'])      
 
         # FinalBeamElectron selection
-        if len(FinalBeamElectron_Sorted) != 0:
-            ParticleDict = ParticleFuncs.AddParticle('FinalBeamElectron', ParticleDict, FinalBeamElectron_Sorted[-1][1].P4())
+        if len(EventDict['PTSorted']['Electrons']) != 0:
+            ParticleDict = ParticleFuncs.AddParticle('FinalBeamElectron', ParticleDict, EventDict['PTSorted']['Electrons'][-1][1].P4())
         else:
             continue
 
+        if ParticleDict['FinalBeamElectron']['Eta'] < AnalysisCuts['FinalBeamElectron']['Eta'][0] or AnalysisCuts['FinalBeamElectron']['Eta'][1] < ParticleDict['FinalBeamElectron']['Eta']:
+            continue
+
+        # FinalBeamJet selection
         if len(EventDict['PTSorted']['Jets']) != 0:
             ParticleDict = ParticleFuncs.AddParticle('FinalBeamJet', ParticleDict, EventDict['PTSorted']['Jets'][-1][1].P4())
+
 
         # Adds particle for W+ - W- muons and W+ - Electron 
         if ParticleDict['WPlusMuon']['Check'] and ParticleDict['WMinusMuon']['Check']:

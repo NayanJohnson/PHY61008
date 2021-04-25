@@ -336,7 +336,7 @@ HistDict =  {
             'Particles' :   [['ZLeadingJet']],
         },
         'Dimensions':   1,
-    },    
+    },
 
     'ZSubLeadingJet'  
                     :   {
@@ -349,7 +349,7 @@ HistDict =  {
 
     'ZJets'         :   {
         'Requests'      :   {
-            'Vars'      :   ['Eta', 'Phi', 'Rapidity', 'Pt', 'M'],
+            'Vars'      :   ['Eta', 'Phi', 'Rapidity', 'Pt', 'M', 'Mt'],
             'Particles' :   [['ZLeadingJet', 'ZSubLeadingJet']],
         },
         'Dimensions':   1,
@@ -363,6 +363,13 @@ HistDict =  {
         'Dimensions':   1,
     },    
 
+    'ZSubLeadingJetFinalBeamJet'         :   {
+        'Requests'      :   {
+            'Vars'      :   ['M', 'Mt'],
+            'Particles' :   [['ZSubLeadingJet', 'FinalBeamJet']],
+        },
+        'Dimensions':   1,
+    },    
 
     'FinalBeamElectronLeadingMuon'  
                     :   {
@@ -938,6 +945,18 @@ HistComparisonDict =    {
             'Name'          :   'ZJets',
         },
 
-        'Var'           :   ['M']    
+        'Var'           :   ['M', 'Mt']    
     },
+
+    '13'             :   {
+        'Hist1'         :   {
+            'Name'          :   'ZSubLeadingJetFinalBeamJet',
+        },
+        
+        'Hist2'         :   {
+            'Name'          :   'ZJets',
+        },
+
+        'Var'           :   ['M', 'Mt']    
+    },    
 }
