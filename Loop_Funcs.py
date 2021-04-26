@@ -67,7 +67,7 @@ EventDict   =   {
 '''
 
 
-def LoadTrees(TreeList, GetNEvents=False):
+def LoadTrees(TreeList, prefix):
     '''
     Loads .root file with tree labeled 'Delphes' and outputs dictionary containing the number 
     of events and branches.
@@ -81,10 +81,10 @@ def LoadTrees(TreeList, GetNEvents=False):
     # Create object of class ExRootTreeReader
     TreeReader = ExRootTreeReader(chain)
 
-    if GetNEvents:
-        NEvents = TreeReader.GetEntries()
+    if prefix=='Signal' or prefix=='Background':
+        NEvents = config.EventLoopParams[prefix]['NEvents']
     else:
-        NEvents = config.EventLoopParams['NEvents']
+        NEvents = TreeReader.GetEntries()
     # Get pointers to branches used in this analysis
     branchParticle = TreeReader.UseBranch('Particle')
     branchGenJet = TreeReader.UseBranch('GenJet')
@@ -456,9 +456,10 @@ def EventLoop(TreeDict, Xsec, outfilename, LevelRun, LoopRun, EventRun, Analysis
                         if Lepton['Charge'] == -1:
                             ParticleDict = ParticleFuncs.AddParticle('WMinus'+WMinusdecay[0:-1], ParticleDict, Lepton['P4'])      
         
-        ZJets_M = ( ParticleDict['ZLeadingJet']['P4'] + ParticleDict['ZSubLeadingJet']['P4'] ).M()
-        if ZJets_M < AnalysisCuts['ZJets']['M'][0] or AnalysisCuts['ZJets']['M'][1] < ZJets_M:
-            continue
+        if ParticleDict['ZLeadingJet']['Check'] and ParticleDict['ZSubLeadingJet']['Check']:
+            ZJets_M = ( ParticleDict['ZLeadingJet']['P4'] + ParticleDict['ZSubLeadingJet']['P4'] ).M()
+            if ZJets_M < AnalysisCuts['ZJets']['M'][0] or AnalysisCuts['ZJets']['M'][1] < ZJets_M:
+                continue
 
         # FinalBeamElectron selection
         if len(EventDict['PTSorted']['Electrons']) != 0:
