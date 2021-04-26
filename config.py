@@ -8,7 +8,6 @@ EventLoopParams = {
         'Xsec'              :   0,
         'NEvents'           :   0,
     },
-    
     'Level'             :   {
         'Loop'              :   {
             'Cuts'              :   {
