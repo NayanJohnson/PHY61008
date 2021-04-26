@@ -1,13 +1,22 @@
 EventLoopParams = {
     'Signal'            :   {
+<<<<<<< HEAD
         'Xsec'              :   7.0e-05,
         'NEvents'           :   50000,        
+=======
+        'Xsec'              :   0.00036,
+        'NEvents'           :   50000*1,        
+>>>>>>> Patch
     },
 
     'Background'        :   {
         'Xsec'              :   0.057,
         'NEvents'           :   28395,
     },
+<<<<<<< HEAD
+=======
+    
+>>>>>>> Patch
     'Level'             :   {
         'Loop'              :   {
             'Cuts'              :   {
@@ -43,7 +52,6 @@ EventLoopParams = {
             },
         },
 
-
         'Analysis'     :   {
             'Cuts'              :   {
                 
@@ -55,10 +63,13 @@ EventLoopParams = {
                     'Pt'                :   (20, float('inf')),
                 },
 
+<<<<<<< HEAD
                 'ZJets'             :   {
                     'M'                 :   (50, float('inf')),
                 },
 
+=======
+>>>>>>> Patch
                 'MissingET'         :   {
                     'Et'                :   (0, float('inf')),
                 },
@@ -89,7 +100,7 @@ EventLoopParams = {
                 'MissingET'         :   {
                     'Et'                :   (0, float('inf')),
                 },
-
+                
                 'FinalBeamElectron' :   {
                     'Eta'               :   (float('-inf'), float('inf')),
                 },
@@ -102,12 +113,20 @@ EventLoopParams = {
     },
 
     'Z'         :   {
+<<<<<<< HEAD
         'Decays'    :   ('Jets', None),
+=======
+        'Decays'    :   (None, None),
+>>>>>>> Patch
         'Mass'      :   91.19 #GeV
     },      
 
     'WPlus'     :   {
+<<<<<<< HEAD
         'Decays'    :   (None, None),
+=======
+        'Decays'    :   ('Muons', None),
+>>>>>>> Patch
         'Mass'      :   80.38 #GeV
     },      
 
