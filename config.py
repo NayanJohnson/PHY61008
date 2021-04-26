@@ -1,6 +1,14 @@
 EventLoopParams = {
-    'Xsec'              :  	9.96e-05,
-    'NEvents'           :   10000*5,
+    'Signal'            :   {
+        'Xsec'              :   0,
+        'NEvents'           :   0,        
+    },
+
+    'Background'        :   {
+        'Xsec'              :   0,
+        'NEvents'           :   0,
+    },
+    
     'Level'             :   {
         'Loop'              :   {
             'Cuts'              :   {
@@ -36,8 +44,22 @@ EventLoopParams = {
             },
         },
 
+
         'Analysis'     :   {
             'Cuts'              :   {
+                
+                'LeadingJet'        :   {
+                    'Pt'                :   (0, float('inf')),
+                },
+
+                'SubLeadingJet'     :   {
+                    'Pt'                :   (0, float('inf')),
+                },
+
+                'ZJets'             :   {
+                    'M'                 :   (0, float('inf')),
+                },
+
                 'MissingET'         :   {
                     'Et'                :   (0, float('inf')),
                 },
@@ -48,6 +70,19 @@ EventLoopParams = {
             },
 
             'NoCuts'            :   {
+                
+                'LeadingJet'        :   {
+                    'Pt'                :   (0, float('inf')),
+                },
+
+                'SubLeadingJet'     :   {
+                    'Pt'                :   (0, float('inf')),
+                },
+
+                'ZJets'             :   {
+                    'M'                 :   (0, float('inf')),
+                },
+
                 'MissingET'         :   {
                     'Et'                :   (0, float('inf')),
                 },
@@ -60,17 +95,17 @@ EventLoopParams = {
     },
 
     'Z'         :   {
-        'Decays' :   ('Jets', None),
+        'Decays'    :   ('Jets', None),
         'Mass'      :   91.19 #GeV
     },      
 
     'WPlus'     :   {
-        'Decays' :   (None, None),
+        'Decays'    :   (None, None),
         'Mass'      :   80.38 #GeV
     },      
 
     'WMinus'    :   {
-        'Decays' :   ('Muons', None),
+        'Decays'    :   ('Muons', None),
         'Mass'      :   80.38 #GeV
     }   
 }   
