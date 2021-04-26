@@ -52,11 +52,11 @@ EventLoopParams = {
                 },
 
                 'SubLeadingJet'     :   {
-                    'Pt'                :   (0, float('inf')),
+                    'Pt'                :   (20, float('inf')),
                 },
 
                 'ZJets'             :   {
-                    'M'                 :   (0, float('inf')),
+                    'M'                 :   (50, float('inf')),
                 },
 
                 'MissingET'         :   {
