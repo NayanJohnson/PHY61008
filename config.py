@@ -1,6 +1,14 @@
 EventLoopParams = {
-    'Xsec'              :   2.8985389400000052,
-    'NEvents'           :   1000000,
+    'Signal'            :   {
+        'Xsec'              :   0,
+        'NEvents'           :   0,        
+    },
+
+    'Background'        :   {
+        'Xsec'              :   0,
+        'NEvents'           :   0,
+    },
+    
     'Level'             :   {
         'Loop'              :   {
             'Cuts'              :   {
@@ -48,6 +56,19 @@ EventLoopParams = {
             },
 
             'NoCuts'            :   {
+                
+                'LeadingJet'        :   {
+                    'Pt'                :   (0, float('inf')),
+                },
+
+                'SubLeadingJet'     :   {
+                    'Pt'                :   (0, float('inf')),
+                },
+
+                'ZJets'             :   {
+                    'M'                 :   (0, float('inf')),
+                },
+
                 'MissingET'         :   {
                     'Et'                :   (0, float('inf')),
                 },
@@ -60,17 +81,17 @@ EventLoopParams = {
     },
 
     'Z'         :   {
-        'Decays' :   (None, None),
+        'Decays'    :   (None, None),
         'Mass'      :   91.19 #GeV
     },      
 
     'WPlus'     :   {
-        'Decays' :   ('Muons', None),
+        'Decays'    :   ('Muons', None),
         'Mass'      :   80.38 #GeV
     },      
 
     'WMinus'    :   {
-        'Decays' :   ('Muons', None),
+        'Decays'    :   ('Muons', None),
         'Mass'      :   80.38 #GeV
     }   
 }   
