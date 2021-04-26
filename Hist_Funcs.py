@@ -198,7 +198,7 @@ def FillHists(HistDict, ParticleDict):
                         else:
                             hist.Fill(xVal, yVal)
 
-def HistLims(hist, var, Scale=1, Norm=False):
+def HistLims(hist, name, var, Scale=1, Norm=False):
     '''
         Rescales hist lims.
         Passed objects:
@@ -207,6 +207,11 @@ def HistLims(hist, var, Scale=1, Norm=False):
         Norm        :   Should the hist be normalised?
     '''    
     XMin, XMax, YMin, YMax = None, None, None, None
+
+    try:
+        hist.Integral()
+    except AttributeError:
+        print(name, var)
 
     if Norm and hist.Integral() != 0:
         # Normalises the hist    
@@ -334,8 +339,8 @@ def CompareHist(HistProps, MediaDir):
     Hist2File_AnalysisRun = HistProps['Hist2']['FileDict']['AnalysisRun']
 
     # print(HistProps)
-    Hist1, Lims1 = HistLims(Hist1, Hist1Var, Norm=Norm)
-    Hist2, Lims2 = HistLims(Hist2, Hist2Var, Norm=Norm)
+    Hist1, Lims1 = HistLims(Hist1, Hist1Name, Hist1Var, Norm=Norm)
+    Hist2, Lims2 = HistLims(Hist2, Hist2Name, Hist2Var, Norm=Norm)
 
     # Clear canvas
     HistCan = TCanvas()

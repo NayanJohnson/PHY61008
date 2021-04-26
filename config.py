@@ -32,9 +32,9 @@ EventLoopParams = {
 
         'Event'        :   {
             'Cuts'              :   {
-                'Electrons'         :   1,
-                'Muons'             :   2,
-                'Jets'              :   1
+                'Electrons'         :   0,
+                'Muons'             :   0,
+                'Jets'              :   0
             },
 
             'NoCuts'            :   {
@@ -46,8 +46,17 @@ EventLoopParams = {
 
         'Analysis'     :   {
             'Cuts'              :   {
+                
+                'LeadingJet'        :   {
+                    'Pt'                :   (0, float('inf')),
+                },
+
+                'SubLeadingJet'     :   {
+                    'Pt'                :   (0, float('inf')),
+                },
+
                 'MissingET'         :   {
-                    'Et'                :   (30, float('inf')),
+                    'Et'                :   (0, float('inf')),
                 },
 
                 'FinalBeamElectron' :   {
@@ -72,7 +81,7 @@ EventLoopParams = {
                 'MissingET'         :   {
                     'Et'                :   (0, float('inf')),
                 },
-
+                
                 'FinalBeamElectron' :   {
                     'Eta'               :   (float('-inf'), float('inf')),
                 }
