@@ -1,6 +1,14 @@
 EventLoopParams = {
-    'Xsec'              :   0.00016,
-    'NEvents'           :   10000*5,
+    'Signal'            :   {
+        'Xsec'              :   0,
+        'NEvents'           :   0,        
+    },
+
+    'Background'        :   {
+        'Xsec'              :   0,
+        'NEvents'           :   0,
+    },
+    
     'Level'             :   {
         'Loop'              :   {
             'Cuts'              :   {
