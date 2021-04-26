@@ -1,7 +1,7 @@
 EventLoopParams = {
     'Signal'            :   {
-        'Xsec'              :   0,
-        'NEvents'           :   0,        
+        'Xsec'              :   0.00036,
+        'NEvents'           :   50000*1,        
     },
 
     'Background'        :   {
@@ -44,7 +44,6 @@ EventLoopParams = {
             },
         },
 
-
         'Analysis'     :   {
             'Cuts'              :   {
                 
@@ -56,10 +55,13 @@ EventLoopParams = {
                     'Pt'                :   (0, float('inf')),
                 },
 
+<<<<<<< HEAD
                 'ZJets'             :   {
                     'M'                 :   (0, float('inf')),
                 },
 
+=======
+>>>>>>> Patch
                 'MissingET'         :   {
                     'Et'                :   (0, float('inf')),
                 },
@@ -95,17 +97,17 @@ EventLoopParams = {
     },
 
     'Z'         :   {
-        'Decays' :   (None, None),
+        'Decays'    :   (None, None),
         'Mass'      :   91.19 #GeV
     },      
 
     'WPlus'     :   {
-        'Decays' :   (None, None),
+        'Decays'    :   ('Muons', None),
         'Mass'      :   80.38 #GeV
     },      
 
     'WMinus'    :   {
-        'Decays' :   (None, None),
+        'Decays'    :   ('Muons', None),
         'Mass'      :   80.38 #GeV
     }   
 }   
