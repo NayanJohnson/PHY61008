@@ -5,8 +5,8 @@ EventLoopParams = {
     },
 
     'Background'        :   {
-        'Xsec'              :   0.00016,
-        'NEvents'           :   50000,
+        'Xsec'              :   0.014,
+        'NEvents'           :   34222,
     },
     
     'Level'             :   {
@@ -49,11 +49,11 @@ EventLoopParams = {
             'Cuts'              :   {
                 
                 'LeadingJet'        :   {
-                    'Pt'                :   (20, float('inf')),
+                    'Pt'                :   (30, float('inf')),
                 },
 
                 'SubLeadingJet'     :   {
-                    'Pt'                :   (15, float('inf')),
+                    'Pt'                :   (20, float('inf')),
                 },
 
                 'ZJets'             :   {
