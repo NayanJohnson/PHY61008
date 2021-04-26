@@ -59,10 +59,10 @@ if len(EventRuns) == 0:
     EventRuns = ['Cuts', 'NoCuts']
 
 # Loading Trees
-myTree = LoopFuncs.LoadTrees(Trees)
+myTree = LoopFuncs.LoadTrees(Trees, outfileprefix)
 
 # Getting Xsec from config file 
-Xsec = config.EventLoopParams['Xsec']
+Xsec = config.EventLoopParams[outfileprefix]['Xsec']
 
 # Will recursively try to create each dir in RootDir path
 if len(RootDir) > 0:

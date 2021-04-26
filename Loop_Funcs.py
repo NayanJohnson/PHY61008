@@ -67,7 +67,7 @@ EventDict   =   {
 '''
 
 
-def LoadTrees(TreeList, GetNEvents=False):
+def LoadTrees(TreeList, prefix):
     '''
     Loads .root file with tree labeled 'Delphes' and outputs dictionary containing the number 
     of events and branches.
@@ -81,10 +81,10 @@ def LoadTrees(TreeList, GetNEvents=False):
     # Create object of class ExRootTreeReader
     TreeReader = ExRootTreeReader(chain)
 
-    if GetNEvents:
-        NEvents = TreeReader.GetEntries()
+    if prefix=='Signal' or prefix=='Background':
+        NEvents = config.EventLoopParams[prefix]['NEvents']
     else:
-        NEvents = config.EventLoopParams['NEvents']
+        NEvents = TreeReader.GetEntries()
     # Get pointers to branches used in this analysis
     branchParticle = TreeReader.UseBranch('Particle')
     branchGenJet = TreeReader.UseBranch('GenJet')
