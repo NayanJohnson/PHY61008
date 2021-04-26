@@ -48,7 +48,7 @@ EventLoopParams = {
             'Cuts'              :   {
                 
                 'LeadingJet'        :   {
-                    'Pt'                :   (0, float('inf')),
+                    'Pt'                :   (30, float('inf')),
                 },
 
                 'SubLeadingJet'     :   {
