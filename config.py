@@ -1,7 +1,7 @@
 EventLoopParams = {
     'Signal'            :   {
-        'Xsec'              :   0,
-        'NEvents'           :   0,        
+        'Xsec'              :   0.00036,
+        'NEvents'           :   50000*1,        
     },
 
     'Background'        :   {
