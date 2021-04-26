@@ -89,7 +89,7 @@ def GetParticleVariable(ParticleDict, ParticleList, var):
     '''
 
     # List of variables that are stored in all particles.
-    ParticleProperties = ['Charge', 'E', 'Eta', 'Phi', 'Rapidity', 'Theta', 'Pt', 'Et', 'Mt']
+    ParticleProperties = ['Charge', 'E', 'Eta', 'Phi', 'Rapidity', 'Theta', 'E', 'Pt', 'Et']
 
 
     # If all particles are present
@@ -128,6 +128,12 @@ def GetParticleVariable(ParticleDict, ParticleList, var):
                 ParticleSum = particle['P4'] + ParticleSum
             return ParticleSum.M()
 
+        elif var == 'Mt':
+            ParticleSum = TLorentzVector()
+            for particle in ParticleList:
+                ParticleSum = particle['P4'] + ParticleSum
+            return ParticleSum.Mt()
+
         elif var == 'dEta':
             dEta = ParticleList[0]['Eta'] - ParticleList[1]['Eta']
             return dEta
@@ -158,7 +164,7 @@ def InvMassCheck(Type, Boson, ParticleDict, EventDict, EventCuts):
     '''
     '''
 
-    if EventDict['Count'][Type] <= config.EventLoopParams['Level']['Event']['Cuts'][Type]:
+    if EventDict['Count'][Type] < config.EventLoopParams['Level']['Event']['Cuts'][Type]:
         return ParticleDict, EventDict, True
 
     BosonMass = config.EventLoopParams[Boson]['Mass']
@@ -183,10 +189,10 @@ def InvMassCheck(Type, Boson, ParticleDict, EventDict, EventCuts):
     for ParticlePair in Permutations:
         InvMassList.append( (ParticlePair[0][1].P4()+ParticlePair[1][1].P4()).Mag() )
 
-    
     # Find the closest InvMass to the BosonMass
     PairInvMass = min(InvMassList, key=lambda x:abs(x-BosonMass))
     PairIndex = InvMassList.index(PairInvMass)
+
     if Permutations[PairIndex][0][0] < Permutations[PairIndex][1][0]:
         ParticleDict = AddParticle(Boson+'Leading'+Type[0:-1], ParticleDict, Permutations[PairIndex][1][1].P4())
         ParticleDict = AddParticle(Boson+'SubLeading'+Type[0:-1], ParticleDict, Permutations[PairIndex][0][1].P4())
@@ -196,9 +202,8 @@ def InvMassCheck(Type, Boson, ParticleDict, EventDict, EventCuts):
         ParticleDict = AddParticle(Boson+'SubLeading'+Type[0:-1], ParticleDict, Permutations[PairIndex][1][1].P4())
 
     # Removing boson particles from list of particle
-    particlesList.remove(Permutations[PairIndex][0])
-    particlesList.remove(Permutations[PairIndex][1])
-    EventDict['PTSorted'][Type] = particlesList
+    EventDict['PTSorted'][Type].remove(Permutations[PairIndex][0])
+    EventDict['PTSorted'][Type].remove(Permutations[PairIndex][1])
 
     return ParticleDict, EventDict, False
 
