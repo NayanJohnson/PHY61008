@@ -63,9 +63,9 @@ EventLoopParams = {
                     'Et'                :   (0, float('inf')),
                 },
 
-                'FinalBeamElectron' :   {
-                    'Eta'               :   (float('-inf'), float('inf')),
-                }
+                'FinalBeamJet' :   {
+                    'Pt'               :   (0, float('inf')),
+                },                                
             },
 
             'NoCuts'            :   {
@@ -85,10 +85,14 @@ EventLoopParams = {
                 'MissingET'         :   {
                     'Et'                :   (0, float('inf')),
                 },
-                
+
                 'FinalBeamElectron' :   {
                     'Eta'               :   (float('-inf'), float('inf')),
-                }
+                },
+
+                'FinalBeamJet' :   {
+                    'Pt'               :   (0, float('inf')),
+                },      
             },
         },
     },
