@@ -95,17 +95,17 @@ EventLoopParams = {
     },
 
     'Z'         :   {
-        'Decays' :   (None, None),
+        'Decays'    :   (None, None),
         'Mass'      :   91.19 #GeV
     },      
 
     'WPlus'     :   {
-        'Decays' :   (None, None),
+        'Decays'    :   (None, None),
         'Mass'      :   80.38 #GeV
     },      
 
     'WMinus'    :   {
-        'Decays' :   (None, None),
+        'Decays'    :   (None, None),
         'Mass'      :   80.38 #GeV
     }   
 }   
