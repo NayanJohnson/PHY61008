@@ -92,11 +92,11 @@ VarParams = {
     },
     
     'dR_Eta'    :   {
-        'Range'     :   [0, 100]
+        'Range'     :   [0, 20]
     },
     
     'dR_Rap'    :   {
-        'Range'     :   [0, 100]
+        'Range'     :   [0, 20]
     },
     
     'M'   :   {
