@@ -357,7 +357,7 @@ HistDict =  {
 
     'ZLeadingJetFinalBeamJet'         :   {
         'Requests'      :   {
-            'Vars'      :   ['M', 'Mt'],
+            'Vars'      :   ['M', 'Mt', 'dR_Eta'],
             'Particles' :   [['ZLeadingJet', 'FinalBeamJet']],
         },
         'Dimensions':   1,
@@ -945,7 +945,7 @@ HistComparisonDict =    {
             'Name'          :   'ZJets',
         },
 
-        'Var'           :   ['M', 'Mt']    
+        'Var'           :   ['M', 'Mt', 'dR_Eta']    
     },
 
     '13'             :   {
