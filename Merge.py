@@ -52,13 +52,13 @@ if RootDir:
 n = 5
 GroupedTrees = [RunTrees[x:x+n] for x in range(0,len(RunTrees),n)]
 GroupNEvents = []
+outfilename = RootDir+outfilename+'.root'
 for i in range(len(GroupedTrees)):
     chain = TChain('Delphes')
 
     for tree in GroupedTrees[i]:
         chain.Add(tree)
     GroupNEvents.append(chain.GetEntries())
-    outfilename = RootDir+outfilename+'.root'
 
     # For the first loop overwrite existing files
     # For subsequent loops update the file
