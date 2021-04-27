@@ -1,10 +1,6 @@
 EventLoopParams = {
     'Signal'            :   {
-<<<<<<< HEAD
         'Xsec'              :   0.00016,
-=======
-        'Xsec'              :   0.00036,
->>>>>>> Patch
         'NEvents'           :   50000*1,        
     },
 
@@ -56,15 +52,11 @@ EventLoopParams = {
                 },
 
                 'SubLeadingJet'     :   {
-<<<<<<< HEAD
                     'Pt'                :   (20, float('inf')),
                 },
 
                 'ZJets'             :   {
                     'M'                 :   (50, float('inf')),
-=======
-                    'Pt'                :   (0, float('inf')),
->>>>>>> Patch
                 },
 
                 'MissingET'         :   {
@@ -102,11 +94,7 @@ EventLoopParams = {
     },
 
     'Z'         :   {
-<<<<<<< HEAD
         'Decays'    :   ('Jets', None),
-=======
-        'Decays'    :   (None, None),
->>>>>>> Patch
         'Mass'      :   91.19 #GeV
     },      
 
@@ -116,11 +104,7 @@ EventLoopParams = {
     },      
 
     'WMinus'    :   {
-<<<<<<< HEAD
         'Decays'    :   (None, None),
-=======
-        'Decays'    :   ('Muons', None),
->>>>>>> Patch
         'Mass'      :   80.38 #GeV
     }   
 }   
