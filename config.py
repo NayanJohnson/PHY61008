@@ -68,6 +68,10 @@ EventLoopParams = {
                 'FinalBeamElectron' :   {
                     'Eta'               :   (float('-inf'), float('inf')),
                 }
+
+                'FinalBeamJet' :   {
+                    'Pt'               :   (0, float('inf')),
+                }
             },
 
             'NoCuts'            :   {
@@ -90,6 +94,10 @@ EventLoopParams = {
 
                 'FinalBeamElectron' :   {
                     'Eta'               :   (float('-inf'), float('inf')),
+                }
+
+                'FinalBeamJet' :   {
+                    'Pt'               :   (0, float('inf')),
                 }
             },
         },
