@@ -59,9 +59,9 @@ EventLoopParams = {
                     'Et'                :   (0, float('inf')),
                 },
 
-                'FinalBeamElectron' :   {
-                    'Eta'               :   (float('-inf'), float('inf')),
-                }
+                'FinalBeamJet' :   {
+                    'Pt'               :   (0, float('inf')),
+                },                                
             },
 
             'NoCuts'            :   {
@@ -74,29 +74,37 @@ EventLoopParams = {
                     'Pt'                :   (0, float('inf')),
                 },
 
+                'ZJets'             :   {
+                    'M'                 :   (0, float('inf')),
+                },
+
                 'MissingET'         :   {
                     'Et'                :   (0, float('inf')),
                 },
-                
+
                 'FinalBeamElectron' :   {
                     'Eta'               :   (float('-inf'), float('inf')),
-                }
+                },
+
+                'FinalBeamJet' :   {
+                    'Pt'               :   (0, float('inf')),
+                },      
             },
         },
     },
 
     'Z'         :   {
-        'Decays' :   ('Jets', None),
+        'Decays'    :   ('Jets', None),
         'Mass'      :   91.19 #GeV
     },      
 
     'WPlus'     :   {
-        'Decays'    :   ('Muons', None),
+        'Decays'    :   (None, None),
         'Mass'      :   80.38 #GeV
     },      
 
     'WMinus'    :   {
-        'Decays'    :   ('Muons', None),
+        'Decays'    :   ('None, None),
         'Mass'      :   80.38 #GeV
     }   
 }   
