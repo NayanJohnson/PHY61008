@@ -1,12 +1,12 @@
 EventLoopParams = {
     'Signal'            :   {
-        'Xsec'              :   7.0e-05,
+        'Xsec'              :   0.00020,
         'NEvents'           :   50000,        
     },
 
     'Background'        :   {
         'Xsec'              :   0.057,
-        'NEvents'           :   28395,
+        'NEvents'           :   76738,
     },
     'Level'             :   {
         'Loop'              :   {
@@ -67,7 +67,7 @@ EventLoopParams = {
                 },
 
                 'FinalBeamJet' :   {
-                    'Pt'                :   (10, float('inf')),
+                    'Pt'                :   (0, float('inf')),
                 }                
             },
 
