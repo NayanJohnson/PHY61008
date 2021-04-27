@@ -485,7 +485,7 @@ def EventLoop(TreeDict, Xsec, outfilename, LevelRun, LoopRun, EventRun, Analysis
             
             # ZLeadingJetFinalBeamElectron_dR_Eta cut
             if ParticleDict['FinalBeamJet']['Check']:
-                ZLeading_FinalBeam_Jets_dR_Eta = ParticleFuncs.GetParticleVariable(ParticleDict, [ParticleDict['ZLeadingJet'], ParticleDict['FinalBeamElectron']], 'dR_Eta')
+                ZLeading_FinalBeam_Jets_dR_Eta = ParticleFuncs.GetParticleVariable(ParticleDict, [ParticleDict['ZLeadingJet'], ParticleDict['FinalBeamJet']], 'dR_Eta')
                 if ZLeading_FinalBeam_Jets_dR_Eta < AnalysisCuts['ZLeading_FinalBeam_Jets']['dR_Eta'][0] or AnalysisCuts['ZLeading_FinalBeam_Jets']['dR_Eta'][1] < ZLeading_FinalBeam_Jets_dR_Eta:
                     continue
 
