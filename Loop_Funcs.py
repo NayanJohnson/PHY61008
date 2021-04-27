@@ -466,6 +466,7 @@ def EventLoop(TreeDict, Xsec, outfilename, LevelRun, LoopRun, EventRun, Analysis
         else:
             continue
 
+        # FinalBeamElectron cuts
         if ParticleDict['FinalBeamElectron']['Eta'] < AnalysisCuts['FinalBeamElectron']['Eta'][0] or AnalysisCuts['FinalBeamElectron']['Eta'][1] < ParticleDict['FinalBeamElectron']['Eta']:
             continue
 
@@ -473,6 +474,9 @@ def EventLoop(TreeDict, Xsec, outfilename, LevelRun, LoopRun, EventRun, Analysis
         if len(EventDict['PTSorted']['Jets']) != 0:
             ParticleDict = ParticleFuncs.AddParticle('FinalBeamJet', ParticleDict, EventDict['PTSorted']['Jets'][-1][1].P4())
 
+        # FinalBeamJet cuts
+        if ParticleDict['FinalBeamJet']['Pt'] < AnalysisCuts['FinalBeamJet']['Pt'][0] or AnalysisCuts['FinalBeamJet']['Pt'][1] < ParticleDict['FinalBeamJet']['Pt']:
+            continue
 
         # Adds particle for W+ - W- muons and W+ - Electron 
         if ParticleDict['WPlusMuon']['Check'] and ParticleDict['WMinusMuon']['Check']:
