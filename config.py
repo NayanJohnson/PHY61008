@@ -55,6 +55,10 @@ EventLoopParams = {
                     'Pt'                :   (0, float('inf')),
                 },
 
+                'ZJets'             :   {
+                    'M'                 :   (0, float('inf')),
+                },
+
                 'MissingET'         :   {
                     'Et'                :   (0, float('inf')),
                 },
