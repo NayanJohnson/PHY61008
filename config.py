@@ -68,7 +68,7 @@ EventLoopParams = {
 
                 'FinalBeamJet' :   {
                     'Pt'                :   (0, float('inf')),
-                }                
+                },               
             },
 
             'NoCuts'            :   {
@@ -95,7 +95,7 @@ EventLoopParams = {
 
                 'FinalBeamJet' :   {
                     'Pt'                :   (0, float('inf')),
-                }  
+                },
             },
         },
     },
