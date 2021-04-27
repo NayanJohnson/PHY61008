@@ -455,12 +455,16 @@ def EventLoop(TreeDict, Xsec, outfilename, LevelRun, LoopRun, EventRun, Analysis
                     if Lepton['Check']:
                         if Lepton['Charge'] == -1:
                             ParticleDict = ParticleFuncs.AddParticle('WMinus'+WMinusdecay[0:-1], ParticleDict, Lepton['P4'])      
+<<<<<<< HEAD
         
         # ZJets cut        
         if ParticleDict['ZLeadingJet']['Check'] and ParticleDict['ZSubLeadingJet']['Check']:
             ZJets_M = ( ParticleDict['ZLeadingJet']['P4'] + ParticleDict['ZSubLeadingJet']['P4'] ).M()
             if ZJets_M < AnalysisCuts['ZJets']['M'][0] or AnalysisCuts['ZJets']['M'][1] < ZJets_M:
                 continue
+=======
+           
+>>>>>>> Patch
 
         # FinalBeamElectron selection
         if len(EventDict['PTSorted']['Electrons']) != 0:
@@ -479,6 +483,20 @@ def EventLoop(TreeDict, Xsec, outfilename, LevelRun, LoopRun, EventRun, Analysis
         # FinalBeamJet cuts
         if ParticleDict['FinalBeamJet']['Pt'] < AnalysisCuts['FinalBeamJet']['Pt'][0] or AnalysisCuts['FinalBeamJet']['Pt'][1] < ParticleDict['FinalBeamJet']['Pt']:
             continue
+
+        # ZJets cuts
+        if ParticleDict['ZLeadingJet']['Check']:
+            if ParticleDict['ZSubLeadingJet']['Check']:
+                # ZJets InvMass cut
+                ZJets_M = ( ParticleDict['ZLeadingJet']['P4'] + ParticleDict['ZSubLeadingJet']['P4'] ).M()
+                if ZJets_M < AnalysisCuts['ZJets']['M'][0] or AnalysisCuts['ZJets']['M'][1] < ZJets_M:
+                    continue
+            
+            # ZLeadingJetFinalBeamElectron_dR_Eta cut
+            if ParticleDict['FinalBeamJet']['Check']:
+                ZLeading_FinalBeam_Jets_dR_Eta = GetParticleVariable(ParticleDict, [ParticleDict['ZLeadingJet'], ParticleDict['FinalBeamElectron']], 'dR_Eta')
+                if ZLeading_FinalBeam_Jets_dR_Eta < AnalysisCuts['ZLeading_FinalBeam_Jets']['dR_Eta'][0] or AnalysisCuts['ZLeading_FinalBeam_Jets']['dR_Eta'][1] < ZLeading_FinalBeam_Jets_dR_Eta:
+                    continue
 
         # Adds particle for W+ - W- muons and W+ - Electron 
         if ParticleDict['WPlusMuon']['Check'] and ParticleDict['WMinusMuon']['Check']:
