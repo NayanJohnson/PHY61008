@@ -6,7 +6,8 @@ EventLoopParams = {
 
     'Background'        :   {
         'Xsec'              :   0.014,
-        'NEvents'           :   34222,
+        'NEvents'           :   54780,
+        
     },
     
     'Level'             :   {
@@ -43,6 +44,7 @@ EventLoopParams = {
                 'Jets'              :   0,
             },
         },
+
 
         'Analysis'     :   {
             'Cuts'              :   {
@@ -85,7 +87,7 @@ EventLoopParams = {
                 'MissingET'         :   {
                     'Et'                :   (0, float('inf')),
                 },
-                
+
                 'FinalBeamElectron' :   {
                     'Eta'               :   (float('-inf'), float('inf')),
                 }
