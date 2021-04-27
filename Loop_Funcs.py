@@ -456,17 +456,11 @@ def EventLoop(TreeDict, Xsec, outfilename, LevelRun, LoopRun, EventRun, Analysis
                         if Lepton['Charge'] == -1:
                             ParticleDict = ParticleFuncs.AddParticle('WMinus'+WMinusdecay[0:-1], ParticleDict, Lepton['P4'])      
         
-<<<<<<< HEAD
-        # ZJets cut
-        ZJets_M = ( ParticleDict['ZLeadingJet']['P4'] + ParticleDict['ZSubLeadingJet']['P4'] ).M()
-        if ZJets_M < AnalysisCuts['ZJets']['M'][0] or AnalysisCuts['ZJets']['M'][1] < ZJets_M:
-            continue
-=======
+        # ZJets cut        
         if ParticleDict['ZLeadingJet']['Check'] and ParticleDict['ZSubLeadingJet']['Check']:
             ZJets_M = ( ParticleDict['ZLeadingJet']['P4'] + ParticleDict['ZSubLeadingJet']['P4'] ).M()
             if ZJets_M < AnalysisCuts['ZJets']['M'][0] or AnalysisCuts['ZJets']['M'][1] < ZJets_M:
                 continue
->>>>>>> Patch
 
         # FinalBeamElectron selection
         if len(EventDict['PTSorted']['Electrons']) != 0:
@@ -474,11 +468,7 @@ def EventLoop(TreeDict, Xsec, outfilename, LevelRun, LoopRun, EventRun, Analysis
         else:
             continue
 
-<<<<<<< HEAD
-        # FinalBeamElectron cut
-=======
         # FinalBeamElectron cuts
->>>>>>> Patch
         if ParticleDict['FinalBeamElectron']['Eta'] < AnalysisCuts['FinalBeamElectron']['Eta'][0] or AnalysisCuts['FinalBeamElectron']['Eta'][1] < ParticleDict['FinalBeamElectron']['Eta']:
             continue
 
@@ -486,11 +476,7 @@ def EventLoop(TreeDict, Xsec, outfilename, LevelRun, LoopRun, EventRun, Analysis
         if len(EventDict['PTSorted']['Jets']) != 0:
             ParticleDict = ParticleFuncs.AddParticle('FinalBeamJet', ParticleDict, EventDict['PTSorted']['Jets'][-1][1].P4())
 
-<<<<<<< HEAD
-        # FinalBeamJet cut
-=======
         # FinalBeamJet cuts
->>>>>>> Patch
         if ParticleDict['FinalBeamJet']['Pt'] < AnalysisCuts['FinalBeamJet']['Pt'][0] or AnalysisCuts['FinalBeamJet']['Pt'][1] < ParticleDict['FinalBeamJet']['Pt']:
             continue
 
