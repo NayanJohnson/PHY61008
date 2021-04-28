@@ -90,6 +90,7 @@ def GetParticleVariable(ParticleDict, ParticleList, var):
 
     # List of variables that are stored in all particles.
     ParticleProperties = ['Charge', 'E', 'Eta', 'Phi', 'Rapidity', 'Theta', 'E', 'Pt', 'Et']
+    SummedProperties = ['M', 'Mt', 'Eta_Sum', 'Phi_Sum', 'Rapidity_Sum', 'Pt_Sum', 'Et_Sum', 'E_Sum']
 
 
     # If all particles are present
@@ -122,17 +123,26 @@ def GetParticleVariable(ParticleDict, ParticleList, var):
                 q = TMath.Sqrt(2*BeamParticle['E']*ParticleList[0]['E']*(1 - TMath.Cos(BeamParticle['Theta'])))
                 return abs(q)
 
-        elif var == 'M':
+        elif var in SummedProperties:
             ParticleSum = TLorentzVector()
             for particle in ParticleList:
                 ParticleSum = particle['P4'] + ParticleSum
-            return ParticleSum.M()
-
-        elif var == 'Mt':
-            ParticleSum = TLorentzVector()
-            for particle in ParticleList:
-                ParticleSum = particle['P4'] + ParticleSum
-            return ParticleSum.Mt()
+            if var == 'M':
+                return ParticleSum.M()
+            elif var == 'Mt'
+                return ParticleSum.Mt()
+            elif var == 'Eta_Sum'
+                return ParticleSum.Eta()
+            elif var == 'Phi_Sum'
+                return ParticleSum.Phi()
+            elif var == 'Rapidity_Sum'
+                return ParticleSum.Rapidity()
+            elif var == 'Pt_Sum'
+                return ParticleSum.Pt()
+            elif var == 'Et_Sum'
+                return ParticleSum.Et()
+            elif var == 'E_Sum'
+                return ParticleSum.E()
 
         elif var == 'dEta':
             dEta = ParticleList[0]['Eta'] - ParticleList[1]['Eta']
