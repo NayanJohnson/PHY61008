@@ -98,7 +98,6 @@ EventLoopParams = {
                                     :   {
                     'dR_Eta'            :   (0, float('inf')),
                     'M'                 :   (0, float('inf')),
-
                 },       
 
                 'MissingET'         :   {
