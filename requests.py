@@ -374,7 +374,7 @@ HistDict =  {
 
     'ZJets'         :   {
         'Requests'      :   {
-            'Vars'      :   ['Eta', 'Phi', 'Rapidity', 'Pt_Sum', 'M', 'Mt', 'dR_Eta'],
+            'Vars'      :   ['Eta', 'Phi', 'Rapidity', 'Pt', 'Pt_Sum', 'M', 'Mt', 'dR_Eta'],
             'Particles' :   [['ZLeadingJet', 'ZSubLeadingJet']],
         },
         'Dimensions':   1,
