@@ -483,11 +483,15 @@ def EventLoop(TreeDict, Xsec, outfilename, LevelRun, LoopRun, EventRun, Analysis
                 if ZJets_M < AnalysisCuts['ZJets']['M'][0] or AnalysisCuts['ZJets']['M'][1] < ZJets_M:
                     continue
             
-            # ZLeadingJetFinalBeamElectron_dR_Eta cut
+            # ZLeadingJet-FinalBeamElectron cuts
             if ParticleDict['FinalBeamJet']['Check']:
                 ZLeading_FinalBeam_Jets_dR_Eta = ParticleFuncs.GetParticleVariable(ParticleDict, [ParticleDict['ZLeadingJet'], ParticleDict['FinalBeamJet']], 'dR_Eta')
                 if ZLeading_FinalBeam_Jets_dR_Eta < AnalysisCuts['ZLeading_FinalBeam_Jets']['dR_Eta'][0] or AnalysisCuts['ZLeading_FinalBeam_Jets']['dR_Eta'][1] < ZLeading_FinalBeam_Jets_dR_Eta:
                     continue
+
+                ZLeading_FinalBeam_Jets_M = ( ParticleDict['ZLeadingJet']['P4'] + ParticleDict['FinalBeamJet']['P4'] ).M()
+                if ZLeading_FinalBeam_Jets_M < AnalysisCuts['ZLeading_FinalBeam_Jets']['M'][0] or AnalysisCuts['ZLeading_FinalBeam_Jets']['M'][1] < ZLeading_FinalBeam_Jets_M:
+                    continue                
 
         # Adds particle for W+ - W- muons and W+ - Electron 
         if ParticleDict['WPlusMuon']['Check'] and ParticleDict['WMinusMuon']['Check']:
