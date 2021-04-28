@@ -61,6 +61,7 @@ EventLoopParams = {
                 'ZLeading_FinalBeam_Jets' 
                                     :   {
                     'dR_Eta'            :   (1.5, float('inf')),
+                    'M'                 :   (100, float('inf')),                    
                 },       
 
                 'MissingET'         :   {
@@ -93,6 +94,7 @@ EventLoopParams = {
                 'ZLeading_FinalBeam_Jets' 
                                     :   {
                     'dR_Eta'            :   (0, float('inf')),
+                    'M'                 :   (100, float('inf')),                    
                 },       
 
                 'MissingET'         :   {
