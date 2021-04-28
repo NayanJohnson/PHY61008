@@ -492,7 +492,11 @@ def EventLoop(TreeDict, Xsec, outfilename, LevelRun, LoopRun, EventRun, Analysis
 
                 ZLeading_FinalBeam_Jets_M = ( ParticleDict['ZLeadingJet']['P4'] + ParticleDict['FinalBeamJet']['P4'] ).M()
                 if ZLeading_FinalBeam_Jets_M < AnalysisCuts['ZLeading_FinalBeam_Jets']['M'][0] or AnalysisCuts['ZLeading_FinalBeam_Jets']['M'][1] < ZLeading_FinalBeam_Jets_M:
-                    continue                
+                    continue           
+
+                ZLeading_FinalBeam_Jets_Mt = ( ParticleDict['ZLeadingJet']['P4'] + ParticleDict['FinalBeamJet']['P4'] ).Mt()
+                if ZLeading_FinalBeam_Jets_Mt < AnalysisCuts['ZLeading_FinalBeam_Jets']['Mt'][0] or AnalysisCuts['ZLeading_FinalBeam_Jets']['Mt'][1] < ZLeading_FinalBeam_Jets_Mt:
+                    continue                         
 
             if ParticleDict['ZSubLeadingJet']['Check']:
                 ZSubLeading_FinalBeam_Jets_dR_Eta = ParticleFuncs.GetParticleVariable(ParticleDict, [ParticleDict['ZSubLeadingJet'], ParticleDict['FinalBeamJet']], 'dR_Eta')
@@ -501,7 +505,11 @@ def EventLoop(TreeDict, Xsec, outfilename, LevelRun, LoopRun, EventRun, Analysis
 
                 ZSubLeading_FinalBeam_Jets_M = ( ParticleDict['ZSubLeadingJet']['P4'] + ParticleDict['FinalBeamJet']['P4'] ).M()
                 if ZSubLeading_FinalBeam_Jets_M < AnalysisCuts['ZSubLeading_FinalBeam_Jets']['M'][0] or AnalysisCuts['ZSubLeading_FinalBeam_Jets']['M'][1] < ZSubLeading_FinalBeam_Jets_M:
-                    continue                
+                    continue            
+
+                ZSubLeading_FinalBeam_Jets_Mt = ( ParticleDict['ZSubLeadingJet']['P4'] + ParticleDict['FinalBeamJet']['P4'] ).Mt()
+                if ZSubLeading_FinalBeam_Jets_Mt < AnalysisCuts['ZSubLeading_FinalBeam_Jets']['Mt'][0] or AnalysisCuts['ZSubLeading_FinalBeam_Jets']['Mt'][1] < ZSubLeading_FinalBeam_Jets_Mt:
+                    continue                      
 
 
 
