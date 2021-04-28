@@ -129,19 +129,19 @@ def GetParticleVariable(ParticleDict, ParticleList, var):
                 ParticleSum = particle['P4'] + ParticleSum
             if var == 'M':
                 return ParticleSum.M()
-            elif var == 'Mt'
+            elif var == 'Mt':
                 return ParticleSum.Mt()
-            elif var == 'Eta_Sum'
+            elif var == 'Eta_Sum':
                 return ParticleSum.Eta()
-            elif var == 'Phi_Sum'
+            elif var == 'Phi_Sum':
                 return ParticleSum.Phi()
-            elif var == 'Rapidity_Sum'
+            elif var == 'Rapidity_Sum':
                 return ParticleSum.Rapidity()
-            elif var == 'Pt_Sum'
+            elif var == 'Pt_Sum':
                 return ParticleSum.Pt()
-            elif var == 'Et_Sum'
+            elif var == 'Et_Sum':
                 return ParticleSum.Et()
-            elif var == 'E_Sum'
+            elif var == 'E_Sum':
                 return ParticleSum.E()
 
         elif var == 'dEta':
