@@ -496,7 +496,11 @@ def EventLoop(TreeDict, Xsec, outfilename, LevelRun, LoopRun, EventRun, Analysis
 
                 ZLeading_FinalBeam_Jets_Mt = ( ParticleDict['ZLeadingJet']['P4'] + ParticleDict['FinalBeamJet']['P4'] ).Mt()
                 if ZLeading_FinalBeam_Jets_Mt < AnalysisCuts['ZLeading_FinalBeam_Jets']['Mt'][0] or AnalysisCuts['ZLeading_FinalBeam_Jets']['Mt'][1] < ZLeading_FinalBeam_Jets_Mt:
-                    continue                         
+                    continue      
+
+                ZLeading_FinalBeam_Jets_Pt = ( ParticleDict['ZLeadingJet']['P4'] + ParticleDict['FinalBeamJet']['P4'] ).Mt()
+                if ZLeading_FinalBeam_Jets_Pt < AnalysisCuts['ZLeading_FinalBeam_Jets']['Pt'][0] or AnalysisCuts['ZLeading_FinalBeam_Jets']['Pt'][1] < ZLeading_FinalBeam_Jets_Pt:
+                    continue                                                  
 
             if ParticleDict['ZSubLeadingJet']['Check']:
                 ZSubLeading_FinalBeam_Jets_dR_Eta = ParticleFuncs.GetParticleVariable(ParticleDict, [ParticleDict['ZSubLeadingJet'], ParticleDict['FinalBeamJet']], 'dR_Eta')
@@ -509,7 +513,11 @@ def EventLoop(TreeDict, Xsec, outfilename, LevelRun, LoopRun, EventRun, Analysis
 
                 ZSubLeading_FinalBeam_Jets_Mt = ( ParticleDict['ZSubLeadingJet']['P4'] + ParticleDict['FinalBeamJet']['P4'] ).Mt()
                 if ZSubLeading_FinalBeam_Jets_Mt < AnalysisCuts['ZSubLeading_FinalBeam_Jets']['Mt'][0] or AnalysisCuts['ZSubLeading_FinalBeam_Jets']['Mt'][1] < ZSubLeading_FinalBeam_Jets_Mt:
-                    continue                      
+                    continue     
+
+                ZSubLeading_FinalBeam_Jets_Pt = ( ParticleDict['ZSubLeadingJet']['P4'] + ParticleDict['FinalBeamJet']['P4'] ).Mt()
+                if ZSubLeading_FinalBeam_Jets_Pt < AnalysisCuts['ZSubLeading_FinalBeam_Jets']['Pt'][0] or AnalysisCuts['ZSubLeading_FinalBeam_Jets']['Pt'][1] < ZSubLeading_FinalBeam_Jets_Pt:
+                    continue                                                          
 
 
 
