@@ -482,8 +482,9 @@ def EventLoop(TreeDict, Xsec, outfilename, LevelRun, LoopRun, EventRun, Analysis
                 if ZJets_M < AnalysisCuts['ZJets']['M'][0] or AnalysisCuts['ZJets']['M'][1] < ZJets_M:
                     continue
             
-            # ZLeadingJet-FinalBeamElectron cuts
-            if ParticleDict['FinalBeamJet']['Check']:
+        # ZJet-FinalBeamElectron cuts
+        if ParticleDict['FinalBeamJet']['Check']:
+            if ParticleDict['ZLeadingJet']['Check']:
                 ZLeading_FinalBeam_Jets_dR_Eta = ParticleFuncs.GetParticleVariable(ParticleDict, [ParticleDict['ZLeadingJet'], ParticleDict['FinalBeamJet']], 'dR_Eta')
                 if ZLeading_FinalBeam_Jets_dR_Eta < AnalysisCuts['ZLeading_FinalBeam_Jets']['dR_Eta'][0] or AnalysisCuts['ZLeading_FinalBeam_Jets']['dR_Eta'][1] < ZLeading_FinalBeam_Jets_dR_Eta:
                     continue
@@ -491,6 +492,17 @@ def EventLoop(TreeDict, Xsec, outfilename, LevelRun, LoopRun, EventRun, Analysis
                 ZLeading_FinalBeam_Jets_M = ( ParticleDict['ZLeadingJet']['P4'] + ParticleDict['FinalBeamJet']['P4'] ).M()
                 if ZLeading_FinalBeam_Jets_M < AnalysisCuts['ZLeading_FinalBeam_Jets']['M'][0] or AnalysisCuts['ZLeading_FinalBeam_Jets']['M'][1] < ZLeading_FinalBeam_Jets_M:
                     continue                
+
+            if ParticleDict['ZSubLeadingJet']['Check']:
+                ZSubLeading_FinalBeam_Jets_dR_Eta = ParticleFuncs.GetParticleVariable(ParticleDict, [ParticleDict['ZSubLeadingJet'], ParticleDict['FinalBeamJet']], 'dR_Eta')
+                if ZSubLeading_FinalBeam_Jets_dR_Eta < AnalysisCuts['ZSubLeading_FinalBeam_Jets']['dR_Eta'][0] or AnalysisCuts['ZSubLeading_FinalBeam_Jets']['dR_Eta'][1] < ZSubLeading_FinalBeam_Jets_dR_Eta:
+                    continue
+
+                ZSubLeading_FinalBeam_Jets_M = ( ParticleDict['ZSubLeadingJet']['P4'] + ParticleDict['FinalBeamJet']['P4'] ).M()
+                if ZSubLeading_FinalBeam_Jets_M < AnalysisCuts['ZSubLeading_FinalBeam_Jets']['M'][0] or AnalysisCuts['ZSubLeading_FinalBeam_Jets']['M'][1] < ZSubLeading_FinalBeam_Jets_M:
+                    continue                
+
+
 
         # Adds particle for W+ - W- muons and W+ - Electron 
         if ParticleDict['WPlusMuon']['Check'] and ParticleDict['WMinusMuon']['Check']:
