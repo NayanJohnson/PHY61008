@@ -48,33 +48,45 @@ if RootDir:
         gSystem.Exec('mkdir '+'/'.join(RootDir.split('/')[:i+1]))
 
 
-# Groups Tree into 5 runs to manage memory use 
+# Groups trees into 5 runs to manage memory use 
 n = 5
 GroupedTrees = [RunTrees[x:x+n] for x in range(0,len(RunTrees),n)]
 GroupNEvents = []
-outfilename = RootDir+outfilename+'.root'
 for i in range(len(GroupedTrees)):
-    chain = TChain('Delphes')
+    GroupChain = TChain('Delphes')
 
     for tree in GroupedTrees[i]:
-        chain.Add(tree)
-    GroupNEvents.append(chain.GetEntries())
+        GroupChain.Add(tree)
 
-    # For the first loop overwrite existing files
-    # For subsequent loops update the file
-    if i == 0:
-        outfile = TFile(outfilename,'RECREATE')
-    else:
-        outfile = TFile(outfilename,'UPDATE')
+    # Make new file for each group
+    GroupOutfile = TFile(RootDir+'Group'+str(i)+'.root','RECREATE')
 
-    PrunedTree = chain.CopyTree(Selection)
+    GroupPrunedTree = GroupChain.CopyTree(Selection)
 
 
-    outfile.Write("", TObject.kOverwrite)
-    outfile.Close()
-    chain.Reset()
+    GroupOutfile.Write()
+    GroupOutfile.Close()
+    GroupChain.Reset()
     print('Group ', i)
 
-NEvents = sum(GroupNEvents)
+
+# Load merged runs and save as one .root file
+outfilename = RootDir+outfilename
+MergedChain = TChain('Delphes')
+for i in range(len(GroupedTrees)):
+    print(RootDir+'Group'+str(i)+'.root')
+    MergedChain.Add(RootDir+'Group'+str(i)+'.root')
+
+# Make new file for each group
+outfile = TFile(RootDir+outfilename+'.root','RECREATE')
+
+PrunedTree = MergedChain.CopyTree('')
+
+NEvents = MergedChain.GetEntries()
+
+outfile.Write()
+outfile.Close()
+MergedChain.Reset()
+
 print('Mean xsec =', Xsec)
 print('NEvents =', NEvents)
