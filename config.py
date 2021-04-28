@@ -6,7 +6,7 @@ EventLoopParams = {
 
     'Background'        :   {
         'Xsec'              :   0.057,
-        'NEvents'           :   76738,
+        'NEvents'           :   243899,
     },
     'Level'             :   {
         'Loop'              :   {
