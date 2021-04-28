@@ -3,8 +3,9 @@
 # plot and what particles the histogram requires
 
 VarKeywords = [
-    'Count', 'Eta', 'Phi', 'Rapidity', 'Pt', 'Et', 'E' 'M' 'Mt', 'q', 
+    'Count', 'Eta', 'Phi', 'Rapidity', 'Pt', 'Et', 'E', 'M', 'Mt', 'q', 
     'dEta', 'dPhi', 'dRapidity', 'dR_Eta', 'dR_Rap',
+    'Eta_Sum', 'Phi_Sum', 'Rapidity_Sum', 'Pt_Sum', 'Et_Sum', 'E_Sum'
 ]
 
 # Tuples of two variables will be treated as 2 dimensions in a 2D histogram
@@ -349,7 +350,7 @@ HistDict =  {
 
     'ZJets'         :   {
         'Requests'      :   {
-            'Vars'      :   ['Eta', 'Phi', 'Rapidity', 'Pt', 'M', 'Mt', 'dR_Eta'],
+            'Vars'      :   ['Eta', 'Phi', 'Rapidity', 'Pt_Sum', 'M', 'Mt', 'dR_Eta'],
             'Particles' :   [['ZLeadingJet', 'ZSubLeadingJet']],
         },
         'Dimensions':   1,
@@ -357,7 +358,7 @@ HistDict =  {
 
     'ZLeadingJetFinalBeamJet'         :   {
         'Requests'      :   {
-            'Vars'      :   ['Pt', 'M', 'Mt', 'dR_Eta'],
+            'Vars'      :   ['Pt_Sum', 'M', 'Mt', 'dR_Eta'],
             'Particles' :   [['ZLeadingJet', 'FinalBeamJet']],
         },
         'Dimensions':   1,
@@ -365,7 +366,7 @@ HistDict =  {
 
     'ZSubLeadingJetFinalBeamJet'         :   {
         'Requests'      :   {
-            'Vars'      :   ['Pt', 'M', 'Mt',  'dR_Eta'],
+            'Vars'      :   ['Pt_Sum', 'M', 'Mt',  'dR_Eta'],
             'Particles' :   [['ZSubLeadingJet', 'FinalBeamJet']],
         },
         'Dimensions':   1,
