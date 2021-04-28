@@ -103,6 +103,30 @@ VarParams = {
     'M'   :   {
         'Range'     :   [0, 1000]
     },
+
+    'Eta_Sum'       :   {
+        'Range'     :   [-10, 10]
+    },
+
+    'Phi_Sum'       :   {
+        'Range'     :   [-3.5, 3.5]
+    },
+
+    'Rapidity_Sum'  :   {
+        'Range'     :   [-10, 10]
+    },
+
+    'E_Sum'        :   {
+        'Range'     :   [0, 1000]
+    },
+
+    'Pt_Sum'        :   {
+        'Range'     :   [0, 500]
+    },
+    
+    'Et_Sum'        :   {
+        'Range'     :   [0, 500]
+    },
 }
 
 # No entries here can have _ as this is how variables are seperated in the code
