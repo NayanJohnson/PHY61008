@@ -381,7 +381,11 @@ def EventLoop(TreeDict, Xsec, outfilename, LevelRun, LoopRun, EventRun, Analysis
     WPlusdecays = config.EventLoopParams['WPlus']['Decays']
     WMinusdecays = config.EventLoopParams['WMinus']['Decays']
     
+    BeamElectronSelection = 0
+    EventKeptNum = 0
     EventCutNum = 0
+    ContinueCut = 0
+    Continue = False
     # Looping through events
     for EventNum in range(TreeDict['TreeReader'].GetEntries()):
         
@@ -420,42 +424,51 @@ def EventLoop(TreeDict, Xsec, outfilename, LevelRun, LoopRun, EventRun, Analysis
             elif Zdecays[0] == Zdecays[1]:
                 continue
             else:
-                ParticleDict, EventDict, Continue = ParticleFuncs.InvMassCheck(Zdecay, 'Z', ParticleDict, EventDict, EventCuts)
-                if Continue:
-                    continue                
+                ParticleDict, EventDict = ParticleFuncs.InvMassCheck(Zdecay, 'Z', ParticleDict, EventDict, EventCuts)            
 
         for WPlusdecay in WPlusdecays:
             if WPlusdecay == None:
                 continue
-            elif WPlusdecays[0] == WPlusdecays[1]:
-                continue            
             elif WPlusdecay == 'Jets':
-                ParticleDict, EventDict, Continue = ParticleFuncs.InvMassCheck(WPlusdecay, 'WPlus', ParticleDict, EventDict, EventCuts)
-                if Continue:
-                    continue                
+                ParticleDict, EventDict = ParticleFuncs.InvMassCheck(WPlusdecay, 'WPlus', ParticleDict, EventDict, EventCuts)          
             else:
-                particlesList = [ParticleDict['Leading'+WPlusdecay[0:-1]], ParticleDict['SubLeading'+WPlusdecay[0:-1]]]
-                for Lepton in particlesList:
-                    if Lepton['Check']:
-                        if Lepton['Charge'] == 1:
-                            ParticleDict = ParticleFuncs.AddParticle('WPlus'+WPlusdecay[0:-1], ParticleDict, Lepton['P4'])
+                WPlusLeptons = EventDict['PTSorted'][WPlusdecay]
+                numbWPlusLeptons = len(WPlusLeptons)
+                for i in range(0, numbWPlusLeptons):
+                    
+                    if numbWPlusLeptons != 0:
+                        WPlusLepton = WPlusLeptons[i][1]
+                        if WPlusLepton.Charge == 1:
+                            ParticleDict = ParticleFuncs.AddParticle('WPlus'+WPlusdecay[0:-1], ParticleDict, WPlusLepton.P4(), WPlusLepton.Charge)      
+                
+                if not ParticleDict['WPlus'+WPlusdecay[0:-1]]['Check']:
+                    Continue = True
+                            
+
 
         for WMinusdecay in WMinusdecays:
             if WMinusdecay == None:
-                continue
-            elif WMinusdecays[0] == WMinusdecays[1]:
-                continue            
+                continue     
             elif WMinusdecay == 'Jets':
-                ParticleDict, EventDict, Continue = ParticleFuncs.InvMassCheck(WMinusdecay, 'WMinus', ParticleDict, EventDict, EventCuts)
-                if Continue:
-                    continue
+                ParticleDict, EventDict = ParticleFuncs.InvMassCheck(WMinusdecay, 'WMinus', ParticleDict, EventDict, EventCuts)
             else:
-                particlesList = [ParticleDict['Leading'+WMinusdecay[0:-1]], ParticleDict['SubLeading'+WMinusdecay[0:-1]]]
-                for Lepton in particlesList:
-                    if Lepton['Check']:
-                        if Lepton['Charge'] == -1:
-                            ParticleDict = ParticleFuncs.AddParticle('WMinus'+WMinusdecay[0:-1], ParticleDict, Lepton['P4'])      
-           
+                WMinusLeptons = EventDict['PTSorted'][WMinusdecay]
+                numbWMinusLeptons = len(WMinusLeptons)
+                for i in range(0, numbWMinusLeptons):
+                    
+                    if numbWMinusLeptons != 0:
+                        WMinusLepton = WMinusLeptons[i][1]
+                        if WMinusLepton.Charge == -1:
+                            ParticleDict = ParticleFuncs.AddParticle('WMinus'+WMinusdecay[0:-1], ParticleDict, WMinusLepton.P4(), WMinusLepton.Charge)      
+                
+                if not ParticleDict['WMinus'+WMinusdecay[0:-1]]['Check']:
+                    Continue = True
+
+        if Continue:
+            ContinueCut += 1
+            continue
+
+
 
         # FinalBeamElectron selection
         if len(EventDict['PTSorted']['Electrons']) != 0:
@@ -519,8 +532,6 @@ def EventLoop(TreeDict, Xsec, outfilename, LevelRun, LoopRun, EventRun, Analysis
                 if ZSubLeading_FinalBeam_Jets_Pt < AnalysisCuts['ZSubLeading_FinalBeam_Jets']['Pt'][0] or AnalysisCuts['ZSubLeading_FinalBeam_Jets']['Pt'][1] < ZSubLeading_FinalBeam_Jets_Pt:
                     continue                                                          
 
-
-
         # Adds particle for W+ - W- muons and W+ - Electron 
         if ParticleDict['WPlusMuon']['Check'] and ParticleDict['WMinusMuon']['Check']:
             DiMuon = ParticleDict['WPlusMuon']['P4'] + ParticleDict['WMinusMuon']['P4']
@@ -528,9 +539,19 @@ def EventLoop(TreeDict, Xsec, outfilename, LevelRun, LoopRun, EventRun, Analysis
             ParticleDict = ParticleFuncs.AddParticle('DiMuon', ParticleDict, DiMuon)
             ParticleDict = ParticleFuncs.AddParticle('WPlusMuonFinalBeamElectron', ParticleDict, WPlusMuonFinalBeamElectron)
 
+        # Adds particle for W+ - W- muons and W+ - Electron 
+        if ParticleDict['WMinusMuon']['Check']:
+            WMinusMuon_qLepton = ParticleFuncs.GetParticleVariable(ParticleDict, [ParticleDict['WMinusMuon']], 'qLepton')
+            FinalBeamElectron_qLepton = ParticleFuncs.GetParticleVariable(ParticleDict, [ParticleDict['FinalBeamElectron']], 'qLepton')
+
+            if FinalBeamElectron_qLepton < WMinusMuon_qLepton:
+                BeamElectronSelection += 1
+
         # Filling HistDict with particles then filling the hists
         HistDict = ParticleFuncs.RequestParticles(HistDict, ParticleDict)
         HistFuncs.FillHists(HistDict, ParticleDict)
+
+        EventKeptNum += 1
 
     # Get scaling factor for histograms
     Scale = HistFuncs.GetScale(Xsec, TreeDict['NEvents'])
@@ -544,3 +565,7 @@ def EventLoop(TreeDict, Xsec, outfilename, LevelRun, LoopRun, EventRun, Analysis
     outfile.Write()
     outfile.Close()
     gSystem.Exec('rootprint -f png -d '+outfilename+'/ '+outfilename+'.root')
+
+    print('NEvents kept =', EventKeptNum)
+    print('NEvents where boson cut discaded event =', ContinueCut)
+    print('NEvents where beam electron correctly selected =', BeamElectronSelection)
