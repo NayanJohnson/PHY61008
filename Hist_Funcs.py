@@ -198,7 +198,7 @@ def FillHists(HistDict, ParticleDict):
                         else:
                             hist.Fill(xVal, yVal)
 
-def HistLims(hist, name, var, Scale=1, Norm=False, Change=True):
+def HistLims(hist, name, var, Scale=1, Norm=False, Change1D=True, Change2D=True):
     '''
         Rescales hist lims.
         Passed objects:
@@ -206,7 +206,7 @@ def HistLims(hist, name, var, Scale=1, Norm=False, Change=True):
         Scale       :   float used to scale histrogram - default is 1.
         Norm        :   Should the hist be normalised?
     '''    
-    XMin, XMax, YMin, YMax = None, None, None, None
+    XMin, XMax, YMin, YMax = False, False, False, False
 
     try:
         hist.Integral()
@@ -219,9 +219,9 @@ def HistLims(hist, name, var, Scale=1, Norm=False, Change=True):
     else:
         hist.Scale(Scale)
 
-    if Change:
-        ThresholdMin = (hist.Integral()/200) * 1/100                # Skip if hist = False
-        if hist:
+    ThresholdMin = (hist.Integral()/200) * 1/100                # Skip if hist = False
+    if hist:
+        if Change1D:
             if hist.GetDimension() == 1:
                 # Recalculating Max Min with higher threshold - this is possible as 
                 # the hists have been rebinned to a large width
@@ -235,10 +235,10 @@ def HistLims(hist, name, var, Scale=1, Norm=False, Change=True):
                 XMax = BinMaxX + 5
                 XMin = BinMinX - 5
 
-
                 hist.SetAxisRange(XMin, XMax, 'X')
-            
-            elif hist.GetDimension() == 2:
+
+        elif hist.GetDimension() == 2:
+            if Change2D:
 
                 xVar  = var.split('_')[-2]
                 yVar  = var.split('_')[-1]
@@ -263,8 +263,6 @@ def HistLims(hist, name, var, Scale=1, Norm=False, Change=True):
 
                 hist.SetAxisRange(XMin, XMax, 'X')
                 hist.SetAxisRange(YMin, YMax, 'Y')
-    else:
-        XMin, XMax, YMin, YMax = False, False, False, False
 
     return hist, [(XMin, XMax), (YMin, YMax)]
 
@@ -342,8 +340,8 @@ def CompareHist(HistProps, MediaDir, LimChange=True):
     Hist2File_AnalysisRun = HistProps['Hist2']['FileDict']['AnalysisRun']
 
     # print(HistProps)
-    Hist1, Lims1 = HistLims(Hist1, Hist1Name, Hist1Var, Norm=Norm, Change=LimChange)
-    Hist2, Lims2 = HistLims(Hist2, Hist2Name, Hist2Var, Norm=Norm, Change=LimChange)
+    Hist1, Lims1 = HistLims(Hist1, Hist1Name, Hist1Var, Norm=Norm, Change1D=LimChange)
+    Hist2, Lims2 = HistLims(Hist2, Hist2Name, Hist2Var, Norm=Norm, Change1D=LimChange)
 
     # Clear canvas
     HistCan = TCanvas()
