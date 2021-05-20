@@ -1,12 +1,12 @@
 EventLoopParams = {
     'Signal'            :   {
-        'Xsec'              :   1.00e-04,
+        'Xsec'              :   0.00016,
         'NEvents'           :   50000,        
     },
 
     'Background'        :   {
-        'Xsec'              :   0.057,
-        'NEvents'           :   243899,
+        'Xsec'              :   0.014,
+        'NEvents'           :   176131,
     },
     'Level'             :   {
         'Loop'              :   {
@@ -55,7 +55,7 @@ EventLoopParams = {
                 },
 
                 'ZJets'             :   {
-                    'M'                 :   (60, 100),
+                    'M'                 :   (50, float('inf')),
                 },
 
                 'ZLeading_FinalBeam_Jets' 
