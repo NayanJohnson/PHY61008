@@ -198,7 +198,7 @@ def FillHists(HistDict, ParticleDict):
                         else:
                             hist.Fill(xVal, yVal)
 
-def HistLims(hist, name, var, Scale=1, Norm=False):
+def HistLims(hist, name, var, Scale=1, Norm=False, Change1D=True, Change2D=True, Diff2D=True):
     '''
         Rescales hist lims.
         Passed objects:
@@ -206,7 +206,7 @@ def HistLims(hist, name, var, Scale=1, Norm=False):
         Scale       :   float used to scale histrogram - default is 1.
         Norm        :   Should the hist be normalised?
     '''    
-    XMin, XMax, YMin, YMax = None, None, None, None
+    XMin, XMax, YMin, YMax = False, False, False, False
 
     try:
         hist.Integral()
@@ -220,52 +220,56 @@ def HistLims(hist, name, var, Scale=1, Norm=False):
         hist.Scale(Scale)
 
     ThresholdMin = (hist.Integral()/200) * 1/100                # Skip if hist = False
-
     if hist:
-        if hist.GetDimension() == 1:
-            # Recalculating Max Min with higher threshold - this is possible as 
-            # the hists have been rebinned to a large width
-            # Get the index of the min/max bin and the read off the value of the 
-            # low edge
-            # Set FindLastBinAbove threshold to 5 since otherwise the 
-            # hist goes on for way too long
-            BinMaxX = hist.GetBinLowEdge(hist.FindLastBinAbove(ThresholdMin, 1))
-            BinMinX = hist.GetBinLowEdge(hist.FindFirstBinAbove(0, 1))
-            # Max/min = BinMax/min +- 5% +- 5 (prevents max=min for BinMax/Min=0)
-            XMax = BinMaxX + 5
-            XMin = BinMinX - 5
+        if Change1D:
+            if hist.GetDimension() == 1:
+                # Recalculating Max Min with higher threshold - this is possible as 
+                # the hists have been rebinned to a large width
+                # Get the index of the min/max bin and the read off the value of the 
+                # low edge
+                # Set FindLastBinAbove threshold to 5 since otherwise the 
+                # hist goes on for way too long
+                BinMaxX = hist.GetBinLowEdge(hist.FindLastBinAbove(ThresholdMin, 1))
+                BinMinX = hist.GetBinLowEdge(hist.FindFirstBinAbove(0, 1))
+                # Max/min = BinMax/min +- 5% +- 5 (prevents max=min for BinMax/Min=0)
+                XMax = BinMaxX + 5
+                XMin = BinMinX - 5
 
+                hist.SetAxisRange(XMin, XMax, 'X')
 
-            hist.SetAxisRange(XMin, XMax, 'X')
-        
         elif hist.GetDimension() == 2:
+            if Change2D:
 
-            xVar  = var.split('_')[-2]
-            yVar  = var.split('_')[-1]
+                xVar  = var.split('_')[-2]
+                yVar  = var.split('_')[-1]
 
-            # Recalculating Max Min with higher threshold - this is possible as 
-            # the hists have been rebinned to a large width
-            # Get the index of the min/max bin and the read off the value of the 
-            # low edge
-            # Set FindLastBinAbove threshold to 2 since the particles are now spread
-            # between two vars so the bins will be less filled 
-            # hist goes on for way too long
-            # For 2D hist must first get axis before using TH1 methods
-            BinMaxX = hist.GetXaxis().GetBinLowEdge(hist.FindLastBinAbove(ThresholdMin, 1))
-            BinMinX = hist.GetXaxis().GetBinLowEdge(hist.FindFirstBinAbove(0, 1))
-            BinMaxY = hist.GetYaxis().GetBinLowEdge(hist.FindLastBinAbove(ThresholdMin, 2))
-            BinMinY = hist.GetYaxis().GetBinLowEdge(hist.FindFirstBinAbove(0, 2))                
-            # Max/min = BinMax/min +- 5 (prevents max=min for BinMax/Min=0)
-            XMax = BinMaxX + 5
-            XMin = BinMinX - 5
-            YMax = BinMaxY + 5
-            YMin = BinMinY - 5        
+                # Recalculating Max Min with higher threshold - this is possible as 
+                # the hists have been rebinned to a large width
+                # Get the index of the min/max bin and the read off the value of the 
+                # low edge
+                # Set FindLastBinAbove threshold to 2 since the particles are now spread
+                # between two vars so the bins will be less filled 
+                # hist goes on for way too long
+                # For 2D hist must first get axis before using TH1 methods
+                BinMaxX = hist.GetXaxis().GetBinLowEdge(hist.FindLastBinAbove(ThresholdMin, 1))
+                BinMinX = hist.GetXaxis().GetBinLowEdge(hist.FindFirstBinAbove(0, 1))
+                BinMaxY = hist.GetYaxis().GetBinLowEdge(hist.FindLastBinAbove(ThresholdMin, 2))
+                BinMinY = hist.GetYaxis().GetBinLowEdge(hist.FindFirstBinAbove(0, 2))                
+                # Max/min = BinMax/min +- 5 (prevents max=min for BinMax/Min=0)
+                XMax = BinMaxX + 5
+                XMin = BinMinX - 5
+                YMax = BinMaxY + 5
+                YMin = BinMinY - 5        
+                if not Diff2D:
+                    Max = max(XMax, YMax)
+                    Min = min(XMin, YMin)
+                    XMax, YMax, Xmin, YMin = Max, Max, Min, Min
+                hist.SetAxisRange(XMin, XMax, 'X')
+                hist.SetAxisRange(YMin, YMax, 'Y')
 
-            hist.SetAxisRange(XMin, XMax, 'X')
-            hist.SetAxisRange(YMin, YMax, 'Y')
     return hist, [(XMin, XMax), (YMin, YMax)]
 
-def CompareHist(HistProps, MediaDir):
+def CompareHist(HistProps, MediaDir, LimChange=True):
     '''
         Given a histogram dictionary and 
          
@@ -346,20 +350,20 @@ def CompareHist(HistProps, MediaDir):
     HistCan = TCanvas()
     HistCan.cd()
 
-    XMin = min(Lims1[0][0], Lims2[0][0])
-    XMax = max(Lims1[0][1], Lims2[0][1])
+    if Lims1[0][0] and Lims2[0][0] and Lims1[0][1] and Lims2[0][1]:
+        XMin = min(Lims1[0][0], Lims2[0][0])
+        XMax = max(Lims1[0][1], Lims2[0][1])
 
-    Hist1.SetAxisRange(XMin, XMax, 'X')
-    Hist2.SetAxisRange(XMin, XMax, 'X')
+        Hist1.SetAxisRange(XMin, XMax, 'X')
+        Hist2.SetAxisRange(XMin, XMax, 'X')
 
-    #2D hists
-    if Hist1.GetDimension() == 2:
-        YMin = min(Lims1[1][0], Lims2[1][0])
-        YMax = max(Lims1[1][1], Lims2[1][1])
-        Hist1.SetAxisRange(YMin, YMax, 'Y')
-        Hist2.SetAxisRange(YMin, YMax, 'Y')
-
-
+        #2D hists
+        if Hist1.GetDimension() == 2:
+            if Lims1[1][0] and Lims2[1][0] and Lims1[1][1] and Lims2[1][1]:
+                YMin = min(Lims1[1][0], Lims2[1][0])
+                YMax = max(Lims1[1][1], Lims2[1][1])
+                Hist1.SetAxisRange(YMin, YMax, 'Y')
+                Hist2.SetAxisRange(YMin, YMax, 'Y')
 
     # max frequency
     Max1 = Hist1.GetMaximum() + Hist1.GetMaximum()/10
@@ -479,3 +483,19 @@ def CompareHist(HistProps, MediaDir):
             HistCan.SaveAs(MediaDir+Comparison+Hist1File_Prefix+Hist2File_Prefix+'/Loop'+Hist1File_LoopRun+'-'+Hist2File_LoopRun+'/Event'+Hist1File_EventRun+'-'+Hist2File_EventRun+'/Analysis'+Hist1File_AnalysisRun+'-'+Hist2File_AnalysisRun+'/'+Hist1File_LevelRun+'-'+Hist2File_LevelRun+'Level/'+Hist1Name+Hist1Var+'.png')
         else:
             HistCan.SaveAs(MediaDir+Comparison+Hist1File_Prefix+Hist2File_Prefix+'/Loop'+Hist1File_LoopRun+'-'+Hist2File_LoopRun+'/Event'+Hist1File_EventRun+'-'+Hist2File_EventRun+'/Analysis'+Hist1File_AnalysisRun+'-'+Hist2File_AnalysisRun+'/'+Hist1File_LevelRun+'-'+Hist2File_LevelRun+'Level/'+Hist1Name+Hist2Name+Hist1Var+'.png')
+
+    HistCan.Clear()
+
+    Hist1.Rebin(5)
+    Hist2.Rebin(5)
+
+    Sig_Back = Hist1.Clone()
+    Sig_Back.Divide(Hist1,Hist2)
+
+    Sig_Back.Draw()
+    HistCan.Update()
+    with LoopFuncs.Quiet():
+        if Hist1Name == Hist2Name:
+            HistCan.SaveAs(MediaDir+Comparison+Hist1File_Prefix+Hist2File_Prefix+'/Loop'+Hist1File_LoopRun+'-'+Hist2File_LoopRun+'/Event'+Hist1File_EventRun+'-'+Hist2File_EventRun+'/Analysis'+Hist1File_AnalysisRun+'-'+Hist2File_AnalysisRun+'/'+Hist1File_LevelRun+'-'+Hist2File_LevelRun+'Level/'+Hist1Name+Hist1Var+'_'+Hist1File_Prefix+'Over'+Hist2File_Prefix+'.png')
+        else:
+            HistCan.SaveAs(MediaDir+Comparison+Hist1File_Prefix+Hist2File_Prefix+'/Loop'+Hist1File_LoopRun+'-'+Hist2File_LoopRun+'/Event'+Hist1File_EventRun+'-'+Hist2File_EventRun+'/Analysis'+Hist1File_AnalysisRun+'-'+Hist2File_AnalysisRun+'/'+Hist1File_LevelRun+'-'+Hist2File_LevelRun+'Level/'+Hist1Name+Hist2Name+Hist1Var+'_'+Hist1File_Prefix+'Over'+Hist2File_Prefix+'.png')

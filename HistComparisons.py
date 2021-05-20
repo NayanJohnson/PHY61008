@@ -123,6 +123,7 @@ for FilePair in FileComparisons:
                         else:
                             Comparison = 'Rel'
 
+                        gSystem.Exec('rm -R '+MediaDir+Comparison+HistFile1_Prefix+HistFile2_Prefix+'/Loop'+HistFile1_LoopRun+'-'+HistFile2_LoopRun+'/Event'+HistFile1_EventRun+'-'+HistFile2_EventRun+'/Analysis'+HistFile1_AnalysisRun+'-'+HistFile2_AnalysisRun+'/'+HistFile1_LevelRun+'-'+HistFile2_LevelRun+'Level/')
                         gSystem.Exec('mkdir '+MediaDir+Comparison+HistFile1_Prefix+HistFile2_Prefix)
                         gSystem.Exec('mkdir '+MediaDir+Comparison+HistFile1_Prefix+HistFile2_Prefix+'/Loop'+HistFile1_LoopRun+'-'+HistFile2_LoopRun)
                         gSystem.Exec('mkdir '+MediaDir+Comparison+HistFile1_Prefix+HistFile2_Prefix+'/Loop'+HistFile1_LoopRun+'-'+HistFile2_LoopRun+'/Event'+HistFile1_EventRun+'-'+HistFile2_EventRun)

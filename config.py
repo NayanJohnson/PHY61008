@@ -1,12 +1,21 @@
 EventLoopParams = {
     'Signal'            :   {
+<<<<<<< HEAD
         'Xsec'              :   10.0e-05,
+=======
+        'Xsec'              :   0.00016,
+>>>>>>> cb3f84d9b4ea8385fd6827be95721999a2d8dc19
         'NEvents'           :   50000,        
     },
 
     'Background'        :   {
+<<<<<<< HEAD
         'Xsec'              :   0.057,
         'NEvents'           :   243899,
+=======
+        'Xsec'              :   0.014,
+        'NEvents'           :   176131,
+>>>>>>> cb3f84d9b4ea8385fd6827be95721999a2d8dc19
     },
     'Level'             :   {
         'Loop'              :   {
