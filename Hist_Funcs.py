@@ -260,7 +260,7 @@ def HistLims(hist, name, var, Scale=1, Norm=False, Change1D=True, Change2D=True,
                 XMin = BinMinX - 5
                 YMax = BinMaxY + 5
                 YMin = BinMinY - 5        
-                if !Diff2D:
+                if not Diff2D:
                     Max = max(XMax, YMax)
                     Min = min(XMin, YMin)
                     XMax, YMax, Xmin, YMin = Max, Max, Min, Min
