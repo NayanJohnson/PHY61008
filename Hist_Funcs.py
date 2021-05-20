@@ -219,10 +219,10 @@ def HistLims(hist, name, var, Scale=1, Norm=False, Change1D=True, Change2D=True,
     else:
         hist.Scale(Scale)
 
-    ThresholdMin = (hist.Integral()/200) * 1/100                # Skip if hist = False
     if hist:
-        if Change1D:
-            if hist.GetDimension() == 1:
+        if hist.GetDimension() == 1:
+            if Change1D:
+                ThresholdMin = (hist.Integral()/200) * 1/50           
                 # Recalculating Max Min with higher threshold - this is possible as 
                 # the hists have been rebinned to a large width
                 # Get the index of the min/max bin and the read off the value of the 
@@ -239,7 +239,8 @@ def HistLims(hist, name, var, Scale=1, Norm=False, Change1D=True, Change2D=True,
 
         elif hist.GetDimension() == 2:
             if Change2D:
-
+                
+                ThresholdMin = (hist.Integral()/200) * 1/100           
                 xVar  = var.split('_')[-2]
                 yVar  = var.split('_')[-1]
 
