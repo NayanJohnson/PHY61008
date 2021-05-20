@@ -3,7 +3,7 @@
 # plot and what particles the histogram requires
 
 VarKeywords = [
-    'Count', 'Eta', 'Phi', 'Rapidity', 'Pt', 'Et', 'E', 'M', 'Mt', 'q', 
+    'Count', 'Eta', 'Phi', 'Rapidity', 'Pt', 'Et', 'E', 'M', 'Mt', 'qeMethod', 'qLepton', 
     'dEta', 'dPhi', 'dRapidity', 'dR_Eta', 'dR_Rap',
     'Eta_Sum', 'Phi_Sum', 'Rapidity_Sum', 'Pt_Sum', 'Et_Sum', 'E_Sum'
 ]
@@ -31,11 +31,11 @@ ParticleKeywords = [
 ]
 
 VarParams = {
-    'Nbins'     :   160,
+    'Nbins'     :   150,
     'LowRangeNbinsScale'    
                 :   1,
     'HighRangeNbinsScale'   
-                :   1.25,
+                :   1,
     'Count'     :   {
         'Range'     :   [0, 10]
     },

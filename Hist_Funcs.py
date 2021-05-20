@@ -1,5 +1,5 @@
-from ROOT import TH1F, TH2F, TCanvas, TLegend, SetOwnership, TColor
-
+from ROOT import TH1F, TH2F, TCanvas, TLegend, SetOwnership, TColor, gStyle
+gStyle.SetOptStat(0)
 import config, requests, itertools
 import Particle_Funcs as ParticleFuncs
 import Loop_Funcs as LoopFuncs
@@ -58,6 +58,54 @@ def GetScale(Xsec, NEvents):
 
     return Scale
 
+def GetVarLabels(var):
+    VarLabel = ''
+    if var == 'Count':
+        VarLabel = 'Count per event'
+    elif var == 'Eta':
+        VarLabel = '#eta'
+    elif var == 'Phi':
+        VarLabel = '#phi [rad]'
+    elif var == 'Rapidity':
+        VarLabel = 'y'
+    elif var == 'Pt':
+        VarLabel = 'p_{T} [GeV]'
+    elif var == 'Et':
+        VarLabel = 'E_{T} [GeV]'
+    elif var == 'E':
+        VarLabel = 'E [GeV]'                    
+    elif var == 'M':
+        VarLabel = 'M [GeV]'                    
+    elif var == 'Mt':
+        VarLabel = 'M_{T} [GeV]'
+    elif var == 'qLepton':
+        VarLabel = 'q [GeV]'
+    elif var == 'qeMethod':
+        VarLabel = 'q [GeV]'
+    elif var == 'dEta':
+        VarLabel = '#Delta#eta'      
+    elif var == 'dPhi':
+        VarLabel = '#Delta#phi [rad]'
+    elif var == 'dRapidity':
+        VarLabel = '#Delta#text{y}' 
+    elif var == 'dR_Eta':
+        VarLabel = '#DeltaR'                 
+    elif var == 'dR_Rap':
+        VarLabel = '#DeltaR'     
+    elif var == 'Eta_Sum':
+        VarLabel = '#eta_{Sum}'
+    elif var == 'Phi_Sum':
+        VarLabel = '#phi_{Sum} [rad]'
+    elif var == 'Rapidity_Sum':
+        VarLabel = 'y_{Sum}'
+    elif var == 'Pt_Sum':
+        VarLabel = 'p_{T, Sum} [GeV]'
+    elif var == 'Et_Sum':
+        VarLabel = 'E_{T, Sum} [GeV]'
+    elif var == 'E_Sum':
+        VarLabel = 'E_{Sum} [GeV]'   
+    return VarLabel
+
 def MakeHists(HistDict):
     '''
         Will initialise histograms using HistDict[Category][Requests][Vars] list
@@ -75,8 +123,9 @@ def MakeHists(HistDict):
         # 1D Hists
         if attributes['Dimensions'] == 1:
             for var in attributes['Requests']['Vars']:
+                VarLabel = GetVarLabels(var)
                 histName = name+'_'+var
-                histTitle = histName+';'+var+';Frequency'
+                histTitle = histName+';'+VarLabel+';Frequency'
 
                 histXlow = VarParams[var]['Range'][0]
                 histXup = VarParams[var]['Range'][1]
@@ -102,10 +151,11 @@ def MakeHists(HistDict):
             for pair in attributes['Requests']['Vars']:
                 histName = name+'_'+pair[0]+'_'+pair[1]
 
+                VarLabels = [GetVarLabels(pair[0]), GetVarLabels(pair[1])]
                 if attributes['Requests']['Particles'][0][0] == attributes['Requests']['Particles'][0][1]:
-                    histTitle = histName+';'+pair[0]+';'+pair[1]+';Frequency'
+                    histTitle = histName+';'+VarLabels[0]+';'+VarLabels[1]+';Frequency'
                 else:
-                    histTitle = histName+';'+attributes['Requests']['Particles'][0][0][0]+'_'+pair[0]+';'+attributes['Requests']['Particles'][0][1][0]+'_'+pair[1]+';Frequency'
+                    histTitle = histName+';'+attributes['Requests']['Particles'][0][0][0]+' '+VarLabels[0]+';'+attributes['Requests']['Particles'][0][1][0]+' '+VarLabels[1]+';Frequency'
 
 
                 histXlow = VarParams[pair[0]]['Range'][0]
@@ -133,10 +183,28 @@ def MakeHists(HistDict):
                     histYNbins = int(NbinsDefault * HighRangeBinScale)                    
 
                 hist = TH2F(histName, histTitle, histXNbins, histXlow, histXup, histYNbins, histYlow, histYup)
-                
+                hist
                 hist.SetOption('HIST COLZ')
                 # Adds the hist to the dict
                 HistDict[name]['Hists'][pair[0]+'_'+pair[1]]    =   hist
+
+                hist.GetZaxis().SetTitleSize(0.04)
+                hist.GetZaxis().SetLabelSize(0.03)
+                hist.GetZaxis().SetTickLength(0.02)
+                hist.SetStats(False)
+
+
+        # hist.GetXaxis().SetLabelSize(0.03)
+        # hist.GetYaxis().SetLabelSize(0.03)
+
+        hist.GetXaxis().SetTitleSize(0.04)
+        hist.GetYaxis().SetTitleSize(0.04)
+
+        hist.GetXaxis().SetTickLength(0.02)
+        hist.GetYaxis().SetTickLength(0.02)
+
+        hist.SetStats(False)
+        
 
     return HistDict
 
@@ -390,9 +458,8 @@ def CompareHist(HistProps, MediaDir, LimChange=True):
     SetOwnership(Legend1,False)
     Legend1.SetBorderSize(1)
     Legend1.SetShadowColor(2)
-    Legend1.SetHeader(Hist1Name)
     # Entries
-    Legend1.AddEntry('entries','Entries: '+str(int(Hist1.GetEntries())))
+    # Legend1.AddEntry('entries','Entries: '+str(int(Hist1.GetEntries())))
     Legend1.AddEntry(Hist1, 'Line Color', 'l')
     Legend1.SetTextSize(0.025)
     Legend1.SetTextColor(1)
@@ -406,12 +473,20 @@ def CompareHist(HistProps, MediaDir, LimChange=True):
     Legend2.SetBorderSize(1)
     Legend2.SetShadowColor(2)
     # Entries
-    Legend2.AddEntry('entries','Entries: '+str(int(Hist2.GetEntries())))
+    # Legend2.AddEntry('entries','Entries: '+str(int(Hist2.GetEntries())))
     Legend2.AddEntry(Hist2, 'Line Color', 'l')
     Legend2.SetTextSize(0.025)       
     # Seperation is small, but will be maximised to the bounds of the TLegend
     # box
     Legend2.SetEntrySeparation(.1)
+
+    if Hist1File_Prefix != Hist2File_Prefix:
+        Legend1.SetHeader(Hist1File_Prefix)
+        Legend2.SetHeader(Hist2File_Prefix)
+    elif Hist1Name != Hist2Name:
+        Legend1.SetHeader(Hist1Name)
+        Legend2.SetHeader(Hist2Name)
+
 
     HistTitle = Hist1Name+'_'+Hist2Name
 
@@ -459,9 +534,6 @@ def CompareHist(HistProps, MediaDir, LimChange=True):
 
     Hist1.SetTitle(HistTitle)
 
-    Legend1.SetHeader(Hist1PrefixLabel+Hist1NameLabel+Hist1LevelLabel+Hist1LoopLabel+Hist1EventLabel+Hist1AnalysisLabel)
-    Legend2.SetHeader(Hist2PrefixLabel+Hist2NameLabel+Hist2LevelLabel+Hist2LoopLabel+Hist2EventLabel+Hist2AnalysisLabel)
-
     if Hist1.GetDimension() == 1:
         # Force both to be drawn as hist and on the same canvas
         Hist1.SetLineColor(4)        
@@ -487,8 +559,8 @@ def CompareHist(HistProps, MediaDir, LimChange=True):
 
     HistCan.Clear()
 
-    Hist1.Rebin(5)
-    Hist2.Rebin(5)
+    Hist1.Rebin(3)
+    Hist2.Rebin(3)
 
     Sig_Back = Hist1.Clone()
     Sig_Back.Divide(Hist1,Hist2)
