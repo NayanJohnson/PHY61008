@@ -198,7 +198,7 @@ def FillHists(HistDict, ParticleDict):
                         else:
                             hist.Fill(xVal, yVal)
 
-def HistLims(hist, name, var, Scale=1, Norm=False):
+def HistLims(hist, name, var, Scale=1, Norm=False, Change=True):
     '''
         Rescales hist lims.
         Passed objects:
@@ -219,53 +219,56 @@ def HistLims(hist, name, var, Scale=1, Norm=False):
     else:
         hist.Scale(Scale)
 
-    ThresholdMin = (hist.Integral()/200) * 1/100                # Skip if hist = False
+    if Change:
+        ThresholdMin = (hist.Integral()/200) * 1/100                # Skip if hist = False
+        if hist:
+            if hist.GetDimension() == 1:
+                # Recalculating Max Min with higher threshold - this is possible as 
+                # the hists have been rebinned to a large width
+                # Get the index of the min/max bin and the read off the value of the 
+                # low edge
+                # Set FindLastBinAbove threshold to 5 since otherwise the 
+                # hist goes on for way too long
+                BinMaxX = hist.GetBinLowEdge(hist.FindLastBinAbove(ThresholdMin, 1))
+                BinMinX = hist.GetBinLowEdge(hist.FindFirstBinAbove(0, 1))
+                # Max/min = BinMax/min +- 5% +- 5 (prevents max=min for BinMax/Min=0)
+                XMax = BinMaxX + 5
+                XMin = BinMinX - 5
 
-    if hist:
-        if hist.GetDimension() == 1:
-            # Recalculating Max Min with higher threshold - this is possible as 
-            # the hists have been rebinned to a large width
-            # Get the index of the min/max bin and the read off the value of the 
-            # low edge
-            # Set FindLastBinAbove threshold to 5 since otherwise the 
-            # hist goes on for way too long
-            BinMaxX = hist.GetBinLowEdge(hist.FindLastBinAbove(ThresholdMin, 1))
-            BinMinX = hist.GetBinLowEdge(hist.FindFirstBinAbove(0, 1))
-            # Max/min = BinMax/min +- 5% +- 5 (prevents max=min for BinMax/Min=0)
-            XMax = BinMaxX + 5
-            XMin = BinMinX - 5
 
+                hist.SetAxisRange(XMin, XMax, 'X')
+            
+            elif hist.GetDimension() == 2:
 
-            hist.SetAxisRange(XMin, XMax, 'X')
-        
-        elif hist.GetDimension() == 2:
+                xVar  = var.split('_')[-2]
+                yVar  = var.split('_')[-1]
 
-            xVar  = var.split('_')[-2]
-            yVar  = var.split('_')[-1]
+                # Recalculating Max Min with higher threshold - this is possible as 
+                # the hists have been rebinned to a large width
+                # Get the index of the min/max bin and the read off the value of the 
+                # low edge
+                # Set FindLastBinAbove threshold to 2 since the particles are now spread
+                # between two vars so the bins will be less filled 
+                # hist goes on for way too long
+                # For 2D hist must first get axis before using TH1 methods
+                BinMaxX = hist.GetXaxis().GetBinLowEdge(hist.FindLastBinAbove(ThresholdMin, 1))
+                BinMinX = hist.GetXaxis().GetBinLowEdge(hist.FindFirstBinAbove(0, 1))
+                BinMaxY = hist.GetYaxis().GetBinLowEdge(hist.FindLastBinAbove(ThresholdMin, 2))
+                BinMinY = hist.GetYaxis().GetBinLowEdge(hist.FindFirstBinAbove(0, 2))                
+                # Max/min = BinMax/min +- 5 (prevents max=min for BinMax/Min=0)
+                XMax = BinMaxX + 5
+                XMin = BinMinX - 5
+                YMax = BinMaxY + 5
+                YMin = BinMinY - 5        
 
-            # Recalculating Max Min with higher threshold - this is possible as 
-            # the hists have been rebinned to a large width
-            # Get the index of the min/max bin and the read off the value of the 
-            # low edge
-            # Set FindLastBinAbove threshold to 2 since the particles are now spread
-            # between two vars so the bins will be less filled 
-            # hist goes on for way too long
-            # For 2D hist must first get axis before using TH1 methods
-            BinMaxX = hist.GetXaxis().GetBinLowEdge(hist.FindLastBinAbove(ThresholdMin, 1))
-            BinMinX = hist.GetXaxis().GetBinLowEdge(hist.FindFirstBinAbove(0, 1))
-            BinMaxY = hist.GetYaxis().GetBinLowEdge(hist.FindLastBinAbove(ThresholdMin, 2))
-            BinMinY = hist.GetYaxis().GetBinLowEdge(hist.FindFirstBinAbove(0, 2))                
-            # Max/min = BinMax/min +- 5 (prevents max=min for BinMax/Min=0)
-            XMax = BinMaxX + 5
-            XMin = BinMinX - 5
-            YMax = BinMaxY + 5
-            YMin = BinMinY - 5        
+                hist.SetAxisRange(XMin, XMax, 'X')
+                hist.SetAxisRange(YMin, YMax, 'Y')
+    else:
+        XMin, XMax, YMin, YMax = False, False, False, False
 
-            hist.SetAxisRange(XMin, XMax, 'X')
-            hist.SetAxisRange(YMin, YMax, 'Y')
     return hist, [(XMin, XMax), (YMin, YMax)]
 
-def CompareHist(HistProps, MediaDir):
+def CompareHist(HistProps, MediaDir, LimChange=True):
     '''
         Given a histogram dictionary and 
          
@@ -339,27 +342,27 @@ def CompareHist(HistProps, MediaDir):
     Hist2File_AnalysisRun = HistProps['Hist2']['FileDict']['AnalysisRun']
 
     # print(HistProps)
-    Hist1, Lims1 = HistLims(Hist1, Hist1Name, Hist1Var, Norm=Norm)
-    Hist2, Lims2 = HistLims(Hist2, Hist2Name, Hist2Var, Norm=Norm)
+    Hist1, Lims1 = HistLims(Hist1, Hist1Name, Hist1Var, Norm=Norm, LimChange)
+    Hist2, Lims2 = HistLims(Hist2, Hist2Name, Hist2Var, Norm=Norm, LimChange)
 
     # Clear canvas
     HistCan = TCanvas()
     HistCan.cd()
 
-    XMin = min(Lims1[0][0], Lims2[0][0])
-    XMax = max(Lims1[0][1], Lims2[0][1])
+    if Lims1[0][0] and Lims2[0][0] and Lims1[0][1] and Lims2[0][1]:
+        XMin = min(Lims1[0][0], Lims2[0][0])
+        XMax = max(Lims1[0][1], Lims2[0][1])
 
-    Hist1.SetAxisRange(XMin, XMax, 'X')
-    Hist2.SetAxisRange(XMin, XMax, 'X')
+        Hist1.SetAxisRange(XMin, XMax, 'X')
+        Hist2.SetAxisRange(XMin, XMax, 'X')
 
-    #2D hists
-    if Hist1.GetDimension() == 2:
-        YMin = min(Lims1[1][0], Lims2[1][0])
-        YMax = max(Lims1[1][1], Lims2[1][1])
-        Hist1.SetAxisRange(YMin, YMax, 'Y')
-        Hist2.SetAxisRange(YMin, YMax, 'Y')
-
-
+        #2D hists
+        if Hist1.GetDimension() == 2:
+            if Lims1[1][0] and Lims2[1][0] and Lims1[1][1] and Lims2[1][1]:
+                YMin = min(Lims1[1][0], Lims2[1][0])
+                YMax = max(Lims1[1][1], Lims2[1][1])
+                Hist1.SetAxisRange(YMin, YMax, 'Y')
+                Hist2.SetAxisRange(YMin, YMax, 'Y')
 
     # max frequency
     Max1 = Hist1.GetMaximum() + Hist1.GetMaximum()/10
