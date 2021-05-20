@@ -1,12 +1,13 @@
 EventLoopParams = {
+#MET>50
     'Signal'            :   {
         'Xsec'              :   0.00036,
-        'NEvents'           :   50000*1,        
+        'NEvents'           :   41298,        
     },
 
     'Background'        :   {
-        'Xsec'              :   0,
-        'NEvents'           :   0,
+        'Xsec'              :   2.9,
+        'NEvents'           :   559,
     },
     
     'Level'             :   {
@@ -32,9 +33,9 @@ EventLoopParams = {
 
         'Event'        :   {
             'Cuts'              :   {
-                'Electrons'         :   0,
-                'Muons'             :   0,
-                'Jets'              :   0
+                'Electrons'         :   1,
+                'Muons'             :   2,
+                'Jets'              :   1
             },
 
             'NoCuts'            :   {

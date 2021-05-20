@@ -198,7 +198,7 @@ def FillHists(HistDict, ParticleDict):
                         else:
                             hist.Fill(xVal, yVal)
 
-def HistLims(hist, name, var, Scale=1, Norm=False, Change1D=True, Change2D=True):
+def HistLims(hist, name, var, Scale=1, Norm=False, Change1D=True, Change2D=True, Diff2D=True):
     '''
         Rescales hist lims.
         Passed objects:
@@ -260,7 +260,10 @@ def HistLims(hist, name, var, Scale=1, Norm=False, Change1D=True, Change2D=True)
                 XMin = BinMinX - 5
                 YMax = BinMaxY + 5
                 YMin = BinMinY - 5        
-
+                if not Diff2D:
+                    Max = max(XMax, YMax)
+                    Min = min(XMin, YMin)
+                    XMax, YMax, Xmin, YMin = Max, Max, Min, Min
                 hist.SetAxisRange(XMin, XMax, 'X')
                 hist.SetAxisRange(YMin, YMax, 'Y')
 
