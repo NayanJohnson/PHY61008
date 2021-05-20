@@ -541,8 +541,8 @@ def EventLoop(TreeDict, Xsec, outfilename, LevelRun, LoopRun, EventRun, Analysis
 
         # Adds particle for W+ - W- muons and W+ - Electron 
         if ParticleDict['WMinusMuon']['Check']:
-            WMinusMuon_qLepton = GetParticleVariable(ParticleDict, [ParticleDict['WMinusMuon']], 'qLepton')
-            FinalBeamElectron_qLepton = GetParticleVariable(ParticleDict, [ParticleDict['FinalBeamElectron']], 'qLepton')
+            WMinusMuon_qLepton = ParticleFuncs.GetParticleVariable(ParticleDict, [ParticleDict['WMinusMuon']], 'qLepton')
+            FinalBeamElectron_qLepton = ParticleFuncs.GetParticleVariable(ParticleDict, [ParticleDict['FinalBeamElectron']], 'qLepton')
 
             if FinalBeamElectron_qLepton < WMinusMuon_qLepton:
                 BeamElectronSelection += 1
