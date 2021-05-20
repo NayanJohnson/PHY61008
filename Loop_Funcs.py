@@ -454,7 +454,7 @@ def EventLoop(TreeDict, Xsec, outfilename, LevelRun, LoopRun, EventRun, Analysis
             else:
                 WMinusLeptons = EventDict['PTSorted'][WMinusdecay]
                 numbWMinusLeptons = len(WMinusLeptons)
-                for i in range(0, WMinusLeptons):
+                for i in range(0, numbWMinusLeptons):
                     
                     if numbWMinusLeptons != 0:
                         WMinusLepton = WMinusLeptons[i][1]
