@@ -452,13 +452,6 @@ def EventLoop(TreeDict, Xsec, outfilename, LevelRun, LoopRun, EventRun, Analysis
             elif WMinusdecay == 'Jets':
                 ParticleDict, EventDict = ParticleFuncs.InvMassCheck(WMinusdecay, 'WMinus', ParticleDict, EventDict, EventCuts)
             else:
-<<<<<<< HEAD
-                particlesList = [ParticleDict['Leading'+WMinusdecay[0:-1]], ParticleDict['SubLeading'+WMinusdecay[0:-1]]]
-                for Lepton in particlesList:
-                    if Lepton['Check']:
-                        if Lepton['Charge'] == -1:
-                            ParticleDict = ParticleFuncs.AddParticle('WMinus'+WMinusdecay[0:-1], ParticleDict, Lepton['P4'])      
-=======
                 WMinusLeptons = EventDict['PTSorted'][WMinusdecay]
                 numbWMinusLeptons = len(WMinusLeptons)
                 for i in range(0, WMinusLeptons):
@@ -476,7 +469,6 @@ def EventLoop(TreeDict, Xsec, outfilename, LevelRun, LoopRun, EventRun, Analysis
             continue
 
 
->>>>>>> fc2647424a1ca8eb851cad81c908c1276afe70ec
 
         # FinalBeamElectron selection
         if len(EventDict['PTSorted']['Electrons']) != 0:
