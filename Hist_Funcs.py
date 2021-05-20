@@ -458,9 +458,8 @@ def CompareHist(HistProps, MediaDir, LimChange=True):
     SetOwnership(Legend1,False)
     Legend1.SetBorderSize(1)
     Legend1.SetShadowColor(2)
-    Legend1.SetHeader(Hist1Name)
     # Entries
-    Legend1.AddEntry('entries','Entries: '+str(int(Hist1.GetEntries())))
+    # Legend1.AddEntry('entries','Entries: '+str(int(Hist1.GetEntries())))
     Legend1.AddEntry(Hist1, 'Line Color', 'l')
     Legend1.SetTextSize(0.025)
     Legend1.SetTextColor(1)
@@ -474,12 +473,20 @@ def CompareHist(HistProps, MediaDir, LimChange=True):
     Legend2.SetBorderSize(1)
     Legend2.SetShadowColor(2)
     # Entries
-    Legend2.AddEntry('entries','Entries: '+str(int(Hist2.GetEntries())))
+    # Legend2.AddEntry('entries','Entries: '+str(int(Hist2.GetEntries())))
     Legend2.AddEntry(Hist2, 'Line Color', 'l')
     Legend2.SetTextSize(0.025)       
     # Seperation is small, but will be maximised to the bounds of the TLegend
     # box
     Legend2.SetEntrySeparation(.1)
+
+    if Hist1File_Prefix != Hist2File_Prefix:
+        Legend1.SetHeader(Hist1File_Prefix)
+        Legend2.SetHeader(Hist2File_Prefix)
+    elif Hist1Name != Hist2Name:
+        Legend1.SetHeader(Hist1Name)
+        Legend2.SetHeader(Hist2Name)
+
 
     HistTitle = Hist1Name+'_'+Hist2Name
 
@@ -526,9 +533,6 @@ def CompareHist(HistProps, MediaDir, LimChange=True):
         Hist2AnalysisLabel = 'Analysis'+Hist2File_AnalysisRun
 
     Hist1.SetTitle(HistTitle)
-
-    Legend1.SetHeader(Hist1PrefixLabel+Hist1NameLabel+Hist1LevelLabel+Hist1LoopLabel+Hist1EventLabel+Hist1AnalysisLabel)
-    Legend2.SetHeader(Hist2PrefixLabel+Hist2NameLabel+Hist2LevelLabel+Hist2LoopLabel+Hist2EventLabel+Hist2AnalysisLabel)
 
     if Hist1.GetDimension() == 1:
         # Force both to be drawn as hist and on the same canvas
