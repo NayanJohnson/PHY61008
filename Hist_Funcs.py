@@ -342,8 +342,8 @@ def CompareHist(HistProps, MediaDir, LimChange=True):
     Hist2File_AnalysisRun = HistProps['Hist2']['FileDict']['AnalysisRun']
 
     # print(HistProps)
-    Hist1, Lims1 = HistLims(Hist1, Hist1Name, Hist1Var, Norm=Norm, LimChange)
-    Hist2, Lims2 = HistLims(Hist2, Hist2Name, Hist2Var, Norm=Norm, LimChange)
+    Hist1, Lims1 = HistLims(Hist1, Hist1Name, Hist1Var, Norm=Norm, Change=LimChange)
+    Hist2, Lims2 = HistLims(Hist2, Hist2Name, Hist2Var, Norm=Norm, Change=LimChange)
 
     # Clear canvas
     HistCan = TCanvas()

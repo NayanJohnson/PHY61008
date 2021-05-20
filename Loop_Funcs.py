@@ -538,7 +538,7 @@ def EventLoop(TreeDict, Xsec, outfilename, LevelRun, LoopRun, EventRun, Analysis
     # Scaling and altering hist lims
     for category, attributes in HistDict.items():
         for var, hist in attributes['Hists'].items():
-            hist = HistFuncs.HistLims(hist, category, var, Scale=Scale)[0]
+            hist = HistFuncs.HistLims(hist, category, var, Scale=Scale, Change=False)[0]
 
     # Writing and closing file
     outfile.Write()
