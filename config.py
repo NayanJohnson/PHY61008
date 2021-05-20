@@ -1,5 +1,5 @@
 EventLoopParams = {
-#MET>50
+#MET>15
     'Signal'            :   {
         'Xsec'              :   0.00036,
         'NEvents'           :   41298,        
