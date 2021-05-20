@@ -803,11 +803,20 @@ HistDict =  {
     '2DFinalBeamJet-ZLeadingJet'     
                     :   {
         'Requests'      :   {
-            'Vars'      :   [['Et', 'Eta'], ['Et', 'Phi'], ['Et', 'Pt'], ['Et', 'Et']],
+            'Vars'      :   [['Eta', 'Eta'], ['Phi', 'Phi'], ['Pt', 'Pt'], ['Et', 'Et']],
             'Particles' :   [[['FinalBeamJet'], ['ZLeadingJet']]],
         },
         'Dimensions':   2,
     },
+
+    '2DFinalBeamJet-ZSubLeadingJet'     
+                    :   {
+        'Requests'      :   {
+            'Vars'      :   [['Eta', 'Eta'], ['Phi', 'Phi'], ['Pt', 'Pt'], ['Et', 'Et']],
+            'Particles' :   [[['FinalBeamJet'], ['ZSubLeadingJet']]],
+        },
+        'Dimensions':   2,
+    },    
 }
 
 # Dictionary to request hist comparisons
