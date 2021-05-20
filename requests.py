@@ -31,7 +31,7 @@ ParticleKeywords = [
 ]
 
 VarParams = {
-    'Nbins'     :   200,
+    'Nbins'     :   160,
     'LowRangeNbinsScale'    
                 :   1,
     'HighRangeNbinsScale'   
