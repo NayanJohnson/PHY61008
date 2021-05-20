@@ -559,8 +559,8 @@ def CompareHist(HistProps, MediaDir, LimChange=True):
 
     HistCan.Clear()
 
-    Hist1.Rebin(5)
-    Hist2.Rebin(5)
+    Hist1.Rebin(3)
+    Hist2.Rebin(3)
 
     Sig_Back = Hist1.Clone()
     Sig_Back.Divide(Hist1,Hist2)
