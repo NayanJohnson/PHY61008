@@ -1,5 +1,5 @@
-from ROOT import TH1F, TH2F, TCanvas, TLegend, SetOwnership, TColor
-
+from ROOT import TH1F, TH2F, TCanvas, TLegend, SetOwnership, TColor, gStyle
+gStyle.SetOptStat(0)
 import config, requests, itertools
 import Particle_Funcs as ParticleFuncs
 import Loop_Funcs as LoopFuncs
@@ -58,6 +58,54 @@ def GetScale(Xsec, NEvents):
 
     return Scale
 
+def GetVarLabels(var):
+    VarLabel = ''
+    if var == 'Count':
+        VarLabel = 'Count per event'
+    elif var == 'Eta':
+        VarLabel = '#eta'
+    elif var == 'Phi':
+        VarLabel = '#phi [rad]'
+    elif var == 'Rapidity':
+        VarLabel = 'y'
+    elif var == 'Pt':
+        VarLabel = 'p_{T} [GeV]'
+    elif var == 'Et':
+        VarLabel = 'E_{T} [GeV]'
+    elif var == 'E':
+        VarLabel = 'E [GeV]'                    
+    elif var == 'M':
+        VarLabel = 'M [GeV]'                    
+    elif var == 'Mt':
+        VarLabel = 'M_{T} [GeV]'
+    elif var == 'qLepton':
+        VarLabel = 'q [GeV]'
+    elif var == 'qeMethod':
+        VarLabel = 'q [GeV]'
+    elif var == 'dEta':
+        VarLabel = '#Delta#eta'      
+    elif var == 'dPhi':
+        VarLabel = '#Delta#phi [rad]'
+    elif var == 'dRapidity':
+        VarLabel = '#Delta#text{y}' 
+    elif var == 'dR_Eta':
+        VarLabel = '#DeltaR'                 
+    elif var == 'dR_Rap':
+        VarLabel = '#DeltaR'     
+    elif var == 'Eta_Sum':
+        VarLabel = '#eta_{Sum}'
+    elif var == 'Phi_Sum':
+        VarLabel = '#phi_{Sum} [rad]'
+    elif var == 'Rapidity_Sum':
+        VarLabel = 'y_{Sum}'
+    elif var == 'Pt_Sum':
+        VarLabel = 'p_{T, Sum} [GeV]'
+    elif var == 'Et_Sum':
+        VarLabel = 'E_{T, Sum} [GeV]'
+    elif var == 'E_Sum':
+        VarLabel = 'E_{Sum} [GeV]'   
+    return VarLabel
+
 def MakeHists(HistDict):
     '''
         Will initialise histograms using HistDict[Category][Requests][Vars] list
@@ -75,8 +123,9 @@ def MakeHists(HistDict):
         # 1D Hists
         if attributes['Dimensions'] == 1:
             for var in attributes['Requests']['Vars']:
+                VarLabel = GetVarLabels(var)
                 histName = name+'_'+var
-                histTitle = histName+';'+var+';Frequency'
+                histTitle = histName+';'+VarLabel+';Frequency'
 
                 histXlow = VarParams[var]['Range'][0]
                 histXup = VarParams[var]['Range'][1]
@@ -102,10 +151,11 @@ def MakeHists(HistDict):
             for pair in attributes['Requests']['Vars']:
                 histName = name+'_'+pair[0]+'_'+pair[1]
 
+                VarLabels = [GetVarLabels(pair[0]), GetVarLabels(pair[1])]
                 if attributes['Requests']['Particles'][0][0] == attributes['Requests']['Particles'][0][1]:
-                    histTitle = histName+';'+pair[0]+';'+pair[1]+';Frequency'
+                    histTitle = histName+';'+VarLabels[0]+';'+VarLabels[1]+';Frequency'
                 else:
-                    histTitle = histName+';'+attributes['Requests']['Particles'][0][0][0]+'_'+pair[0]+';'+attributes['Requests']['Particles'][0][1][0]+'_'+pair[1]+';Frequency'
+                    histTitle = histName+';'+attributes['Requests']['Particles'][0][0][0]+' '+VarLabels[0]+';'+attributes['Requests']['Particles'][0][1][0]+' '+VarLabels[1]+';Frequency'
 
 
                 histXlow = VarParams[pair[0]]['Range'][0]
@@ -133,10 +183,28 @@ def MakeHists(HistDict):
                     histYNbins = int(NbinsDefault * HighRangeBinScale)                    
 
                 hist = TH2F(histName, histTitle, histXNbins, histXlow, histXup, histYNbins, histYlow, histYup)
-                
+                hist
                 hist.SetOption('HIST COLZ')
                 # Adds the hist to the dict
                 HistDict[name]['Hists'][pair[0]+'_'+pair[1]]    =   hist
+
+                hist.GetZaxis().SetTitleSize(0.04)
+                hist.GetZaxis().SetLabelSize(0.03)
+                hist.GetZaxis().SetTickLength(0.02)
+                hist.SetStats(False)
+
+
+        # hist.GetXaxis().SetLabelSize(0.03)
+        # hist.GetYaxis().SetLabelSize(0.03)
+
+        hist.GetXaxis().SetTitleSize(0.04)
+        hist.GetYaxis().SetTitleSize(0.04)
+
+        hist.GetXaxis().SetTickLength(0.02)
+        hist.GetYaxis().SetTickLength(0.02)
+
+        hist.SetStats(False)
+        
 
     return HistDict
 
