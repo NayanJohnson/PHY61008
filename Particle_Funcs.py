@@ -215,5 +215,5 @@ def InvMassCheck(Type, Boson, ParticleDict, EventDict, EventCuts):
     EventDict['PTSorted'][Type].remove(Permutations[PairIndex][0])
     EventDict['PTSorted'][Type].remove(Permutations[PairIndex][1])
 
-    return ParticleDict, EventDict, False
+    return ParticleDict, EventDict
 
