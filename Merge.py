@@ -47,7 +47,7 @@ if RootDir:
     for i in range(len(RootDir.split('/'))):
         gSystem.Exec('mkdir '+'/'.join(RootDir.split('/')[:i+1]))
 
-
+NEvents = []
 # Groups trees into 5 runs to manage memory use 
 n = 5
 GroupedTrees = [RunTrees[x:x+n] for x in range(0,len(RunTrees),n)]
@@ -60,7 +60,7 @@ for i in range(len(GroupedTrees)):
 
     # Make new file for each group
     GroupOutfile = TFile(RootDir+'Group'+str(i)+'.root','RECREATE')
-
+    NEvents.append(GroupChain.GetEntries())
     GroupPrunedTree = GroupChain.CopyTree(Selection)
 
 
@@ -82,11 +82,11 @@ outfile = TFile(RootDir+outfilename+'.root','RECREATE')
 
 PrunedTree = MergedChain.CopyTree('')
 
-NEvents = MergedChain.GetEntries()
-
 outfile.Write()
 outfile.Close()
 MergedChain.Reset()
 
+NEvents_Total = sum(NEvents)
+
 print('Mean xsec =', Xsec)
-print('NEvents =', NEvents)
+print('NEvents =', NEvents_Total)
