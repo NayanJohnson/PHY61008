@@ -199,6 +199,7 @@ for FilePair in FileComparisons:
                                     }
 
                                     HistFuncs.CompareHist(HistProps, MediaDir)
+                                    HistFuncs.SigBack(HistProps, MediaDir)
 
                         for key, properties in HistCompDict.items():
 
@@ -236,4 +237,5 @@ for FilePair in FileComparisons:
                                 }
 
                                 HistFuncs.CompareHist(HistProps, MediaDir)
+                                HistFuncs.SigBack(HistProps, MediaDir)
 
