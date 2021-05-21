@@ -636,10 +636,6 @@ def SigBack(HistProps, MediaDir, LimChange=True):
     Hist2File_EventRun = HistProps['Hist2']['FileDict']['EventRun']
     Hist2File_AnalysisRun = HistProps['Hist2']['FileDict']['AnalysisRun']
 
-
-    Hist1.Rebin(3)
-    Hist2.Rebin(3)
-
     Hist1, Lims1 = HistLims(Hist1, Hist1Name, Hist1Var, Norm=Norm)
     Hist2, Lims2 = HistLims(Hist2, Hist2Name, Hist2Var, Norm=Norm)
 
@@ -657,6 +653,9 @@ def SigBack(HistProps, MediaDir, LimChange=True):
                 YMax = max(Lims1[1][1], Lims2[1][1])
                 Hist1.SetAxisRange(YMin, YMax, 'Y')
                 Hist2.SetAxisRange(YMin, YMax, 'Y')
+
+    Hist1.Rebin(3)
+    Hist2.Rebin(3)
 
     # max frequency
     Max1 = Hist1.GetMaximum() + Hist1.GetMaximum()/10
