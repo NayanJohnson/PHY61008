@@ -65,7 +65,7 @@ VarParams = {
     },
 
     'Mt'   :   {
-        'Range'     :   [0, 1000]
+        'Range'     :   [0, 500]
     },
 
     'qLepton'         :   {
@@ -101,7 +101,7 @@ VarParams = {
     },
     
     'M'   :   {
-        'Range'     :   [0, 1000]
+        'Range'     :   [0, 500]
     },
 
     'Eta_Sum'       :   {
