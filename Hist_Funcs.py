@@ -694,7 +694,7 @@ def SigBack(HistProps, MediaDir, LimChange=True):
     rp.GetLowYaxis().SetTickLength(0.02)
     rp.GetLowYaxis().SetNdivisions(5) 
     rp.GetXaxis().SetLimits(XMin, XMax)
-    rp.Draw('noconfint') 
+    rp.Draw('noconfint nogrid') 
     rp.GetLowerRefYaxis().SetLabelFont(63)
     rp.GetLowerRefYaxis().SetLabelSize(16)
     rp.GetLowerRefYaxis().SetTitle('Signal/Background')
