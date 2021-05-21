@@ -1,6 +1,6 @@
-from ROOT import TH1F, TH2F, TCanvas, TLegend, SetOwnership, TColor, gStyle, gROOT
+from ROOT import TH1F, TH2F, TPad, TCanvas, TLegend, TLatex, TLine, SetOwnership, TColor, gStyle, gROOT, gPad, kBlue, kOrange, TRatioPlot
 gStyle.SetOptStat(0)
-gStyle.SetTitleStyle(0);
+gStyle.SetTitleStyle(0)
 gStyle.SetLegendBorderSize(0)
 gStyle.SetOptTitle(0)
 gROOT.ForceStyle()
@@ -444,6 +444,7 @@ def CompareHist(HistProps, MediaDir, LimChange=True):
     # Take the larger value from the two hists
     Max = max(Max1, Max2)
 
+
     # Setting universal hist options
     for hist in (Hist1, Hist2):
         # SetBins actually introduces an offset into the graph
@@ -560,21 +561,237 @@ def CompareHist(HistProps, MediaDir, LimChange=True):
             HistCan.SaveAs(MediaDir+Comparison+Hist1File_Prefix+Hist2File_Prefix+'/Loop'+Hist1File_LoopRun+'-'+Hist2File_LoopRun+'/Event'+Hist1File_EventRun+'-'+Hist2File_EventRun+'/Analysis'+Hist1File_AnalysisRun+'-'+Hist2File_AnalysisRun+'/'+Hist1File_LevelRun+'-'+Hist2File_LevelRun+'Level/'+Hist1Name+Hist1Var+'.png')
         else:
             HistCan.SaveAs(MediaDir+Comparison+Hist1File_Prefix+Hist2File_Prefix+'/Loop'+Hist1File_LoopRun+'-'+Hist2File_LoopRun+'/Event'+Hist1File_EventRun+'-'+Hist2File_EventRun+'/Analysis'+Hist1File_AnalysisRun+'-'+Hist2File_AnalysisRun+'/'+Hist1File_LevelRun+'-'+Hist2File_LevelRun+'Level/'+Hist1Name+Hist2Name+Hist1Var+'.png')
+        HistCan.Delete()
 
-    HistCan.Clear()
+def SigBack(HistProps, MediaDir, LimChange=True):
+    '''
+        Given a histogram dictionary and 
+         
+        Histogram properties dictionary should be in the following format:
+        HistFiles = {
+            1               :   {
+                'Prefix'        21:  _Prefix,
+        1    'LoopRun'    2   :  HistFile1_LoopRun,
+1              'EventRu2n'     :   HistFile1_EventRun,
+                'AnalysisRun'   :   HistFile1_AnalysisRun,
+                'Name'          :   HistFile1_Name,
+
+                'File'          :   TFile(HistFile1_Name+'.root')
+            },
+
+            2   :   {
+                'Prefix'        :   HistFile2_Prefix,
+                'LoopRun'       :   HistFile2_LoopRun,
+                'EventRun'      :   HistFile2_EventRun,
+                'AnalysisRun'   :   HistFile2_AnalysisRun,
+                'Name'          :   HistFile2_Name,
+
+                'File'          :   TFile(HistFile2_Name+'.root')
+            },
+        }
+
+        HistProps = {
+            'Hist1'     :   {
+                'Hist'      :   Hist1,
+                'HistName'  :   HistName,
+                'HistVar'   :   HistVar,
+                'FileDict'  :   HistFiles[1]
+            },
+
+            'Hist2'     :   {
+                'Hist'      :   Hist2,
+                'HistName'  :   HistName,
+                'HistVar'   :   HistVar,
+                'FileDict'  :   HistFiles[2]
+
+            },
+            
+            'Norm'      :   Norm
+        }
+    '''
+    
+    Norm = HistProps['Norm']
+    if Norm:
+        Comparison = 'Norm'
+    else:
+        Comparison = 'Rel'
+
+    Hist1Name = HistProps['Hist1']['HistName']
+    Hist1Var = HistProps['Hist1']['HistVar']
+    Hist1 = HistProps['Hist1']['FileDict']['File'].Get(Hist1Name+'_'+Hist1Var+';1')
+
+    Hist1File_Prefix = HistProps['Hist1']['FileDict']['Prefix']
+    Hist1File_LevelRun = HistProps['Hist1']['FileDict']['LevelRun']
+    Hist1File_LoopRun = HistProps['Hist1']['FileDict']['LoopRun']
+    Hist1File_EventRun = HistProps['Hist1']['FileDict']['EventRun']
+    Hist1File_AnalysisRun = HistProps['Hist1']['FileDict']['AnalysisRun']
+
+    Hist2Name = HistProps['Hist2']['HistName']
+    Hist2Var = HistProps['Hist2']['HistVar']
+    Hist2 = HistProps['Hist2']['FileDict']['File'].Get(Hist2Name+'_'+Hist2Var+';1')
+    
+    Hist2File_Prefix = HistProps['Hist2']['FileDict']['Prefix']
+    Hist2File_LevelRun = HistProps['Hist2']['FileDict']['LevelRun']
+    Hist2File_LoopRun = HistProps['Hist2']['FileDict']['LoopRun']
+    Hist2File_EventRun = HistProps['Hist2']['FileDict']['EventRun']
+    Hist2File_AnalysisRun = HistProps['Hist2']['FileDict']['AnalysisRun']
+
 
     Hist1.Rebin(3)
     Hist2.Rebin(3)
 
-    Sig_Back = Hist1.Clone()
-    Sig_Back.Divide(Hist1,Hist2)
+    Hist1, Lims1 = HistLims(Hist1, Hist1Name, Hist1Var, Norm=Norm)
+    Hist2, Lims2 = HistLims(Hist2, Hist2Name, Hist2Var, Norm=Norm)
 
-    Sig_Back.GetYaxis().SetTitle('Signal/Background')
+    if Lims1[0][0] and Lims2[0][0] and Lims1[0][1] and Lims2[0][1]:
+        XMin = min(Lims1[0][0], Lims2[0][0])
+        XMax = max(Lims1[0][1], Lims2[0][1])
 
-    Sig_Back.Draw()
-    HistCan.Update()
+        Hist1.SetAxisRange(XMin, XMax, 'X')
+        Hist2.SetAxisRange(XMin, XMax, 'X')
+
+        #2D hists
+        if Hist1.GetDimension() == 2:
+            if Lims1[1][0] and Lims2[1][0] and Lims1[1][1] and Lims2[1][1]:
+                YMin = min(Lims1[1][0], Lims2[1][0])
+                YMax = max(Lims1[1][1], Lims2[1][1])
+                Hist1.SetAxisRange(YMin, YMax, 'Y')
+                Hist2.SetAxisRange(YMin, YMax, 'Y')
+
+    # max frequency
+    Max1 = Hist1.GetMaximum() + Hist1.GetMaximum()/10
+    Max2 = Hist2.GetMaximum() + Hist2.GetMaximum()/10
+    # Take the larger value from the two hists
+    Max = max(Max1, Max2)
+
+    # Setting universal hist options
+    for hist in (Hist1, Hist2):
+        # SetBins actually introduces an offset into the graph
+        hist.SetStats(False)
+        hist.SetMaximum(Max)
+
+        hist.GetXaxis().SetLabelFont(63) #font in pixels
+        hist.GetXaxis().SetLabelSize(16) #in pixels
+        hist.GetYaxis().SetLabelFont(63) #font in pixels
+        hist.GetYaxis().SetLabelSize(16) #in pixels
+
+    c1 = TCanvas("c1","example")
+    # pad1 = TPad("pad1","pad1",0,0.3,1,1)
+    # pad1.SetBottomMargin(0)
+    # pad1.Draw()
+    # pad1.cd()
+    Hist1.SetLineColor(4)        
+    # Hist1.Draw('HIST same')
+    Hist2.SetLineColor(2)
+    # Hist2.Draw('HIST same')
+
+    c1.cd()
+
+
+    rp = TRatioPlot( Hist1 , Hist2 ) 
+    # c1.SetTicks( 0 , 1 )
+    rp.SetH1DrawOpt('HIST')
+    rp.SetH2DrawOpt('HIST')
+    rp.GetLowYaxis().SetTickLength(0.02)
+    rp.GetLowYaxis().SetNdivisions(5) 
+    rp.GetXaxis().SetLimits(XMin, XMax)
+    rp.Draw('noconfint') 
+    rp.GetLowerRefYaxis().SetLabelFont(63)
+    rp.GetLowerRefYaxis().SetLabelSize(16)
+    rp.GetLowerRefYaxis().SetTitle('Signal/Background')
+
+    # Legend properties
+    LegendX1 = .7
+    LegendX_interval = 0.15
+    LegendY1 = .875
+    LegendY_interval = 0.075
+    TextSize = .028
+    Legend1 = TLegend(LegendX1, LegendY1 , LegendX1+LegendX_interval, LegendY1-LegendY_interval)
+    # Stops legend overwriting canvas
+    SetOwnership(Legend1,False)
+    # Legend1.SetBorderSize(1)
+    Legend1.SetShadowColor(2)
+    # Entries
+    Legend1.AddEntry(Hist1,'Entries: '+str(int(Hist1.GetEntries())), 'l')
+    # Legend1.AddEntry(Hist1, 'Line Color', 'l')
+    Legend1.SetTextSize(TextSize)
+    Legend1.SetTextColor(1)
+    # Seperation is small, but will be maximised to the bounds of the TLegend
+    # box
+    Legend1.SetEntrySeparation(.1)
+
+    Legend2 = TLegend(LegendX1, LegendY1-LegendY_interval , LegendX1+LegendX_interval, LegendY1-2*LegendY_interval)
+    # Stops legend overwriting canvas    
+    SetOwnership(Legend2,False)
+    # Legend2.SetBorderSize(1)
+    Legend2.SetShadowColor(2)
+    # Entries
+    Legend2.AddEntry(Hist2,'Entries: '+str(int(Hist2.GetEntries())), 'l')
+    # Legend2.AddEntry(Hist2, 'Line Color', 'l')
+    Legend2.SetTextSize(TextSize)       
+    # Seperation is small, but will be maximised to the bounds of the TLegend
+    # box
+    Legend2.SetEntrySeparation(.1)
+
+    if Hist1File_Prefix != Hist2File_Prefix:
+        Legend1.SetHeader(Hist1File_Prefix)
+        Legend2.SetHeader(Hist2File_Prefix)
+    elif Hist1Name != Hist2Name:
+        Legend1.SetHeader(Hist1Name)
+        Legend2.SetHeader(Hist2Name)
+    
+    Legend1.Draw('same')
+    Legend2.Draw('same')
+    c1.Update() 
+
+
+    HistTitle = Hist1Name+'_'+Hist2Name
+
+    if Hist1File_Prefix == Hist2File_Prefix:
+        Hist1PrefixLabel = ''
+        Hist2PrefixLabel = ''
+    else:
+        Hist1PrefixLabel = Hist1File_Prefix+'_'
+        Hist2PrefixLabel = Hist2File_Prefix+'_'        
+
+    if Hist1Name == Hist2Name:
+        Hist1NameLabel = ''
+        Hist2NameLabel = ''
+    else:
+        Hist1NameLabel = Hist1Name+'_'
+        Hist2NameLabel = Hist2Name+'_'
+
+    if Hist1File_LevelRun == Hist2File_LevelRun:
+        Hist1LevelLabel = ''
+        Hist2LevelLabel = ''
+    else:
+        Hist1LevelLabel = Hist1File_LevelRun+'Level'
+        Hist2LevelLabel = Hist2File_LevelRun+'Level'
+
+    if Hist1File_LoopRun == Hist2File_LoopRun:
+        Hist1LoopLabel = ''
+        Hist2LoopLabel = ''
+    else:
+        Hist1LoopLabel = 'Loop'+Hist1File_LoopRun
+        Hist2LoopLabel = 'Loop'+Hist2File_LoopRun
+
+    if Hist1File_EventRun == Hist2File_EventRun:
+        Hist1EventLabel = ''
+        Hist2EventLabel = ''
+    else:
+        Hist1EventLabel = 'Event'+Hist1File_EventRun
+        Hist2EventLabel = 'Event'+Hist2File_EventRun
+    
+    if Hist1File_AnalysisRun == Hist2File_AnalysisRun:
+        Hist1AnalysisLabel = ''
+        Hist2AnalysisLabel = ''
+    else:
+        Hist1AnalysisLabel = 'Analysis'+Hist1File_AnalysisRun
+        Hist2AnalysisLabel = 'Analysis'+Hist2File_AnalysisRun
+
     with LoopFuncs.Quiet():
         if Hist1Name == Hist2Name:
-            HistCan.SaveAs(MediaDir+Comparison+Hist1File_Prefix+Hist2File_Prefix+'/Loop'+Hist1File_LoopRun+'-'+Hist2File_LoopRun+'/Event'+Hist1File_EventRun+'-'+Hist2File_EventRun+'/Analysis'+Hist1File_AnalysisRun+'-'+Hist2File_AnalysisRun+'/'+Hist1File_LevelRun+'-'+Hist2File_LevelRun+'Level/'+Hist1Name+Hist1Var+'_'+Hist1File_Prefix+'Over'+Hist2File_Prefix+'.png')
+            c1.SaveAs(MediaDir+Comparison+Hist1File_Prefix+Hist2File_Prefix+'/Loop'+Hist1File_LoopRun+'-'+Hist2File_LoopRun+'/Event'+Hist1File_EventRun+'-'+Hist2File_EventRun+'/Analysis'+Hist1File_AnalysisRun+'-'+Hist2File_AnalysisRun+'/'+Hist1File_LevelRun+'-'+Hist2File_LevelRun+'Level/'+Hist1Name+Hist1Var+'_'+Hist1File_Prefix+'Over'+Hist2File_Prefix+'.png')
         else:
-            HistCan.SaveAs(MediaDir+Comparison+Hist1File_Prefix+Hist2File_Prefix+'/Loop'+Hist1File_LoopRun+'-'+Hist2File_LoopRun+'/Event'+Hist1File_EventRun+'-'+Hist2File_EventRun+'/Analysis'+Hist1File_AnalysisRun+'-'+Hist2File_AnalysisRun+'/'+Hist1File_LevelRun+'-'+Hist2File_LevelRun+'Level/'+Hist1Name+Hist2Name+Hist1Var+'_'+Hist1File_Prefix+'Over'+Hist2File_Prefix+'.png')
+            c1.SaveAs(MediaDir+Comparison+Hist1File_Prefix+Hist2File_Prefix+'/Loop'+Hist1File_LoopRun+'-'+Hist2File_LoopRun+'/Event'+Hist1File_EventRun+'-'+Hist2File_EventRun+'/Analysis'+Hist1File_AnalysisRun+'-'+Hist2File_AnalysisRun+'/'+Hist1File_LevelRun+'-'+Hist2File_LevelRun+'Level/'+Hist1Name+Hist2Name+Hist1Var+'_'+Hist1File_Prefix+'Over'+Hist2File_Prefix+'.png')
+
