@@ -1,5 +1,8 @@
-from ROOT import TH1F, TH2F, TCanvas, TLegend, SetOwnership, TColor, gStyle
+from ROOT import TH1F, TH2F, TCanvas, TLegend, SetOwnership, TColor, gStyle, gROOT
 gStyle.SetOptStat(0)
+gStyle.SetTitleStyle(0);
+gStyle.SetLegendBorderSize(0)
+gROOT.ForceStyle()
 import config, requests, itertools
 import Particle_Funcs as ParticleFuncs
 import Loop_Funcs as LoopFuncs
@@ -125,7 +128,7 @@ def MakeHists(HistDict):
             for var in attributes['Requests']['Vars']:
                 VarLabel = GetVarLabels(var)
                 histName = name+'_'+var
-                histTitle = histName+';'+VarLabel+';Frequency'
+                histTitle = histName+';'+VarLabel+';Events'
 
                 histXlow = VarParams[var]['Range'][0]
                 histXup = VarParams[var]['Range'][1]
@@ -448,20 +451,20 @@ def CompareHist(HistProps, MediaDir, LimChange=True):
 
 
     # Legend properties
-    LegendX1 = .8
+    LegendX1 = .7
     LegendX_interval = 0.2
-    LegendY1 = .95
-    LegendY_interval = 0.1
-
+    LegendY1 = .875
+    LegendY_interval = 0.075
+    TextSize = .028
     Legend1 = TLegend(LegendX1, LegendY1 , LegendX1+LegendX_interval, LegendY1-LegendY_interval)
     # Stops legend overwriting canvas
     SetOwnership(Legend1,False)
-    Legend1.SetBorderSize(1)
+    # Legend1.SetBorderSize(1)
     Legend1.SetShadowColor(2)
     # Entries
-    # Legend1.AddEntry('entries','Entries: '+str(int(Hist1.GetEntries())))
-    Legend1.AddEntry(Hist1, 'Line Color', 'l')
-    Legend1.SetTextSize(0.025)
+    Legend1.AddEntry(Hist1,'Entries: '+str(int(Hist1.GetEntries())), 'l')
+    # Legend1.AddEntry(Hist1, 'Line Color', 'l')
+    Legend1.SetTextSize(TextSize)
     Legend1.SetTextColor(1)
     # Seperation is small, but will be maximised to the bounds of the TLegend
     # box
@@ -470,12 +473,12 @@ def CompareHist(HistProps, MediaDir, LimChange=True):
     Legend2 = TLegend(LegendX1, LegendY1-LegendY_interval , LegendX1+LegendX_interval, LegendY1-2*LegendY_interval)
     # Stops legend overwriting canvas    
     SetOwnership(Legend2,False)
-    Legend2.SetBorderSize(1)
+    # Legend2.SetBorderSize(1)
     Legend2.SetShadowColor(2)
     # Entries
-    # Legend2.AddEntry('entries','Entries: '+str(int(Hist2.GetEntries())))
-    Legend2.AddEntry(Hist2, 'Line Color', 'l')
-    Legend2.SetTextSize(0.025)       
+    Legend2.AddEntry(Hist2,'Entries: '+str(int(Hist2.GetEntries())), 'l')
+    # Legend2.AddEntry(Hist2, 'Line Color', 'l')
+    Legend2.SetTextSize(TextSize)       
     # Seperation is small, but will be maximised to the bounds of the TLegend
     # box
     Legend2.SetEntrySeparation(.1)
@@ -564,6 +567,8 @@ def CompareHist(HistProps, MediaDir, LimChange=True):
 
     Sig_Back = Hist1.Clone()
     Sig_Back.Divide(Hist1,Hist2)
+
+    Sig_Back.GetYaxis().SetTitle('Signal/Background')
 
     Sig_Back.Draw()
     HistCan.Update()
