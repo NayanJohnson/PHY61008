@@ -294,7 +294,7 @@ def HistLims(hist, name, var, Scale=1, Norm=False, Change1D=True, Change2D=True,
     if hist:
         if hist.GetDimension() == 1:
             if Change1D:
-                ThresholdMin = (hist.Integral()/200) * 1/50           
+                ThresholdMin = (hist.Integral()/200) * 1/25           
                 # Recalculating Max Min with higher threshold - this is possible as 
                 # the hists have been rebinned to a large width
                 # Get the index of the min/max bin and the read off the value of the 
@@ -698,7 +698,11 @@ def SigBack(HistProps, MediaDir, LimChange=True):
     rp.GetLowerRefYaxis().SetLabelFont(63)
     rp.GetLowerRefYaxis().SetLabelSize(16)
     rp.GetLowerRefYaxis().SetTitle('Signal/Background')
-
+    gStyle.SetOptStat(0)
+    gStyle.SetTitleStyle(0)
+    gStyle.SetLegendBorderSize(0)
+    gStyle.SetOptTitle(0)
+    gROOT.ForceStyle()
     # Legend properties
     LegendX1 = .7
     LegendX_interval = 0.15
