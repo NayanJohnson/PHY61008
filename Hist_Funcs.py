@@ -2,6 +2,7 @@ from ROOT import TH1F, TH2F, TCanvas, TLegend, SetOwnership, TColor, gStyle, gRO
 gStyle.SetOptStat(0)
 gStyle.SetTitleStyle(0);
 gStyle.SetLegendBorderSize(0)
+gStyle.SetOptTitle(0)
 gROOT.ForceStyle()
 import config, requests, itertools
 import Particle_Funcs as ParticleFuncs
@@ -128,7 +129,7 @@ def MakeHists(HistDict):
             for var in attributes['Requests']['Vars']:
                 VarLabel = GetVarLabels(var)
                 histName = name+'_'+var
-                histTitle = histName+';'+VarLabel+';Events'
+                histTitle = ''+';'+VarLabel+';Events'
 
                 histXlow = VarParams[var]['Range'][0]
                 histXup = VarParams[var]['Range'][1]
@@ -156,9 +157,9 @@ def MakeHists(HistDict):
 
                 VarLabels = [GetVarLabels(pair[0]), GetVarLabels(pair[1])]
                 if attributes['Requests']['Particles'][0][0] == attributes['Requests']['Particles'][0][1]:
-                    histTitle = histName+';'+VarLabels[0]+';'+VarLabels[1]+';Frequency'
+                    histTitle = ''+';'+VarLabels[0]+';'+VarLabels[1]+';Frequency'
                 else:
-                    histTitle = histName+';'+attributes['Requests']['Particles'][0][0][0]+' '+VarLabels[0]+';'+attributes['Requests']['Particles'][0][1][0]+' '+VarLabels[1]+';Frequency'
+                    histTitle = ''+';'+attributes['Requests']['Particles'][0][0][0]+' '+VarLabels[0]+';'+attributes['Requests']['Particles'][0][1][0]+' '+VarLabels[1]+';Frequency'
 
 
                 histXlow = VarParams[pair[0]]['Range'][0]
