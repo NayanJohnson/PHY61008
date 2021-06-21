@@ -1,8 +1,5 @@
-# Running this script:
-# python script.py hists1.root hists2.root output.root
-
-import sys, itertools
-import config, requests, itertools
+import sys
+import config, requests
 import Particle_Funcs as ParticleFuncs
 import Hist_Funcs as HistFuncs
 import Loop_Funcs as LoopFuncs
