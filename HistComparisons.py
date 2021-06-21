@@ -25,11 +25,20 @@ MediaDir = ''
 RootDir = ('', '')
 FileComparisons = []
 
+# Parsing the arguments
+"""
+Arguments 
+
+
+"""
+
 for arg in sys.argv:
     # Should filter the python script
     if arg.split('.')[-1] == 'py':
         continue
 
+    # Directory to store graphs
+    # "MEDIADIRS=DIR"
     elif arg.split('=')[0].upper() == 'MEDIADIRS':
         RootDir = arg.split('=')[1]
 
@@ -40,7 +49,6 @@ for arg in sys.argv:
      
     elif arg.split('=')[0].upper() == 'PREFIX':
         FileComparisons.append( (arg.split('=')[1].split('-')[0], arg.split('=')[1].split('-')[1]) )
-
 
     # Comparison args
     # "COMPARISON=COMP1-COMP2"
@@ -56,8 +64,8 @@ for arg in sys.argv:
     elif arg.split('=')[0].upper() == 'ANALYSIS':
         AnalysisComparisons.append( (arg.split('=')[1].split('-')[0], arg.split('=')[1].split('-')[1]) )
 
-    # Single variable args
-    # "VAR=ARG"
+    # Whether to do a run of normalised graphs or not.
+    # "NORM=True/False"
     elif arg.split('=')[0].upper() == 'NORM':
         NormRuns.append( arg.split('=')[1] )
 
@@ -86,10 +94,12 @@ if len(AnalysisComparisons) == 0:
     AnalysisComparisons = [('Cuts', 'NoCuts'), ('Cuts', 'Cuts'), ('NoCuts', 'NoCuts')]
 
 if len(NormRuns) == 0:
-    NormRuns = [True, False]    
+    NormRuns = [True, False]   
 
+# Keeps track of number of runs
 loopnum = 0
 
+# Loops through all combinations of each run
 for FilePair in FileComparisons:
     for LevelRunPair in LevelComparisons:
         for LoopRunPair in LoopComparisons:
@@ -97,10 +107,10 @@ for FilePair in FileComparisons:
                 for AnalysisRunPair in AnalysisComparisons:
                     for Norm in NormRuns:
                         
-
                         loopnum += 1
                         print('Loop:', loopnum)
 
+                        # Initialising varibles for Hist1 and Hist2 for this run
                         HistFile1_RootDir = RootDir[0]
                         HistFile1_Prefix = FilePair[0]
                         HistFile1_LevelRun = LevelRunPair[0]
@@ -116,14 +126,17 @@ for FilePair in FileComparisons:
                         HistFile2_EventRun = EventRunPair[1]
                         HistFile2_AnalysisRun = AnalysisRunPair[1]
                         HistFile2_Name = HistFile2_RootDir+'/Loop'+HistFile2_LoopRun+'/Event'+HistFile2_EventRun+'/Analysis'+HistFile2_AnalysisRun+'/'+HistFile2_Prefix+HistFile2_LevelRun+'.root'
-                        
-                        
+
+                        # Norm == True
                         if Norm:
                             Comparison = 'Norm'
+                        # Norm == False
                         else:
                             Comparison = 'Rel'
-
+                        
+                        # Removes dir of previous version of this run 
                         gSystem.Exec('rm -R '+MediaDir+Comparison+HistFile1_Prefix+HistFile2_Prefix+'/Loop'+HistFile1_LoopRun+'-'+HistFile2_LoopRun+'/Event'+HistFile1_EventRun+'-'+HistFile2_EventRun+'/Analysis'+HistFile1_AnalysisRun+'-'+HistFile2_AnalysisRun+'/'+HistFile1_LevelRun+'-'+HistFile2_LevelRun+'Level/')
+                        # Makes the dir for this run
                         gSystem.Exec('mkdir '+MediaDir+Comparison+HistFile1_Prefix+HistFile2_Prefix)
                         gSystem.Exec('mkdir '+MediaDir+Comparison+HistFile1_Prefix+HistFile2_Prefix+'/Loop'+HistFile1_LoopRun+'-'+HistFile2_LoopRun)
                         gSystem.Exec('mkdir '+MediaDir+Comparison+HistFile1_Prefix+HistFile2_Prefix+'/Loop'+HistFile1_LoopRun+'-'+HistFile2_LoopRun+'/Event'+HistFile1_EventRun+'-'+HistFile2_EventRun)
@@ -132,7 +145,7 @@ for FilePair in FileComparisons:
 
                         print('Current run:', MediaDir+Comparison+HistFile1_Prefix+HistFile2_Prefix+'/Loop'+HistFile1_LoopRun+'-'+HistFile2_LoopRun+'/Event'+HistFile1_EventRun+'-'+HistFile2_EventRun+'/Analysis'+HistFile1_AnalysisRun+'-'+HistFile2_AnalysisRun+'/'+HistFile1_LevelRun+'-'+HistFile2_LevelRun+'Level/')
 
-                        # Read hist files
+                        # Read hist files and setup dict for each file using previously defined variables
                         HistFiles = {
                             1               :   {
                                 'Prefix'        :   HistFile1_Prefix,
@@ -157,7 +170,9 @@ for FilePair in FileComparisons:
                             },
                         }    
 
+                        # Dict of requested hists generated from the Histograms.py script 
                         HistDict = requests.HistDict
+                        # Dict of requested histogram comparisons
                         HistCompDict = requests.HistComparisonDict
 
                         # if False:
@@ -178,7 +193,7 @@ for FilePair in FileComparisons:
                                     # Read the hist in each file
                                     Hist1 = HistFiles[1]['File'].Get(HistName+'_'+HistVar+';1')
                                     Hist2 = HistFiles[2]['File'].Get(HistName+'_'+HistVar+';1')  
-                                                                
+
                                     HistProps = {
                                         'Hist1'     :   {
                                             'Hist'      :   Hist1,
@@ -194,7 +209,7 @@ for FilePair in FileComparisons:
                                             'FileDict'  :   HistFiles[2]
 
                                         },
-                                        
+
                                         'Norm'      :   Norm
                                     }
 
@@ -209,10 +224,9 @@ for FilePair in FileComparisons:
                                     HistVar = var[0]+'_'+var[1]
                                 else:
                                     HistVar = var
-                                
+
                                 Hist1Name = properties['Hist1']['Name']
                                 Hist2Name = properties['Hist2']['Name']
-
 
                                 # Read the hist in each file
                                 Hist1 = HistFiles[1]['File'].Get(Hist1Name+'_'+HistVar+';1')
@@ -232,7 +246,7 @@ for FilePair in FileComparisons:
                                         'HistVar'   :   HistVar,
                                         'FileDict'  :   HistFiles[2]
                                     },
-                                        
+
                                     'Norm'      :   Norm 
                                 }
 
