@@ -68,7 +68,8 @@ NEvents = []
 n = 5
 GroupedTrees = [RunTrees[x:x+n] for x in range(0,len(RunTrees),n)]
 GroupNEvents = []
-# Make a directory for the grouped outfiles in the RootDir
+# Remake "Groups" directory for the grouped outfiles in the RootDir
+gSystem.Exec('rm -R'+RootDir+'Groups/')
 gSystem.Exec('mkdir '+RootDir+'Groups/')
 
 for i in range(len(GroupedTrees)):
@@ -90,15 +91,15 @@ for i in range(len(GroupedTrees)):
     GroupOutfile.Write()
     GroupOutfile.Close()
     GroupChain.Reset()
-    print('Group ', i)
+    print('Group '+str(i)+' pruned.')
 
 
 # Load groups to one chain and save as one .root file
 outfilename = RootDir+outfilename
 MergedChain = TChain('Delphes')
 for i in range(len(GroupedTrees)):
-    print(RootDir+'Groups/'+str(i)+'.root')
     MergedChain.Add(RootDir+'Groups/'+str(i)+'.root')
+    print('Group '+str(i)+' added.')
 
 outfile = TFile(RootDir+outfilename+'.root','RECREATE')
 
