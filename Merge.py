@@ -40,7 +40,7 @@ for arg in sys.argv:
 # Makes a string for the filename of each run
 # The runs are indexed as "run_N/tag_1_delphes_events.root" where 
 # N is represented using 2 or more digits 
-
+RunDirs = []
 for run in range(NRuns):
     runstr = 'run_'+'{:02d}'.format(run+1)+'/'
     RunDirs.append(runstr)
