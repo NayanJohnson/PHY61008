@@ -1,4 +1,4 @@
-from ROOT import gSystem, TFile, TChain, TObject
+from ROOT import gSystem, TFile, TChain
 import sys
 
 # Initialising runs
