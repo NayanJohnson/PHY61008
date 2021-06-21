@@ -1,6 +1,6 @@
 # Running this script:
 # python script.py output.root
-from ROOT import gSystem, TFile, TH1F, TMath
+from ROOT import gSystem, TFile, TH1F
 
 import config, requests, sys
 import Loop_Funcs as LoopFuncs
