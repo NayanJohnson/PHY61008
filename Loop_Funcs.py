@@ -581,7 +581,10 @@ def EventLoop(TreeDict, Xsec, outfilename, LevelRun, LoopRun, EventRun, Analysis
         EventKeptNum += 1
 
     # Get scaling factor for histograms
-    Scale = HistFuncs.GetScale(Xsec, TreeDict['NEvents'])
+    # L_int(Data) = 1 [ab-1] = 1000000 [pb-1]
+    # L_int(MC) = N/Xsec [pb-1]
+    # Scale = L_int(Data) / L_int(MC)
+    Scale = 1000000 / (TreeDict['NEvents']/Xsec)
 
     # Scaling and altering hist lims
     for category, attributes in HistDict.items():

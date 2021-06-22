@@ -1,10 +1,5 @@
-from ROOT import TH1F, TH2F, TPad, TCanvas, TLegend, TLatex, TLine, SetOwnership, TColor, gStyle, gROOT, gPad, kBlue, kOrange, TRatioPlot
-gStyle.SetOptStat(0)
-gStyle.SetTitleStyle(0)
-gStyle.SetLegendBorderSize(0)
-gStyle.SetOptTitle(0)
-gROOT.ForceStyle()
-import config, requests, itertools
+from ROOT import TH1F, TH2F, TPad, TCanvas, TLegend, TLine, SetOwnership, TColor, gStyle, gROOT, TRatioPlot
+import config, requests
 import Particle_Funcs as ParticleFuncs
 import Loop_Funcs as LoopFuncs
 
@@ -48,19 +43,12 @@ for 2D:
 
 '''
 
-def GetScale(Xsec, NEvents):
-    '''
-        Given the path to the pythia log file and the number of events,
-        will return the scaling factor calculated from the process 
-        cross section. 
-    '''
-    
-    # L_int(Data) = 1 [ab-1] = 1000000 [pb-1]
-    # L_int(MC) = N/Xsec [pb-1]
-    # Scale = L_int(Data) / L_int(MC)
-    Scale = 1000000 / (NEvents/Xsec)
+gStyle.SetOptStat(0)
+gStyle.SetTitleStyle(0)
+gStyle.SetLegendBorderSize(0)
+gStyle.SetOptTitle(0)
+gROOT.ForceStyle()
 
-    return Scale
 
 def GetVarLabels(var):
     VarLabel = ''
