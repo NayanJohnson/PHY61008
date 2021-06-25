@@ -38,19 +38,65 @@ for 2D:
     },
 
     Dimensions  :   2,
-    Particles   :   [( xparticle1, xparticle2 ...), (y1particle1, yparticle2, ...)],
+    Particles   :   [(xParticles1), (yParticles1), (xParticles2), (yParticles2)],
     Hists       :   {name1 : hist1, ... },
+
+HistFiles = {
+    1               :   {
+        'Prefix'        :   HistFile1_Prefix,
+        'LevelRun'      :   HistFile1_LevelRun,
+        'LoopRun'       :   HistFile1_LoopRun,
+        'EventRun'      :   HistFile1_EventRun,
+        'AnalysisRun'   :   HistFile1_AnalysisRun,
+        'Name'          :   HistFile1_Name,
+
+        'File'          :   TFile(HistFile1_Name)
+    },
+
+    2   :   {
+        'Prefix'        :   HistFile2_Prefix,
+        'LevelRun'      :   HistFile2_LevelRun,
+        'LoopRun'       :   HistFile2_LoopRun,
+        'EventRun'      :   HistFile2_EventRun,
+        'AnalysisRun'   :   HistFile2_AnalysisRun,
+        'Name'          :   HistFile2_Name,
+
+        'File'          :   TFile(HistFile2_Name)
+    },
+}    
+
+HistProps = {
+    'Hist1'     :   {
+        'Hist'      :   Hist1,
+        'HistName'  :   HistName,
+        'HistVar'   :   HistVar,
+        'FileDict'  :   HistFiles[1]
+    },
+
+    'Hist2'     :   {
+        'Hist'      :   Hist2,
+        'HistName'  :   HistName,
+        'HistVar'   :   HistVar,
+        'FileDict'  :   HistFiles[2]
+
+    },
+
+    'Norm'      :   Norm
+}
 
 '''
 
+# Setting some options for canvas drawing, they're probably not all necessary
 gStyle.SetOptStat(0)
 gStyle.SetTitleStyle(0)
 gStyle.SetLegendBorderSize(0)
 gStyle.SetOptTitle(0)
 gROOT.ForceStyle()
 
-
 def GetVarLabels(var):
+    '''
+    Given a variable, will output the corresponding axis label.
+    '''
     VarLabel = ''
     if var == 'Count':
         VarLabel = 'Count per event'
@@ -100,8 +146,8 @@ def GetVarLabels(var):
 
 def MakeHists(HistDict):
     '''
-        Will initialise histograms using HistDict[Category][Requests][Vars] list
-        and add them to HistDict[Category][Hists].
+    Will initialise histograms using HistDict[Category][Requests][Vars] list
+    and add them to HistDict[Category][Hists].
     '''
 
     VarParams = requests.VarParams
@@ -110,6 +156,7 @@ def MakeHists(HistDict):
     HighRangeBinScale = VarParams['HighRangeNbinsScale']
 
     for name, attributes in HistDict.items():
+        # Initialising the dictionary to store the hists for each "name"
         attributes['Hists'] = {}
         
         # 1D Hists
@@ -123,10 +170,10 @@ def MakeHists(HistDict):
                 histXup = VarParams[var]['Range'][1]
                 histXrange = histXup-histXlow
 
+                # Scales number of bins dependng on var range
                 if histXrange <= 10:
                     histXNbins = int(NbinsDefault * 1/2 * LowRangeBinScale)
                 elif histXrange <= 100:
-                    # Scales number of bins dependng on var range
                     histXNbins = int(NbinsDefault * LowRangeBinScale)
                 else:
                     histXNbins = int(NbinsDefault * HighRangeBinScale)
@@ -154,10 +201,10 @@ def MakeHists(HistDict):
                 histXup = VarParams[pair[0]]['Range'][1]
                 histXrange = histXup-histXlow
 
+                # Scales number of bins dependng on var range
                 if histXrange <= 10:
                     histXNbins = int(NbinsDefault * 1/2 * LowRangeBinScale)
                 elif histXrange <= 100:
-                    # Scales number of bins dependng on var range
                     histXNbins = int(NbinsDefault * LowRangeBinScale)
                 else:
                     histXNbins = int(NbinsDefault * HighRangeBinScale)
@@ -166,28 +213,24 @@ def MakeHists(HistDict):
                 histYup = VarParams[pair[1]]['Range'][1]        
                 histYrange = histYup-histYlow
 
+                # Scales number of bins dependng on var range
                 if histYrange <= 10:
                     histYNbins = int(NbinsDefault * 1/2 * LowRangeBinScale)
                 elif histYrange <= 100:
-                    # Scales number of bins dependng on var range
                     histYNbins = int(NbinsDefault * LowRangeBinScale)
                 else:
                     histYNbins = int(NbinsDefault * HighRangeBinScale)                    
 
                 hist = TH2F(histName, histTitle, histXNbins, histXlow, histXup, histYNbins, histYlow, histYup)
-                hist
+
                 hist.SetOption('HIST COLZ')
-                # Adds the hist to the dict
-                HistDict[name]['Hists'][pair[0]+'_'+pair[1]]    =   hist
 
                 hist.GetZaxis().SetTitleSize(0.04)
                 hist.GetZaxis().SetLabelSize(0.03)
                 hist.GetZaxis().SetTickLength(0.02)
-                hist.SetStats(False)
 
-
-        # hist.GetXaxis().SetLabelSize(0.03)
-        # hist.GetYaxis().SetLabelSize(0.03)
+                # Adds the hist to the dict
+                HistDict[name]['Hists'][pair[0]+'_'+pair[1]]    =   hist
 
         hist.GetXaxis().SetTitleSize(0.04)
         hist.GetYaxis().SetTitleSize(0.04)
@@ -197,15 +240,14 @@ def MakeHists(HistDict):
 
         hist.SetStats(False)
         
-
     return HistDict
 
 def FillHists(HistDict, ParticleDict):
     '''
-        Given a HistDict, will fill the histograms.
+    Given a HistDict, will fill the histograms using ParticleDict.
     '''
     
-    # List of variables that are stored in all particles.
+    # List of variables that are stored in the particle's dict. 
     ParticleProperties = ['PID', 'E', 'Eta', 'Phi', 'Rapidity', 'Theta', 'Pt', 'Et']
 
     for category, attributes in HistDict.items():
@@ -217,9 +259,11 @@ def FillHists(HistDict, ParticleDict):
                     hist.Fill(attributes['Count'])
 
                 else:
+                    # Loop through all particles stored with the hist
+                    # attributes['Particles'] = [[List1], [List2]...]
                     for xParticles in attributes['Particles']:
 
-                        # Get the variable of the particle in question
+                        # Get the variable of the particles in question
                         xVal = ParticleFuncs.GetParticleVariable(ParticleDict, xParticles, xVar)
 
                         # If a value is returned
@@ -238,10 +282,9 @@ def FillHists(HistDict, ParticleDict):
                 # 2D hist key = 'xVar_yVar'
                 xVar, yVar = key.split('_')[0], key.split('_')[1]
 
-                # attributes['Particles'] = [(xParticles), (yParticles)]
+                # attributes['Particles'] = [[(xParticles1), (yParticles1)], [(xParticles2), (yParticles2)], ...]
                 for Comparison in attributes['Particles']:
 
-                    # Comparison = [(xParticles), (yParticles)]
                     xParticles, yParticles = Comparison[0], Comparison[1]
 
                     xVal = ParticleFuncs.GetParticleVariable(ParticleDict, xParticles, xVar)
@@ -260,11 +303,10 @@ def FillHists(HistDict, ParticleDict):
 
 def HistLims(hist, name, var, Scale=1, Norm=False, Change1D=True, Change2D=True, Diff2D=True):
     '''
-        Rescales hist lims.
-        Passed objects:
-        hist        :   histogram
-        Scale       :   float used to scale histrogram - default is 1.
-        Norm        :   Should the hist be normalised?
+    Rescales hist lims.
+    Norm : Whether to normalise the histograms
+    ChangeND : Whether to alter the ND histogram lims
+    Diff2D : Whether the 2D axis are allowed different limits
     '''    
     XMin, XMax, YMin, YMax = False, False, False, False
 
@@ -273,116 +315,77 @@ def HistLims(hist, name, var, Scale=1, Norm=False, Change1D=True, Change2D=True,
     except AttributeError:
         print(name, var)
 
+    # Normalises the hist or not    
     if Norm and hist.Integral() != 0:
-        # Normalises the hist    
         hist.Scale(1./hist.Integral())
     else:
         hist.Scale(Scale)
 
-    if hist:
-        if hist.GetDimension() == 1:
-            if Change1D:
-                ThresholdMin = (hist.Integral()/200) * 1/25           
-                # Recalculating Max Min with higher threshold - this is possible as 
-                # the hists have been rebinned to a large width
-                # Get the index of the min/max bin and the read off the value of the 
-                # low edge
-                # Set FindLastBinAbove threshold to 5 since otherwise the 
-                # hist goes on for way too long
-                BinMaxX = hist.GetBinLowEdge(hist.FindLastBinAbove(ThresholdMin, 1))
-                BinMinX = hist.GetBinLowEdge(hist.FindFirstBinAbove(0, 1))
-                # Max/min = BinMax/min +- 5% +- 5 (prevents max=min for BinMax/Min=0)
-                XMax = BinMaxX + 5
-                XMin = BinMinX - 5
 
-                hist.SetAxisRange(XMin, XMax, 'X')
+    if hist.GetDimension() == 1:
+        if Change1D:
+            ThresholdMin = (hist.Integral()/200) * 1/25
+            # Recalculating Max Min with higher threshold - this is possible as 
+            # the hists have been rebinned to a large width
+            # Get the index of the min/max bin and the read off the value of the 
+            # low edge
+            # Set FindLastBinAbove threshold to 5 since otherwise the 
+            # hist goes on for way too long
+            BinMaxX = hist.GetBinLowEdge(hist.FindLastBinAbove(ThresholdMin, 1))
+            BinMinX = hist.GetBinLowEdge(hist.FindFirstBinAbove(0, 1))
+            # Max/min = BinMax/min +- 5% +- 5 (prevents max=min for BinMax/Min=0)
+            XMax = BinMaxX + 5
+            XMin = BinMinX - 5
 
-        elif hist.GetDimension() == 2:
-            if Change2D:
-                
-                ThresholdMin = (hist.Integral()/200) * 1/100           
-                xVar  = var.split('_')[-2]
-                yVar  = var.split('_')[-1]
+            hist.SetAxisRange(XMin, XMax, 'X')
 
-                # Recalculating Max Min with higher threshold - this is possible as 
-                # the hists have been rebinned to a large width
-                # Get the index of the min/max bin and the read off the value of the 
-                # low edge
-                # Set FindLastBinAbove threshold to 2 since the particles are now spread
-                # between two vars so the bins will be less filled 
-                # hist goes on for way too long
-                # For 2D hist must first get axis before using TH1 methods
-                BinMaxX = hist.GetXaxis().GetBinLowEdge(hist.FindLastBinAbove(ThresholdMin, 1))
-                BinMinX = hist.GetXaxis().GetBinLowEdge(hist.FindFirstBinAbove(0, 1))
-                BinMaxY = hist.GetYaxis().GetBinLowEdge(hist.FindLastBinAbove(ThresholdMin, 2))
-                BinMinY = hist.GetYaxis().GetBinLowEdge(hist.FindFirstBinAbove(0, 2))                
-                # Max/min = BinMax/min +- 5 (prevents max=min for BinMax/Min=0)
-                XMax = BinMaxX + 5
-                XMin = BinMinX - 5
-                YMax = BinMaxY + 5
-                YMin = BinMinY - 5        
-                if not Diff2D:
-                    Max = max(XMax, YMax)
-                    Min = min(XMin, YMin)
-                    XMax, YMax, Xmin, YMin = Max, Max, Min, Min
-                hist.SetAxisRange(XMin, XMax, 'X')
-                hist.SetAxisRange(YMin, YMax, 'Y')
+    elif hist.GetDimension() == 2:
+        if Change2D:
+            
+            ThresholdMin = (hist.Integral()/200) * 1/100
+            xVar  = var.split('_')[-2]
+            yVar  = var.split('_')[-1]
+
+            # Recalculating Max Min with higher threshold - this is possible as 
+            # the hists have been rebinned to a large width
+            # Get the index of the min/max bin and the read off the value of the 
+            # low edge
+            # Set FindLastBinAbove threshold to 2 since the particles are now spread
+            # between two vars so the bins will be less filled 
+            # hist goes on for way too long
+            # For 2D hist must first get axis before using TH1 methods
+            BinMaxX = hist.GetXaxis().GetBinLowEdge(hist.FindLastBinAbove(ThresholdMin, 1))
+            BinMinX = hist.GetXaxis().GetBinLowEdge(hist.FindFirstBinAbove(0, 1))
+            BinMaxY = hist.GetYaxis().GetBinLowEdge(hist.FindLastBinAbove(ThresholdMin, 2))
+            BinMinY = hist.GetYaxis().GetBinLowEdge(hist.FindFirstBinAbove(0, 2))                
+            # Max/min = BinMax/min +- 5 (prevents max=min for BinMax/Min=0)
+            XMax = BinMaxX + 5
+            XMin = BinMinX - 5
+            YMax = BinMaxY + 5
+            YMin = BinMinY - 5        
+            if not Diff2D:
+                Max = max(XMax, YMax)
+                Min = min(XMin, YMin)
+                XMax, YMax, Xmin, YMin = Max, Max, Min, Min
+            hist.SetAxisRange(XMin, XMax, 'X')
+            hist.SetAxisRange(YMin, YMax, 'Y')
 
     return hist, [(XMin, XMax), (YMin, YMax)]
 
 def CompareHist(HistProps, MediaDir, LimChange=True):
     '''
-        Given a histogram dictionary and 
-         
-        Histogram properties dictionary should be in the following format:
-        HistFiles = {
-            1               :   {
-                'Prefix'        21:  _Prefix,
-        1    'LoopRun'    2   :  HistFile1_LoopRun,
-1              'EventRu2n'     :   HistFile1_EventRun,
-                'AnalysisRun'   :   HistFile1_AnalysisRun,
-                'Name'          :   HistFile1_Name,
-
-                'File'          :   TFile(HistFile1_Name+'.root')
-            },
-
-            2   :   {
-                'Prefix'        :   HistFile2_Prefix,
-                'LoopRun'       :   HistFile2_LoopRun,
-                'EventRun'      :   HistFile2_EventRun,
-                'AnalysisRun'   :   HistFile2_AnalysisRun,
-                'Name'          :   HistFile2_Name,
-
-                'File'          :   TFile(HistFile2_Name+'.root')
-            },
-        }
-
-        HistProps = {
-            'Hist1'     :   {
-                'Hist'      :   Hist1,
-                'HistName'  :   HistName,
-                'HistVar'   :   HistVar,
-                'FileDict'  :   HistFiles[1]
-            },
-
-            'Hist2'     :   {
-                'Hist'      :   Hist2,
-                'HistName'  :   HistName,
-                'HistVar'   :   HistVar,
-                'FileDict'  :   HistFiles[2]
-
-            },
-            
-            'Norm'      :   Norm
-        }
+    Given a histogram dictionary and 2 histogram files (stored in HistFiles and HistProps),
+    will output comparison histograms.
     '''
     
+    # Whether to normalise the hists or not
     Norm = HistProps['Norm']
     if Norm:
         Comparison = 'Norm'
     else:
         Comparison = 'Rel'
 
+    # Initialising hist vars from the dictionaries
     Hist1Name = HistProps['Hist1']['HistName']
     Hist1Var = HistProps['Hist1']['HistVar']
     Hist1 = HistProps['Hist1']['FileDict']['File'].Get(Hist1Name+'_'+Hist1Var+';1')
@@ -403,14 +406,11 @@ def CompareHist(HistProps, MediaDir, LimChange=True):
     Hist2File_EventRun = HistProps['Hist2']['FileDict']['EventRun']
     Hist2File_AnalysisRun = HistProps['Hist2']['FileDict']['AnalysisRun']
 
-    # print(HistProps)
+    # Getting the limits of each hist
     Hist1, Lims1 = HistLims(Hist1, Hist1Name, Hist1Var, Norm=Norm)
     Hist2, Lims2 = HistLims(Hist2, Hist2Name, Hist2Var, Norm=Norm)
 
-    # Clear canvas
-    HistCan = TCanvas()
-    HistCan.cd()
-
+    # Setting the limits of both hists to be equal
     if Lims1[0][0] and Lims2[0][0] and Lims1[0][1] and Lims2[0][1]:
         XMin = min(Lims1[0][0], Lims2[0][0])
         XMax = max(Lims1[0][1], Lims2[0][1])
@@ -435,10 +435,12 @@ def CompareHist(HistProps, MediaDir, LimChange=True):
 
     # Setting universal hist options
     for hist in (Hist1, Hist2):
-        # SetBins actually introduces an offset into the graph
         hist.SetStats(False)
         hist.SetMaximum(Max)
 
+    # Initialise canvas
+    HistCan = TCanvas()
+    HistCan.cd()
 
     # Legend properties
     LegendX1 = .7
@@ -446,11 +448,13 @@ def CompareHist(HistProps, MediaDir, LimChange=True):
     LegendY1 = .875
     LegendY_interval = 0.075
     TextSize = .028
+
     Legend1 = TLegend(LegendX1, LegendY1 , LegendX1+LegendX_interval, LegendY1-LegendY_interval)
     # Stops legend overwriting canvas
     SetOwnership(Legend1,False)
     # Legend1.SetBorderSize(1)
     Legend1.SetShadowColor(2)
+
     # Entries
     Legend1.AddEntry(Hist1,'Entries: '+str(int(Hist1.GetEntries())), 'l')
     # Legend1.AddEntry(Hist1, 'Line Color', 'l')
@@ -465,6 +469,7 @@ def CompareHist(HistProps, MediaDir, LimChange=True):
     SetOwnership(Legend2,False)
     # Legend2.SetBorderSize(1)
     Legend2.SetShadowColor(2)
+
     # Entries
     Legend2.AddEntry(Hist2,'Entries: '+str(int(Hist2.GetEntries())), 'l')
     # Legend2.AddEntry(Hist2, 'Line Color', 'l')
@@ -473,6 +478,7 @@ def CompareHist(HistProps, MediaDir, LimChange=True):
     # box
     Legend2.SetEntrySeparation(.1)
 
+    # The header of each legend
     if Hist1File_Prefix != Hist2File_Prefix:
         Legend1.SetHeader(Hist1File_Prefix)
         Legend2.SetHeader(Hist2File_Prefix)
@@ -480,7 +486,7 @@ def CompareHist(HistProps, MediaDir, LimChange=True):
         Legend1.SetHeader(Hist1Name)
         Legend2.SetHeader(Hist2Name)
 
-
+    # Constructing titles and labels depending on the comparison
     HistTitle = Hist1Name+'_'+Hist2Name
 
     if Hist1File_Prefix == Hist2File_Prefix:
@@ -544,66 +550,29 @@ def CompareHist(HistProps, MediaDir, LimChange=True):
     Legend2.Draw('same')
 
     HistCan.Update()
+    # Prevents log outputs
     with LoopFuncs.Quiet():
+        # Saves the canvas
         if Hist1Name == Hist2Name:
             HistCan.SaveAs(MediaDir+Comparison+Hist1File_Prefix+Hist2File_Prefix+'/Loop'+Hist1File_LoopRun+'-'+Hist2File_LoopRun+'/Event'+Hist1File_EventRun+'-'+Hist2File_EventRun+'/Analysis'+Hist1File_AnalysisRun+'-'+Hist2File_AnalysisRun+'/'+Hist1File_LevelRun+'-'+Hist2File_LevelRun+'Level/'+Hist1Name+Hist1Var+'.png')
         else:
             HistCan.SaveAs(MediaDir+Comparison+Hist1File_Prefix+Hist2File_Prefix+'/Loop'+Hist1File_LoopRun+'-'+Hist2File_LoopRun+'/Event'+Hist1File_EventRun+'-'+Hist2File_EventRun+'/Analysis'+Hist1File_AnalysisRun+'-'+Hist2File_AnalysisRun+'/'+Hist1File_LevelRun+'-'+Hist2File_LevelRun+'Level/'+Hist1Name+Hist2Name+Hist1Var+'.png')
+        # Attempts to clean up memory
         HistCan.Delete()
 
 def SigBack(HistProps, MediaDir, LimChange=True):
     '''
-        Given a histogram dictionary and 
-         
-        Histogram properties dictionary should be in the following format:
-        HistFiles = {
-            1               :   {
-                'Prefix'        21:  _Prefix,
-        1    'LoopRun'    2   :  HistFile1_LoopRun,
-1              'EventRu2n'     :   HistFile1_EventRun,
-                'AnalysisRun'   :   HistFile1_AnalysisRun,
-                'Name'          :   HistFile1_Name,
-
-                'File'          :   TFile(HistFile1_Name+'.root')
-            },
-
-            2   :   {
-                'Prefix'        :   HistFile2_Prefix,
-                'LoopRun'       :   HistFile2_LoopRun,
-                'EventRun'      :   HistFile2_EventRun,
-                'AnalysisRun'   :   HistFile2_AnalysisRun,
-                'Name'          :   HistFile2_Name,
-
-                'File'          :   TFile(HistFile2_Name+'.root')
-            },
-        }
-
-        HistProps = {
-            'Hist1'     :   {
-                'Hist'      :   Hist1,
-                'HistName'  :   HistName,
-                'HistVar'   :   HistVar,
-                'FileDict'  :   HistFiles[1]
-            },
-
-            'Hist2'     :   {
-                'Hist'      :   Hist2,
-                'HistName'  :   HistName,
-                'HistVar'   :   HistVar,
-                'FileDict'  :   HistFiles[2]
-
-            },
-            
-            'Norm'      :   Norm
-        }
+    Given a histogram dictionary and 2 histogram files (stored in HistFiles and HistProps),
+    will output comparison signal/background histograms.
     '''
-    
+    # Whether to normalise the hists or not    
     Norm = HistProps['Norm']
     if Norm:
         Comparison = 'Norm'
     else:
         Comparison = 'Rel'
 
+    # Initialising hist vars from the dictionaries
     Hist1Name = HistProps['Hist1']['HistName']
     Hist1Var = HistProps['Hist1']['HistVar']
     Hist1 = HistProps['Hist1']['FileDict']['File'].Get(Hist1Name+'_'+Hist1Var+';1')
@@ -624,9 +593,11 @@ def SigBack(HistProps, MediaDir, LimChange=True):
     Hist2File_EventRun = HistProps['Hist2']['FileDict']['EventRun']
     Hist2File_AnalysisRun = HistProps['Hist2']['FileDict']['AnalysisRun']
 
+    # Getting the limits of each hist
     Hist1, Lims1 = HistLims(Hist1, Hist1Name, Hist1Var, Norm=Norm)
     Hist2, Lims2 = HistLims(Hist2, Hist2Name, Hist2Var, Norm=Norm)
 
+    # Setting the limits of both hists to be equal
     if Lims1[0][0] and Lims2[0][0] and Lims1[0][1] and Lims2[0][1]:
         XMin = min(Lims1[0][0], Lims2[0][0])
         XMax = max(Lims1[0][1], Lims2[0][1])
@@ -674,7 +645,7 @@ def SigBack(HistProps, MediaDir, LimChange=True):
 
     c1.cd()
 
-
+    # This will generate an upper (comparison) and lower (ratio) plot
     rp = TRatioPlot( Hist1 , Hist2 ) 
     # c1.SetTicks( 0 , 1 )
     rp.SetH1DrawOpt('HIST')
@@ -691,17 +662,20 @@ def SigBack(HistProps, MediaDir, LimChange=True):
     gStyle.SetLegendBorderSize(0)
     gStyle.SetOptTitle(0)
     gROOT.ForceStyle()
+
     # Legend properties
     LegendX1 = .7
     LegendX_interval = 0.15
     LegendY1 = .875
     LegendY_interval = 0.075
     TextSize = .028
+
     Legend1 = TLegend(LegendX1, LegendY1 , LegendX1+LegendX_interval, LegendY1-LegendY_interval)
     # Stops legend overwriting canvas
     SetOwnership(Legend1,False)
     # Legend1.SetBorderSize(1)
     Legend1.SetShadowColor(2)
+
     # Entries
     Legend1.AddEntry(Hist1,'Entries: '+str(int(Hist1.GetEntries())), 'l')
     # Legend1.AddEntry(Hist1, 'Line Color', 'l')
@@ -716,6 +690,7 @@ def SigBack(HistProps, MediaDir, LimChange=True):
     SetOwnership(Legend2,False)
     # Legend2.SetBorderSize(1)
     Legend2.SetShadowColor(2)
+
     # Entries
     Legend2.AddEntry(Hist2,'Entries: '+str(int(Hist2.GetEntries())), 'l')
     # Legend2.AddEntry(Hist2, 'Line Color', 'l')
@@ -724,18 +699,15 @@ def SigBack(HistProps, MediaDir, LimChange=True):
     # box
     Legend2.SetEntrySeparation(.1)
 
+    # The header of each legend
     if Hist1File_Prefix != Hist2File_Prefix:
         Legend1.SetHeader(Hist1File_Prefix)
         Legend2.SetHeader(Hist2File_Prefix)
     elif Hist1Name != Hist2Name:
         Legend1.SetHeader(Hist1Name)
         Legend2.SetHeader(Hist2Name)
-    
-    Legend1.Draw('same')
-    Legend2.Draw('same')
-    c1.Update() 
 
-
+    # Constructing titles and labels depending on the comparison
     HistTitle = Hist1Name+'_'+Hist2Name
 
     if Hist1File_Prefix == Hist2File_Prefix:
@@ -780,7 +752,13 @@ def SigBack(HistProps, MediaDir, LimChange=True):
         Hist1AnalysisLabel = 'Analysis'+Hist1File_AnalysisRun
         Hist2AnalysisLabel = 'Analysis'+Hist2File_AnalysisRun
 
+    Legend1.Draw('same')
+    Legend2.Draw('same')
+    c1.Update() 
+
+    # Prevents log outputs
     with LoopFuncs.Quiet():
+        # Saves the canvas        
         if Hist1Name == Hist2Name:
             c1.SaveAs(MediaDir+Comparison+Hist1File_Prefix+Hist2File_Prefix+'/Loop'+Hist1File_LoopRun+'-'+Hist2File_LoopRun+'/Event'+Hist1File_EventRun+'-'+Hist2File_EventRun+'/Analysis'+Hist1File_AnalysisRun+'-'+Hist2File_AnalysisRun+'/'+Hist1File_LevelRun+'-'+Hist2File_LevelRun+'Level/'+Hist1Name+Hist1Var+'_'+Hist1File_Prefix+'Over'+Hist2File_Prefix+'.png')
         else:

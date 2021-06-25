@@ -394,7 +394,6 @@ def EventLoop(TreeDict, Xsec, outfilename, LevelRun, LoopRun, EventRun, Analysis
     BeamElectronSelection = 0
     EventKeptNum = 0
     EventCutNum = 0
-
     ContinueCut = 0
     Continue = False
 
@@ -462,7 +461,7 @@ def EventLoop(TreeDict, Xsec, outfilename, LevelRun, LoopRun, EventRun, Analysis
                 
                 if not ParticleDict['WPlus'+WPlusdecay[0:-1]]['Check']:
                     # If no leptons were tagged (usually due to lack of leptons with correct charge), discard event
-                    Continue = True
+                    Continue = True 
                             
         # Checking W- decays
         for WMinusdecay in WMinusdecays:

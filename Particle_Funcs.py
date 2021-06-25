@@ -84,8 +84,8 @@ def RequestParticles(HistDict, ParticleDict):
 
 def GetParticleVariable(ParticleDict, ParticleList, var):
     '''
-        Returns the value or list of variables for the given category : var
-        Category is only used for q calcs.
+    Returns the value or list of variables for the given category : var
+    Category is only used for q calcs.
     '''
 
     # List of variables that are stored in all particles.
