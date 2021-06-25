@@ -1,4 +1,9 @@
+# This file contains info specific to the process 
+# ie this is the file that changes with branch
+
 EventLoopParams = {
+
+    # Dataset xsec and NEvents
     'Signal'            :   {
         'Xsec'              :   10.0e-05,
         'NEvents'           :   50000,        
@@ -8,6 +13,8 @@ EventLoopParams = {
         'Xsec'              :   0.057,
         'NEvents'           :   243899,
     },
+
+    # Cuts for the various levels
     'Level'             :   {
         'Loop'              :   {
             'Cuts'              :   {
@@ -133,6 +140,7 @@ EventLoopParams = {
         },
     },
 
+    # Boson masses and expected decays  
     'Z'         :   {
         'Decays'    :   ('Jets', None),
         'Mass'      :   91.19 #GeV

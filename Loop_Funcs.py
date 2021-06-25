@@ -1,7 +1,40 @@
+"""
+Data structures used:
+
+Holds 
+TreeDict =  {
+    'Tree'          :       TChain of all trees being used,
+    'TreeReader'    :       ExRootTreeReader(chain),
+    'Branches'  :   {
+        'Name'              :   TreeReader.UseBranch('Name'),
+        ...
+    }
+} 
+
+EventDict   =   {
+    'Count'     :   {
+        Particle Name  :   Count,
+        ...
+    },
+    'BeamElectron'  :   BeamElectron,
+    'BeamQuark'     :   BeamQuark,
+    'MissingET'     :   MissingET,
+    'PTSorted'  :   {
+        'Electron'  :   ElectronPT_sorted,
+        'Muon'      :   MuonPT_sorted,
+        'Jet'       :   JetPT_sorted
+    }
+}
+"""
+
+
 # Needed to allow use of kInfo, gErrorIgnoreLevel
 import ROOT
+
+# Used to make some functions shut up :P
 class Quiet:
-    """Context manager for silencing certain ROOT operations.  Usage:
+    """
+    Context manager for silencing certain ROOT operations.  Usage:
     with Quiet(level = ROOT.kInfo+1):
        foo_that_makes_output
 
@@ -21,9 +54,10 @@ class Quiet:
     def __exit__(self, type, value, traceback):
         ROOT.gErrorIgnoreLevel = self.oldlevel
 
+
 from ROOT import gSystem, gInterpreter, TChain, TFile, TLorentzVector
 
-# Path of Delphes directory 
+# Path of Delphes directory in your system
 gSystem.AddDynamicPath('/home/nayan/MG5_aMC_v2_8_2/Delphes/')
 gSystem.Load('libDelphes')
 
@@ -32,45 +66,14 @@ gInterpreter.Declare('#include "external/ExRootAnalysis/ExRootTreeReader.h"')
 
 from ROOT import ExRootTreeReader
 
-import config, requests, itertools
+# Import other .py files to use
+import config, requests
 import Particle_Funcs as ParticleFuncs
 import Hist_Funcs as HistFuncs
 
-'''
-Definitions of used objects:
-
-TreeDict =  {
-    'Tree'          :       chain,
-    'TreeReader'    :       TreeDict,
-    'Branches'  :   {
-        'Particle'          :   branchParticle,
-        'GenJets'           :   branchGenJets,
-    }
-} 
-
-EventDict   =   {
-    'Count'     :   {
-        'Electrons'  :   e_count,
-        'Muons'      :   mu_count,
-        'Jets'       :   jet_count
-    },
-    'BeamElectron'  :   BeamElectron,
-    'BeamQuark'     :   BeamQuark,
-    'MissingET'   :   MissingET,
-    'PTSorted'  :   {
-        'Electron'  :   ElectronPT_sorted,
-        'Muon'      :   MuonPT_sorted,
-        'Jet'       :   JetPT_sorted
-    }
-}
-
-'''
-
-
 def LoadTrees(TreeList, prefix):
     '''
-    Loads .root file with tree labeled 'Delphes' and outputs dictionary containing the number 
-    of events and branches.
+    Loads all 'Delphes' trees in the TreeList outputs a dictionary containing information and branch pointers
     '''
 
     # Create chain of root trees 
@@ -81,16 +84,19 @@ def LoadTrees(TreeList, prefix):
     # Create object of class ExRootTreeReader
     TreeReader = ExRootTreeReader(chain)
 
+    # The data set may use a different NEvents than is stored in the data set 
+    # eg. if the data set has been pruned it will have a lower NEvents than output from MG5
     if prefix=='Signal' or prefix=='Background':
         NEvents = config.EventLoopParams[prefix]['NEvents']
     else:
         NEvents = TreeReader.GetEntries()
+
     # Get pointers to branches used in this analysis
-    branchParticle = TreeReader.UseBranch('Particle')
-    branchGenJet = TreeReader.UseBranch('GenJet')
-    branchElectron = TreeReader.UseBranch('Electron')
-    branchMuon = TreeReader.UseBranch('Muon')
-    branchJet = TreeReader.UseBranch('Jet')
+    branchParticle  = TreeReader.UseBranch('Particle')
+    branchGenJet    = TreeReader.UseBranch('GenJet')
+    branchElectron  = TreeReader.UseBranch('Electron')
+    branchMuon      = TreeReader.UseBranch('Muon')
+    branchJet       = TreeReader.UseBranch('Jet')
     branchMissingET = TreeReader.UseBranch('MissingET')
 
     TreeDict =  {
@@ -115,6 +121,7 @@ def ParticleLoop(TreeDict, EventNum, LevelRun, LoopRun):
     Given a TreeDict, the event number and type of run, will return an EventDict
     '''
 
+    # Loading loop cuts for this run
     Cuts = config.EventLoopParams['Level']['Loop'][LoopRun]
 
     # Reading a specific event 
@@ -128,7 +135,7 @@ def ParticleLoop(TreeDict, EventNum, LevelRun, LoopRun):
     # List of all final state leptons
     FinalLeptons = []
     
-    # Neutrino 4momentum list
+    # MissingET 4momentum list (truth level)
     MissingParticle = []
 
     # Lists for sorting by PT in this event
@@ -171,9 +178,7 @@ def ParticleLoop(TreeDict, EventNum, LevelRun, LoopRun):
                             FinalLeptons.append(particle)              
                             mu_count += 1                
                             # Adding the muon to the sorting list                 
-                            MuonPT.append( (particle.P4().Pt(), particle) )   
-
-                    
+                            MuonPT.append( (particle.P4().Pt(), particle) )                       
                     
                 # Selecting neutrinos
                 elif abs(particle.PID) == 12 or abs(particle.PID) == 14:
@@ -186,10 +191,11 @@ def ParticleLoop(TreeDict, EventNum, LevelRun, LoopRun):
             for particle in MissingParticle:
                 MissingET = particle.P4() + MissingET
             
-
     elif LevelRun == 'Detector':
-            
+        
+        # Making BeamElectron 4vector moving with 50GeV in -z direction
         BeamElectron = TLorentzVector(0, 0, -50, 50)
+        # Impossible to know the momenta of the collided quark
         BeamQuark = False
 
         # Loop through detected electrons
@@ -283,76 +289,73 @@ def ParticleLoop(TreeDict, EventNum, LevelRun, LoopRun):
 
 def GetParticles(TreeDict, LevelRun, LoopRun, HistDict, EventNum):
     '''
+    Fills ParticleDict for a specific event.
     '''
 
     ParticleKeywords = requests.ParticleKeywords
     # Reset particle list for the new event
     for _, dictionary in HistDict.items():
         dictionary['Particles'] = []
-        
+
     # Reset ParticeDict for this event
     ParticleDict = {}
     for keyword in ParticleKeywords:
         ParticleDict = ParticleFuncs.AddParticle(keyword, ParticleDict)
 
-    # Particle loop with cuts
+    # Loop through all particles in the event
     EventDict = ParticleLoop(TreeDict, EventNum, LevelRun, LoopRun)
 
-    # Adding BeamElectron and BeamQuark
+    # BeamElectron and BeamQuark
     ParticleDict = ParticleFuncs.AddParticle('BeamElectron', ParticleDict, EventDict['BeamElectron'])
     ParticleDict = ParticleFuncs.AddParticle('BeamQuark', ParticleDict, EventDict['BeamQuark'])
 
-    # FinalElectron
+    # Detected electrons in event 
     numbElectrons = EventDict['Count']['Electrons']
+    # Leading electron
     for i in range(0, numbElectrons):
         # Checking that there is at least one electron present
         if numbElectrons != 0:
+            # Take the leading electron from the PTSorted list
             LeadingElectron = EventDict['PTSorted']['Electrons'][-1][1]
             ParticleDict = ParticleFuncs.AddParticle('LeadingElectron', ParticleDict, LeadingElectron.P4())
 
-    # Leading and SubLeading muons
+    # Detected muons in event 
     numbMuons = EventDict['Count']['Muons']
+    # Leading muons
     for i in range(0, numbMuons):
-
         # Checking that there is at least one muon present
         if numbMuons != 0:
+            # Take the ith leading muon from the PTSorted list
             Muon = EventDict['PTSorted']['Muons'][i][1]
-            # Leading Muon
+
             if i == numbMuons - 1:
                 ParticleDict = ParticleFuncs.AddParticle('LeadingMuon', ParticleDict, Muon.P4(), Muon.Charge)
-
-            # SubLeading Muon
             elif i == numbMuons - 2 and numbMuons - 2 >= 0:
                 ParticleDict = ParticleFuncs.AddParticle('SubLeadingMuon', ParticleDict, Muon.P4(), Muon.Charge)
-
             elif i == numbMuons - 3 and numbMuons - 3 >= 0:
                 ParticleDict = ParticleFuncs.AddParticle('ThirdMuon', ParticleDict, Muon.P4(), Muon.Charge)
 
-    # Jets
+    # Detected jets in event (after jet overlap removal) 
     numbJets = EventDict['Count']['Jets']
+    # Leading jets
     for i in range(0, numbJets):
-        
         # Checking that there is at least one jet present
         if numbJets != 0:
+            # Take the ith leading jet from the PTSorted list
             Jet = EventDict['PTSorted']['Jets'][i][1]
 
-            # Selecting the leading jet
             if i == numbJets - 1:
                 ParticleDict = ParticleFuncs.AddParticle('LeadingJet', ParticleDict, Jet.P4())
-            # Selecting and checking for the subleading jet
             elif i == numbJets - 2 and numbJets - 2 >= 0:
                 ParticleDict = ParticleFuncs.AddParticle('SubLeadingJet', ParticleDict, Jet.P4())
-            # Selecting and checking for the third jet 
             elif i == numbJets - 3 and numbJets - 3 >= 0:
                 ParticleDict = ParticleFuncs.AddParticle('ThirdJet', ParticleDict, Jet.P4())
-            # Selecting and checking for the fourth jet
             elif i == numbJets - 4 and numbJets - 4 >= 0:
                 ParticleDict = ParticleFuncs.AddParticle('FourthJet', ParticleDict, Jet.P4())
-            # Any extra jets
             else:
                 ParticleDict = ParticleFuncs.AddParticle(str(i+1)+'Jet', ParticleDict, Jet.P4())
 
-    # MissingET
+    # MET
     ParticleDict = ParticleFuncs.AddParticle('MissingET', ParticleDict, EventDict['MissingET'])
 
     # Count hists
@@ -364,40 +367,54 @@ def GetParticles(TreeDict, LevelRun, LoopRun, HistDict, EventNum):
 
 def EventLoop(TreeDict, Xsec, outfilename, LevelRun, LoopRun, EventRun, AnalysisRun):
     '''
+    Loops over all events to fill hists.
+    Includes further analysis on each event to decide what to keep and discard.
+    Some more complicated particles are also calculated here. (eg. sum of multiple particles)
     '''
 
     # Open output
     outfile = TFile(outfilename+'.root','RECREATE')
 
+    # Get HistDict
     HistDict = requests.HistDict
 
     # Initialise requested hists from HistDict
     HistDict = HistFuncs.MakeHists(HistDict)
 
+    # Get event and analysis cuts for this run
     EventCuts = config.EventLoopParams['Level']['Event'][EventRun]
     AnalysisCuts = config.EventLoopParams['Level']['Analysis'][AnalysisRun] 
 
+    # Get the expected boson decays for this process
     Zdecays = config.EventLoopParams['Z']['Decays']
     WPlusdecays = config.EventLoopParams['WPlus']['Decays']
     WMinusdecays = config.EventLoopParams['WMinus']['Decays']
     
+    # Initialise some useful debugging variables
     BeamElectronSelection = 0
     EventKeptNum = 0
     EventCutNum = 0
     ContinueCut = 0
     Continue = False
+
     # Looping through events
     for EventNum in range(TreeDict['TreeReader'].GetEntries()):
         
+        # Progress output every 10000 events
         if EventNum % 10000 == 0:
             print(EventNum, ' events completed.')
 
+        # Fill the ParticleDict for this event
         HistDict, ParticleDict, EventDict = GetParticles(TreeDict, LevelRun, LoopRun, HistDict, EventNum)
-        
-        # MissingET cuts
-        if EventDict['MissingET'].Et() < AnalysisCuts['MissingET']['Et'][0] or AnalysisCuts['MissingET']['Et'][1] < EventDict['MissingET'].Et():
+
+        # Event cuts
+        if EventDict['Count']['Electrons'] < EventCuts['Electrons'] or EventDict['Count']['Muons'] < EventCuts['Muons'] or EventDict['Count']['Jets'] < EventCuts['Jets']:
             continue
 
+        # MET cuts
+        if EventDict['MissingET'].Et() < AnalysisCuts['MissingET']['Et'][0] or AnalysisCuts['MissingET']['Et'][1] < EventDict['MissingET'].Et():
+            continue
+        
         # LeadingJet SubLeadingJet Cut
         if ParticleDict['LeadingJet']['Check']:
             if ParticleDict['LeadingJet']['Pt'] < AnalysisCuts['LeadingJet']['Pt'][0] or AnalysisCuts['LeadingJet']['Pt'][1] < ParticleDict['LeadingJet']['Pt']:
@@ -406,10 +423,6 @@ def EventLoop(TreeDict, Xsec, outfilename, LevelRun, LoopRun, EventRun, Analysis
             if ParticleDict['SubLeadingJet']['Pt'] < AnalysisCuts['SubLeadingJet']['Pt'][0] or AnalysisCuts['SubLeadingJet']['Pt'][1] < ParticleDict['SubLeadingJet']['Pt']:
                 continue        
 
-        # Event cuts
-        if EventDict['Count']['Electrons'] < EventCuts['Electrons'] or EventDict['Count']['Muons'] < EventCuts['Muons'] or EventDict['Count']['Jets'] < EventCuts['Jets']:
-            continue
-
         # MuonSum
         MuonSum = TLorentzVector() 
         for Particle in EventDict['PTSorted']['Muons']:
@@ -417,6 +430,7 @@ def EventLoop(TreeDict, Xsec, outfilename, LevelRun, LoopRun, EventRun, Analysis
             MuonSum += muon.P4()
         ParticleDict = ParticleFuncs.AddParticle('MuonSum', ParticleDict, MuonSum)
 
+        # Checking Zdecays
         EventCutNum += 1
         for Zdecay in Zdecays:
             if Zdecay == None:
@@ -424,14 +438,18 @@ def EventLoop(TreeDict, Xsec, outfilename, LevelRun, LoopRun, EventRun, Analysis
             elif Zdecays[0] == Zdecays[1]:
                 continue
             else:
+                # If the decay does occur in this process, use an InvMassCheck to decide what particles to tag
                 ParticleDict, EventDict = ParticleFuncs.InvMassCheck(Zdecay, 'Z', ParticleDict, EventDict, EventCuts)            
 
+        # Checking W+ decays
         for WPlusdecay in WPlusdecays:
             if WPlusdecay == None:
                 continue
             elif WPlusdecay == 'Jets':
+                # If the decay is to jets, use an InvMassCheck
                 ParticleDict, EventDict = ParticleFuncs.InvMassCheck(WPlusdecay, 'WPlus', ParticleDict, EventDict, EventCuts)          
             else:
+                # If the decays is to leptons, take the leading lepton with the correct charge
                 WPlusLeptons = EventDict['PTSorted'][WPlusdecay]
                 numbWPlusLeptons = len(WPlusLeptons)
                 for i in range(0, numbWPlusLeptons):
@@ -442,16 +460,21 @@ def EventLoop(TreeDict, Xsec, outfilename, LevelRun, LoopRun, EventRun, Analysis
                             ParticleDict = ParticleFuncs.AddParticle('WPlus'+WPlusdecay[0:-1], ParticleDict, WPlusLepton.P4(), WPlusLepton.Charge)      
                 
                 if not ParticleDict['WPlus'+WPlusdecay[0:-1]]['Check']:
-                    Continue = True
+                    # If no leptons were tagged (usually due to lack of leptons with correct charge), discard event
+                    Continue = True 
                             
-
-
+        # Checking W- decays
         for WMinusdecay in WMinusdecays:
             if WMinusdecay == None:
                 continue     
             elif WMinusdecay == 'Jets':
+                # If the decay is to jets, use an InvMassCheck            
                 ParticleDict, EventDict = ParticleFuncs.InvMassCheck(WMinusdecay, 'WMinus', ParticleDict, EventDict, EventCuts)
             else:
+                # If the decays is to leptons, take the leading lepton with the correct charge
+
+                # If the boson could decay to electrons, 
+                # differentiation between the beam electron and decay election would have to be implimented
                 WMinusLeptons = EventDict['PTSorted'][WMinusdecay]
                 numbWMinusLeptons = len(WMinusLeptons)
                 for i in range(0, numbWMinusLeptons):
@@ -462,13 +485,14 @@ def EventLoop(TreeDict, Xsec, outfilename, LevelRun, LoopRun, EventRun, Analysis
                             ParticleDict = ParticleFuncs.AddParticle('WMinus'+WMinusdecay[0:-1], ParticleDict, WMinusLepton.P4(), WMinusLepton.Charge)      
                 
                 if not ParticleDict['WMinus'+WMinusdecay[0:-1]]['Check']:
+                    # If no leptons were tagged (usually due to lack of leptons with correct charge), discard event
                     Continue = True
 
         if Continue:
+            # Continue variable is used within loops to indicate whether
+            # the event is to be discarded
             ContinueCut += 1
             continue
-
-
 
         # FinalBeamElectron selection
         if len(EventDict['PTSorted']['Electrons']) != 0:
@@ -544,6 +568,8 @@ def EventLoop(TreeDict, Xsec, outfilename, LevelRun, LoopRun, EventRun, Analysis
             WMinusMuon_qLepton = ParticleFuncs.GetParticleVariable(ParticleDict, [ParticleDict['WMinusMuon']], 'qLepton')
             FinalBeamElectron_qLepton = ParticleFuncs.GetParticleVariable(ParticleDict, [ParticleDict['FinalBeamElectron']], 'qLepton')
 
+            # Keeps track of how many events have correct
+            # selection of the beam electron vs the decay muon
             if FinalBeamElectron_qLepton < WMinusMuon_qLepton:
                 BeamElectronSelection += 1
 
@@ -554,7 +580,10 @@ def EventLoop(TreeDict, Xsec, outfilename, LevelRun, LoopRun, EventRun, Analysis
         EventKeptNum += 1
 
     # Get scaling factor for histograms
-    Scale = HistFuncs.GetScale(Xsec, TreeDict['NEvents'])
+    # L_int(Data) = 1 [ab-1] = 1000000 [pb-1]
+    # L_int(MC) = N/Xsec [pb-1]
+    # Scale = L_int(Data) / L_int(MC)
+    Scale = 1000000 / (TreeDict['NEvents']/Xsec)
 
     # Scaling and altering hist lims
     for category, attributes in HistDict.items():
