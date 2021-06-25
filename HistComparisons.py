@@ -214,7 +214,8 @@ for FilePair in FileComparisons:
                                     HistFuncs.SigBack(HistProps, MediaDir)
 
                         for key, properties in HistCompDict.items():
-
+                            
+                            # Make a comparison for each var in list 
                             for var in properties['Var']:
                                 # If the hist is 2D
                                 if type(var) == tuple and len(var) == 2:

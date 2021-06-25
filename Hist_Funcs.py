@@ -6,41 +6,6 @@ import Loop_Funcs as LoopFuncs
 '''
 Definitions of used objects:
 
-HistDict =        {
-    category        :   {
-        Requests        :   {
-            Vars            :   [],
-            Particles       :   []
-        },
-        
-        Dimensions  :   int(),
-        Particles   :   [],
-        Hists       :   {
-            name        :   hist, ...
-        },
-    }
-}
-
-for 1D:
-
-    Requests        :   {
-        Vars        :   [var1, var2, ...],
-    },
-
-    Dimensions  :   1,
-    Particles   :   [particle1, particle2, ...],
-    Hists       :   {name1 : hist1, ... },
-
-for 2D:
-
-    Requests        :   {
-        Vars        :   [(xvar1, yvar1), (xvar2, yvar2) ...],
-    },
-
-    Dimensions  :   2,
-    Particles   :   [(xParticles1), (yParticles1), (xParticles2), (yParticles2)],
-    Hists       :   {name1 : hist1, ... },
-
 HistFiles = {
     1               :   {
         'Prefix'        :   HistFile1_Prefix,
