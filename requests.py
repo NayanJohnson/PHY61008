@@ -1,19 +1,13 @@
-# Dictionary that will contain all info needed to produce histograms.
-# 'Request' dictionary is used to tell the script what variables to
-# plot and what particles the histogram requires
+# This file contains data structures used by functions that are not dependant on the process
 
+# Variable strings recognised
 VarKeywords = [
     'Count', 'Eta', 'Phi', 'Rapidity', 'Pt', 'Et', 'E', 'M', 'Mt', 'qeMethod', 'qLepton', 
     'dEta', 'dPhi', 'dRapidity', 'dR_Eta', 'dR_Rap',
     'Eta_Sum', 'Phi_Sum', 'Rapidity_Sum', 'Pt_Sum', 'Et_Sum', 'E_Sum'
 ]
 
-# Tuples of two variables will be treated as 2 dimensions in a 2D histogram
-
-
-# Particle keywords:
-Particles = ['Electron', 'Jet', 'Muon']
-
+# Particle strings recognised
 ParticleKeywords = [
     'BeamQuark', 'FinalBeamJet', 
     'LeadingJet', 'SubLeadingJet', 'ThirdJet',
@@ -30,6 +24,7 @@ ParticleKeywords = [
     'ZLeadingJet', 'ZSubLeadingJet', 
 ]
 
+# Variable dependant histogram parameters 
 VarParams = {
     'Nbins'     :   150,
     'LowRangeNbinsScale'    
@@ -129,28 +124,46 @@ VarParams = {
     },
 }
 
-# No entries here can have _ as this is how variables are seperated in the code
-# When fully filled:
-# HistDict =        {
-#   Catagory        :   {
-#       Requests        :   {
-#           Vars            :   [],
-#           Particles       :   []
-#       },
 
-#       Vars        :   [],
-#       Particles   :   [],
-#       Hists       :   {
-#           Var1        :   Hist1,
-#           Var2        :   Hist2
-#       }
-#   }
-# }
-# Request Particle list has two layers:
-#[ All particles here are in the same histogram
-#   [ All particles here are in the variable calculation
-#  ]
-# ]
+# Dictionary of all histograms to be filled
+# Entries are used to request histograms to be constructed and filled 
+
+'''
+HistDict =        {
+    category        :   {
+        Requests        :   {
+            Vars            :   [],
+            Particles       :   []
+        },
+        
+        Dimensions  :   int(),
+        Particles   :   [],
+        Hists       :   {
+            name        :   hist, ...
+        },
+    }
+}
+
+for 1D:
+
+    Requests        :   {
+        Vars        :   [var1, var2, ...],
+    },
+
+    Dimensions  :   1,
+    Particles   :   [particle1, particle2, ...],
+    Hists       :   {name1 : hist1, ... },
+
+for 2D:
+
+    Requests        :   {
+        Vars        :   [(xvar1, yvar1), (xvar2, yvar2) ...],
+    },
+
+    Dimensions  :   2,
+    Particles   :   [(xParticles1), (yParticles1), (xParticles2), (yParticles2)],
+    Hists       :   {name1 : hist1, ... },
+'''
 
 HistDict =  {
     'Electrons'     :   {
@@ -820,21 +833,21 @@ HistDict =  {
 }
 
 # Dictionary to request hist comparisons
-# Format:
-# HistComparisonDict =  {
-#   'HistKey'           :   {
-#       'Hist1'             :   {
-#           'Name'              :   Hist1Name,
-#           'File'              :   Hist1FileIndex
-#       },
-#       
-#       'Hist2'         :   {
-#           'Name'          :   Hist1Name,
-#           'File'          :   Hist2FileIndex
-#       },
-#
-#       'Var'           :   HistVars
-#   },
+
+'''
+HistComparisonDict =  {
+  'HistKey'           :   {
+      'Hist1'             :   {
+          'Name'              :   Hist1Name,
+      },
+      
+      'Hist2'         :   {
+          'Name'          :   Hist1Name,
+      },
+
+      'Var'           :   [HistVars]
+  },
+'''
 
 HistComparisonDict =    {
 
