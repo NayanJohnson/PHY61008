@@ -1,4 +1,9 @@
+# This file contains info specific to the process 
+# ie this is the file that changes with branch
+
 EventLoopParams = {
+
+    # Dataset xsec and NEvents
     'Signal'            :   {
         'Xsec'              :   0,
         'NEvents'           :   0,        
@@ -8,16 +13,17 @@ EventLoopParams = {
         'Xsec'              :   0,
         'NEvents'           :   0,
     },
-    
+
+    # Cuts for the various levels
     'Level'             :   {
         'Loop'              :   {
             'Cuts'              :   {
-                'e_Eta'             :   (-4.3, 4.9),
-                'e_Pt'              :   5,
-                'mu_Eta'            :   (-4, 4),
-                'mu_Pt'             :   5,  
-                'jet_Eta'           :   (-4.4, 5),
-                'jet_Pt'            :   3,                   
+                'e_Eta'             :   (0, 0),
+                'e_Pt'              :   0,
+                'mu_Eta'            :   (0, 0),
+                'mu_Pt'             :   0,  
+                'jet_Eta'           :   (0, 0),
+                'jet_Pt'            :   0,                   
             },
 
             'NoCuts'            :   {
@@ -44,7 +50,6 @@ EventLoopParams = {
             },
         },
 
-
         'Analysis'     :   {
             'Cuts'              :   {
                 
@@ -66,7 +71,7 @@ EventLoopParams = {
                     'M'                 :   (0, float('inf')),
                     'Mt'                :   (0, float('inf')),
                     'Pt'                :   (0, float('inf')),                    
-                },             
+                },       
 
                 'ZSubLeading_FinalBeam_Jets' 
                                     :   {
@@ -74,8 +79,7 @@ EventLoopParams = {
                     'M'                 :   (0, float('inf')),
                     'Mt'                :   (0, float('inf')),
                     'Pt'                :   (0, float('inf')),                    
-                },       
-
+                }, 
 
                 'MissingET'         :   {
                     'Et'                :   (0, float('inf')),
@@ -87,7 +91,7 @@ EventLoopParams = {
 
                 'FinalBeamJet'      :   {
                     'Pt'                :   (0, float('inf')),
-                },                                
+                },               
             },
 
             'NoCuts'            :   {
@@ -107,10 +111,10 @@ EventLoopParams = {
                 'ZLeading_FinalBeam_Jets' 
                                     :   {
                     'dR_Eta'            :   (0, float('inf')),
-                    'M'                 :   (0, float('inf')),
+                    'M'                 :   (0, float('inf')),  
                     'Mt'                :   (0, float('inf')),
                     'Pt'                :   (0, float('inf')),                    
-                },     
+                },      
 
                 'ZSubLeading_FinalBeam_Jets' 
                                     :   {
@@ -120,10 +124,11 @@ EventLoopParams = {
                     'Pt'                :   (0, float('inf')),                    
                 },       
 
+
                 'MissingET'         :   {
                     'Et'                :   (0, float('inf')),
                 },
-
+                
                 'FinalBeamElectron' :   {
                     'Eta'               :   (float('-inf'), float('inf')),
                 },
@@ -135,6 +140,7 @@ EventLoopParams = {
         },
     },
 
+    # Boson masses and expected decays  
     'Z'         :   {
         'Decays'    :   (None, None),
         'Mass'      :   91.19 #GeV
